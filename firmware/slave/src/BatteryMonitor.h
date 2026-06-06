@@ -1,0 +1,7 @@
+#pragma once
+
+class BatteryMonitor {
+ public:
+  void begin();
+  int readPercent();
+};

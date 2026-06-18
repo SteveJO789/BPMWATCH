@@ -40,6 +40,7 @@ Current bring-up status, 2026-06-18:
 
 ## UWB Pair Test
 
+- Arduino IDE users should follow `docs/arduino-ide-uwb-pair-test.md` or Thai version `docs/arduino-ide-uwb-pair-test-th.md`.
 - [ ] Master <-> Slave 1 at 1m, 2m, 5m, 10m.
 - [ ] Master <-> Slave 2 at 1m, 2m, 5m, 10m.
 - [ ] Slave 1 <-> Slave 2 at 1m, 2m, 5m, 10m.

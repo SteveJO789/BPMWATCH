@@ -56,6 +56,7 @@ Each slave:
 - `firmware/tests`: small hardware validation projects.
 - `firmware/sim/wokwi`: Wokwi simulation project with mocked UWB, BPM, battery, and GY-511 data.
 - `tools/mac-address-scanner`: prints ESP32 MAC address for node setup.
+- `docs/arduino-ide-uwb-pair-test.md` and `docs/arduino-ide-uwb-pair-test-th.md`: Arduino IDE guides for the BU01/DW1000 pair test.
 
 ## Build Instructions
 

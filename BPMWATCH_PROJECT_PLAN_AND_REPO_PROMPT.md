@@ -118,7 +118,7 @@ But 1 master + 1 slave is **not enough** for the final relative 2D map.
 | Component | Recommended Spec | Quantity |
 |---|---:|---:|
 | ESP32 DevKit / ESP32-WROOM-32 | 3.3V logic, Wi-Fi, 4MB flash or more | 1 |
-| BU01 UWB DW1000 Module | 3.3V only, UART/SPI | 1 |
+| B&T BU01 DW1000 LDO UWB Module | Confirm UART/SPI mode, power input pin, and 3.3V-safe logic | 1 |
 | Li-Po Battery | 3.7V, 1000-1500mAh | 1 |
 | TP4056 Type-C Charger | With battery protection | 1 |
 | 3.3V Regulator | ME6211 / AP2112 / buck-boost 3.3V | 1 |
@@ -141,8 +141,8 @@ Each slave node should contain:
 | Component | Recommended Spec | Quantity per Slave |
 |---|---:|---:|
 | ESP32 DevKit / ESP32-WROOM-32 | 3.3V logic, Wi-Fi, 4MB flash or more | 1 |
-| BU01 UWB DW1000 Module | 3.3V only, UART/SPI | 1 |
-| ST7789 TFT Display | 1.3 inch, 240x240, SPI | 1 |
+| B&T BU01 DW1000 LDO UWB Module | Confirm UART/SPI mode, power input pin, and 3.3V-safe logic | 1 |
+| IPS TFT LCD 240x240 ST7789 Display | Module labels SCL/SCK, SDA/MOSI, BLC, DC, and RES | 1 |
 | MAX30102 Heart Rate Sensor | I2C heart-rate / pulse oximeter module | 1 |
 | Li-Po Battery | 3.7V, 1000-1500mAh | 1 |
 | TP4056 Type-C Charger | With battery protection | 1 |
@@ -200,7 +200,7 @@ From these 3 distances, the master can draw a triangle. That triangle is useful 
 
 ### 6.3 Display Choice
 
-Use **ST7789 1.3 inch 240x240 SPI** for the slave screen.
+Use an **IPS TFT LCD 240x240 ST7789 display module** for the slave screen. The module exposes `SCL`, `SDA`, `BLC`, `DC`, and `RES`; on this module `SCL` is SPI `SCK` and `SDA` is SPI `MOSI`, not I2C.
 
 The display should show:
 
@@ -316,7 +316,7 @@ bpmwatch/
 |   |       `-- UwbRanging.cpp
 |   |-- tests/
 |   |   |-- esp32_blink/
-|   |   |-- st7789_test/
+  |   |   |-- st7789_display_test/
 |   |   |-- max30102_test/
 |   |   |-- uwb_pair_test/
 |   |   |-- uwb_triangle_test/
@@ -381,7 +381,7 @@ Clean repository structure
 
 - [ ] Buy 3 ESP32 boards
 - [ ] Buy 3 BU01 UWB modules
-- [ ] Buy 2 ST7789 displays
+- [ ] Buy 2 IPS TFT LCD 240x240 ST7789 display modules
 - [ ] Buy 2 MAX30102 sensors
 - [ ] Buy 3 Li-Po batteries
 - [ ] Buy 3 TP4056 Type-C charger modules
@@ -393,6 +393,11 @@ Clean repository structure
 - [ ] Buy perfboards
 - [ ] Buy watch straps
 - [ ] Buy enclosure or prepare 3D printing
+
+Confirmed UWB module type, 2026-06-18:
+
+- B&T BU01 DW1000 LDO UWB breakout module
+- Do not assume the interface mode from the DW1000 chip name alone; confirm the breakout UART/SPI mode and pin labels on the actual module.
 
 Output:
 
@@ -406,15 +411,23 @@ Enough hardware for 1 master + 2 slave relative map prototype
 
 ### 3.1 ESP32 Test
 
-- [ ] Flash blink firmware
-- [ ] Open Serial Monitor
-- [ ] Print MAC address
-- [ ] Label each board as Master, Slave 1, Slave 2
-- [ ] Save MAC addresses in docs/pin-map.md or docs/node-id.md
+- [x] Flash blink firmware
+- [x] Open Serial Monitor
+- [x] Print MAC address
+- [x] Label each board as Master, Slave 1, Slave 2
+- [x] Save MAC addresses in docs/pin-map.md or docs/node-id.md
 
-### 3.2 ST7789 Display Test
+Bring-up note, 2026-06-18:
 
-- [ ] Wire ST7789 display to ESP32
+- Master MAC: `FC:FA:31:FE:8C:E0`
+- Slave 1 MAC: `1C:75:C4:F4:E9:D4`
+- Slave 2 MAC: `0C:8A:D3:7C:E5:A4`
+- Current milestone reached: Phase 3.2 ST7789 240x240 display test.
+
+### 3.2 ST7789 240x240 Display Test
+
+- Status: in progress. ESP32 board identity and MAC labeling are complete; display wiring and visual checks are the active next work.
+- [ ] Wire ST7789 240x240 display to ESP32
 - [ ] Print text
 - [ ] Draw 2D map placeholder
 - [ ] Draw Master, Slave 1, and Slave 2 labels
@@ -429,10 +442,26 @@ Enough hardware for 1 master + 2 slave relative map prototype
 - [ ] Reset BPM when finger is removed
 - [ ] Print BPM to Serial Monitor
 
-### 3.4 UWB Pair Test
+### 3.4 GY-511 / LSM303DLHC Test
 
-- [ ] Connect BU01 to ESP32
-- [ ] Confirm 3.3V power
+- [ ] Wire GY-511 VCC to 3.3V, GND to GND, SDA to GPIO21, and SCL to GPIO22
+- [ ] Run `firmware/tests/i2c_scanner_test`
+- [ ] Confirm accelerometer address `0x19`
+- [ ] Confirm magnetometer address `0x1E`
+- [ ] If MAX30102 shares the I2C bus, confirm it appears at `0x57`
+- [ ] Run `firmware/tests/gy511_test`
+- [ ] Confirm Serial Monitor prints `GY-511 init OK`
+- [ ] Tilt the sensor and confirm accelerometer X/Y/Z changes
+- [ ] Rotate the sensor and confirm magnetometer X/Y/Z changes
+- [ ] Confirm heading output stays in the `0-359 deg` range
+- [ ] Repeat for Slave 1 GY-511 module
+- [ ] Repeat for Slave 2 GY-511 module
+- [ ] Record wiring or heading stability issues before slave firmware integration
+
+### 3.5 UWB Pair Test
+
+- [ ] Connect B&T BU01 DW1000 LDO module to ESP32
+- [ ] Confirm power input pin and 3.3V-safe signal levels
 - [ ] Test UART/SPI communication
 - [ ] Measure 1m, 2m, 5m, 10m
 - [ ] Repeat for M-S1, M-S2, and S1-S2 pairs
@@ -697,7 +726,7 @@ Complete project documentation
 Use this order to reduce risk:
 
 1. Test ESP32 boards
-2. Test ST7789 display
+2. Test ST7789 240x240 display
 3. Test MAX30102
 4. Test BU01 UWB pair ranging
 5. Test UWB triangle ranging with 3 nodes
@@ -789,7 +818,7 @@ bpmwatch/
 |   |       `-- UwbRanging.cpp
 |   |-- tests/
 |   |   |-- esp32_blink/
-|   |   |-- st7789_test/
+  |   |   |-- st7789_display_test/
 |   |   |-- max30102_test/
 |   |   |-- uwb_pair_test/
 |   |   |-- uwb_triangle_test/
@@ -869,7 +898,7 @@ Generate starter content for:
 
 9. docs/wiring-slave.md
 - Include slave wiring notes
-- Include ST7789, MAX30102, battery, and UWB wiring notes
+- Include ST7789 240x240 display, MAX30102, battery, and UWB wiring notes
 
 10. docs/limitations.md
 - Mention that this is not a true absolute 2D map
@@ -907,7 +936,7 @@ Generate starter content for:
 16. Test projects
 - Add minimal test sketches or README files for:
   - ESP32 blink
-  - ST7789 display
+  - ST7789 240x240 display
   - MAX30102
   - UWB pair ranging
   - UWB triangle ranging
@@ -967,7 +996,7 @@ Checklist:
 
 - [ ] ESP32 flash success
 - [ ] MAC address printed for all 3 boards
-- [ ] ST7789 screen works
+- [ ] ST7789 240x240 screen works
 - [ ] MAX30102 raw IR value works
 - [ ] BU01 UWB pair communication works
 - [ ] Battery power is stable

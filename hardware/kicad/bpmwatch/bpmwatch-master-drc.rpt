@@ -1,0 +1,93 @@
+** Drc report for bpmwatch-master.kicad_pcb **
+** Created on 2026-06-09T22:11:46+0700 **
+
+** Found 13 DRC violations **
+[drill_out_of_range]: Hole size out of range (board setup constraints min hole 0.3000 mm; actual 0.2000 mm)
+    Rule: board setup constraints; error
+    @(97.0450 mm, 114.0775 mm): PTH pad 39 [<no net>] of U3
+[drill_out_of_range]: Hole size out of range (board setup constraints min hole 0.3000 mm; actual 0.2000 mm)
+    Rule: board setup constraints; error
+    @(97.0450 mm, 115.6025 mm): PTH pad 39 [<no net>] of U3
+[drill_out_of_range]: Hole size out of range (board setup constraints min hole 0.3000 mm; actual 0.2000 mm)
+    Rule: board setup constraints; error
+    @(97.8075 mm, 113.3150 mm): PTH pad 39 [<no net>] of U3
+[drill_out_of_range]: Hole size out of range (board setup constraints min hole 0.3000 mm; actual 0.2000 mm)
+    Rule: board setup constraints; error
+    @(97.8075 mm, 114.8400 mm): PTH pad 39 [<no net>] of U3
+[drill_out_of_range]: Hole size out of range (board setup constraints min hole 0.3000 mm; actual 0.2000 mm)
+    Rule: board setup constraints; error
+    @(97.8075 mm, 116.3650 mm): PTH pad 39 [<no net>] of U3
+[drill_out_of_range]: Hole size out of range (board setup constraints min hole 0.3000 mm; actual 0.2000 mm)
+    Rule: board setup constraints; error
+    @(98.5700 mm, 114.0775 mm): PTH pad 39 [<no net>] of U3
+[drill_out_of_range]: Hole size out of range (board setup constraints min hole 0.3000 mm; actual 0.2000 mm)
+    Rule: board setup constraints; error
+    @(98.5700 mm, 115.6025 mm): PTH pad 39 [<no net>] of U3
+[drill_out_of_range]: Hole size out of range (board setup constraints min hole 0.3000 mm; actual 0.2000 mm)
+    Rule: board setup constraints; error
+    @(99.3325 mm, 113.3150 mm): PTH pad 39 [<no net>] of U3
+[drill_out_of_range]: Hole size out of range (board setup constraints min hole 0.3000 mm; actual 0.2000 mm)
+    Rule: board setup constraints; error
+    @(99.3325 mm, 114.8400 mm): PTH pad 39 [<no net>] of U3
+[drill_out_of_range]: Hole size out of range (board setup constraints min hole 0.3000 mm; actual 0.2000 mm)
+    Rule: board setup constraints; error
+    @(99.3325 mm, 116.3650 mm): PTH pad 39 [<no net>] of U3
+[drill_out_of_range]: Hole size out of range (board setup constraints min hole 0.3000 mm; actual 0.2000 mm)
+    Rule: board setup constraints; error
+    @(100.0950 mm, 114.0775 mm): PTH pad 39 [<no net>] of U3
+[drill_out_of_range]: Hole size out of range (board setup constraints min hole 0.3000 mm; actual 0.2000 mm)
+    Rule: board setup constraints; error
+    @(100.0950 mm, 115.6025 mm): PTH pad 39 [<no net>] of U3
+[invalid_outline]: Board has malformed outline (no edges found on Edge.Cuts layer)
+    Local override; error
+    @(0.0000 mm, 0.0000 mm): PCB
+
+** Found 11 unconnected pads **
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(90.5000 mm, 124.0100 mm): Pad 14 [GND_M] of U3 on F.Cu
+    @(87.6550 mm, 131.1625 mm): PTH pad 1 [GND_M] of BT1
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(98.7050 mm, 129.6125 mm): Pad 1 [GND_M] of C1 on F.Cu
+    @(90.5000 mm, 124.0100 mm): Pad 14 [GND_M] of U3 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(102.1150 mm, 138.1125 mm): PTH pad 3 [GND_M] of U1
+    @(98.7050 mm, 129.6125 mm): Pad 1 [GND_M] of C1 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(99.5750 mm, 138.1125 mm): PTH pad 4 [SW_IN_M] of U1
+    @(113.1550 mm, 136.1125 mm): PTH pad 1 [SW_IN_M] of SW1
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(93.5400 mm, 125.2600 mm): Pad 15 [+3V3_M] of U3 on F.Cu
+    @(100.6050 mm, 129.6125 mm): Pad 2 [+3V3_M] of C1 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(83.6550 mm, 123.6125 mm): PTH pad 7 [UWB_MOSI_M] of U4
+    @(90.5000 mm, 117.6600 mm): Pad 9 [UWB_MOSI_M] of U3 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(83.6550 mm, 121.0725 mm): PTH pad 6 [UWB_MISO_M] of U4
+    @(90.5000 mm, 116.3900 mm): Pad 8 [UWB_MISO_M] of U3 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(100.5750 mm, 133.1125 mm): PTH pad 3 [VIN_REG_M] of U2
+    @(113.1550 mm, 134.1125 mm): PTH pad 2 [VIN_REG_M] of SW1
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(83.6550 mm, 126.1525 mm): PTH pad 8 [UWB_SCK_M] of U4
+    @(90.5000 mm, 118.9300 mm): Pad 10 [UWB_SCK_M] of U3 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(83.6550 mm, 118.5325 mm): PTH pad 5 [UWB_CS_M] of U4
+    @(90.5000 mm, 115.1200 mm): Pad 7 [UWB_CS_M] of U3 on F.Cu
+[unconnected_items]: Missing connection between items
+    Local override; error
+    @(83.6550 mm, 113.4525 mm): PTH pad 3 [UWB_RST_M] of U4
+    @(90.5000 mm, 108.7700 mm): Pad 2 [UWB_RST_M] of U3 on F.Cu
+
+** Found 0 Footprint errors **
+
+** End of Report **

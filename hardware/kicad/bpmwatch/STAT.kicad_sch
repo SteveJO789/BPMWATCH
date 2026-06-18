@@ -1,0 +1,5493 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "e42585d0-2e1d-502e-8438-b8cb180404dc")
+	(paper "A3")
+	(lib_symbols
+		(symbol "BPMWATCH:602030_LIPO"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "BT"
+				(at 0 -11 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "602030 Li-Po cell"
+				(at 0 11 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "602030_LIPO_0_1"
+				(rectangle
+					(start -10 -8)
+					(end 10 8)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "602030_LIPO_1_1"
+				(pin power_out line
+					(at 12.54 4 180)
+					(length 2.54)
+					(name "B-"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at 12.54 -4 180)
+					(length 2.54)
+					(name "B+"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "BPMWATCH:BATTERY_DIVIDER_RESISTOR"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "R"
+				(at 0 -8 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Battery monitor divider"
+				(at 0 8 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "BATTERY_DIVIDER_RESISTOR_0_1"
+				(rectangle
+					(start -9 -5)
+					(end 9 5)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "BATTERY_DIVIDER_RESISTOR_1_1"
+				(pin passive line
+					(at -11.54 0 0)
+					(length 2.54)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 11.54 0 180)
+					(length 2.54)
+					(name "B"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "BPMWATCH:BU01_UWB_BREAKOUT"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at 0 -20 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "BU01 UWB breakout"
+				(at 0 20 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "BU01_UWB_BREAKOUT_0_1"
+				(rectangle
+					(start -17 -17)
+					(end 17 17)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "BU01_UWB_BREAKOUT_1_1"
+				(pin power_in line
+					(at -19.54 -6 0)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -19.54 -10 0)
+					(length 2.54)
+					(name "3V3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 19.54 10 180)
+					(length 2.54)
+					(name "RST"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin output line
+					(at 19.54 6 180)
+					(length 2.54)
+					(name "IRQ"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 19.54 2 180)
+					(length 2.54)
+					(name "CS"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin output line
+					(at 19.54 -2 180)
+					(length 2.54)
+					(name "MISO"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 19.54 -6 180)
+					(length 2.54)
+					(name "MOSI/RX"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 19.54 -10 180)
+					(length 2.54)
+					(name "SCK/TX"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "BPMWATCH:ESP32_WROOM_32_MODULE"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at 0 -20 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "ESP32-WROOM-32 module/dev board"
+				(at 0 20 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://www.espressif.com/sites/default/files/documentation/esp32-wroom-32_datasheet_en.pdf"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "ESP32_WROOM_32_MODULE_0_1"
+				(rectangle
+					(start -17 -17)
+					(end 17 17)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "ESP32_WROOM_32_MODULE_1_1"
+				(pin input line
+					(at -19.54 14 0)
+					(length 2.54)
+					(name "EN"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "15"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -19.54 10 0)
+					(length 2.54)
+					(name "GPIO14/UWB_RST"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "14"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -19.54 6 0)
+					(length 2.54)
+					(name "GPIO27/IRQ"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "13"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -19.54 -10 0)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -19.54 -14 0)
+					(length 2.54)
+					(name "3V3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 19.54 22 180)
+					(length 2.54)
+					(name "GPIO17/RST"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "12"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 19.54 18 180)
+					(length 2.54)
+					(name "GPIO16/DC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "11"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 19.54 14 180)
+					(length 2.54)
+					(name "GPIO4/SOS"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "10"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 19.54 10 180)
+					(length 2.54)
+					(name "GPIO34/ADC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "9"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 19.54 6 180)
+					(length 2.54)
+					(name "GPIO22/SCL"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 19.54 2 180)
+					(length 2.54)
+					(name "GPIO21/SDA"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 19.54 -2 180)
+					(length 2.54)
+					(name "GPIO5/CS"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 19.54 -6 180)
+					(length 2.54)
+					(name "GPIO19/MISO"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 19.54 -10 180)
+					(length 2.54)
+					(name "GPIO23/MOSI"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 19.54 -14 180)
+					(length 2.54)
+					(name "GPIO18/SCK"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "BPMWATCH:LSM303DLHC_BREAKOUT"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at 0 -20 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "LSM303DLHC accel/compass breakout"
+				(at 0 20 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://www.st.com/resource/en/datasheet/lsm303dlhc.pdf"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "LSM303DLHC_BREAKOUT_0_1"
+				(rectangle
+					(start -17 -17)
+					(end 17 17)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "LSM303DLHC_BREAKOUT_1_1"
+				(pin power_in line
+					(at -19.54 -4 0)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -19.54 -8 0)
+					(length 2.54)
+					(name "VIN/3V3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin output line
+					(at 19.54 2 180)
+					(length 2.54)
+					(name "DRDY/INT"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 19.54 -2 180)
+					(length 2.54)
+					(name "SDA"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 19.54 -6 180)
+					(length 2.54)
+					(name "SCL"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "BPMWATCH:MAX30102_BREAKOUT"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at 0 -20 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "MAX30102 heart-rate breakout"
+				(at 0 20 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX30102.pdf"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "MAX30102_BREAKOUT_0_1"
+				(rectangle
+					(start -17 -17)
+					(end 17 17)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "MAX30102_BREAKOUT_1_1"
+				(pin power_in line
+					(at -19.54 -4 0)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -19.54 -8 0)
+					(length 2.54)
+					(name "VIN/3V3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin output line
+					(at 19.54 2 180)
+					(length 2.54)
+					(name "INT"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 19.54 -2 180)
+					(length 2.54)
+					(name "SDA"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 19.54 -6 180)
+					(length 2.54)
+					(name "SCL"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "BPMWATCH:POWER_FILTER_CAPACITOR"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "C"
+				(at 0 -8 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Power-filter capacitor"
+				(at 0 8 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "POWER_FILTER_CAPACITOR_0_1"
+				(rectangle
+					(start -9 -5)
+					(end 9 5)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "POWER_FILTER_CAPACITOR_1_1"
+				(pin passive line
+					(at -11.54 2 0)
+					(length 2.54)
+					(name "-"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -11.54 -2 0)
+					(length 2.54)
+					(name "+"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "BPMWATCH:POWER_SWITCH"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "SW"
+				(at 0 -8 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Power switch"
+				(at 0 8 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "POWER_SWITCH_0_1"
+				(rectangle
+					(start -9 -5)
+					(end 9 5)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "POWER_SWITCH_1_1"
+				(pin passive line
+					(at -11.54 0 0)
+					(length 2.54)
+					(name "IN"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 11.54 0 180)
+					(length 2.54)
+					(name "OUT"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "BPMWATCH:SOS_BUTTON"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "SW"
+				(at 0 -8 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "SOS button"
+				(at 0 8 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "SOS_BUTTON_0_1"
+				(rectangle
+					(start -9 -5)
+					(end 9 5)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "SOS_BUTTON_1_1"
+				(pin passive line
+					(at -11.54 0 0)
+					(length 2.54)
+					(name "GPIO"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 11.54 0 180)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "BPMWATCH:ST7789_1IN3_TFT"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at 0 -20 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "ST7789 1.3 inch TFT"
+				(at 0 20 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "ST7789_1IN3_TFT_0_1"
+				(rectangle
+					(start -17 -17)
+					(end 17 17)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "ST7789_1IN3_TFT_1_1"
+				(pin power_in line
+					(at -19.54 -8 0)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -19.54 -12 0)
+					(length 2.54)
+					(name "VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 19.54 8 180)
+					(length 2.54)
+					(name "BLK"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 19.54 4 180)
+					(length 2.54)
+					(name "CS"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 19.54 0 180)
+					(length 2.54)
+					(name "DC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 19.54 -4 180)
+					(length 2.54)
+					(name "RES"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 19.54 -8 180)
+					(length 2.54)
+					(name "SDA/MOSI"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 19.54 -12 180)
+					(length 2.54)
+					(name "SCL/SCK"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "BPMWATCH:TP4056_TYPEC_PROTECTION_MODULE"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at 0 -20 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "TP4056 Type-C charger with protection"
+				(at 0 20 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "TP4056_TYPEC_PROTECTION_MODULE_0_1"
+				(rectangle
+					(start -17 -17)
+					(end 17 17)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "TP4056_TYPEC_PROTECTION_MODULE_1_1"
+				(pin power_in line
+					(at -19.54 -4 0)
+					(length 2.54)
+					(name "USB_GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -19.54 -8 0)
+					(length 2.54)
+					(name "USB_5V"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at 19.54 8 180)
+					(length 2.54)
+					(name "OUT-"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at 19.54 4 180)
+					(length 2.54)
+					(name "OUT+"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at 19.54 -4 180)
+					(length 2.54)
+					(name "B-"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at 19.54 -8 180)
+					(length 2.54)
+					(name "B+"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "BPMWATCH:TPS63802_BUCK_BOOST_MODULE"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at 0 -20 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "TPS63802 buck-boost module"
+				(at 0 20 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://www.ti.com/lit/ds/symlink/tps63802.pdf"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "TPS63802_BUCK_BOOST_MODULE_0_1"
+				(rectangle
+					(start -17 -17)
+					(end 17 17)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "TPS63802_BUCK_BOOST_MODULE_1_1"
+				(pin input line
+					(at -19.54 0 0)
+					(length 2.54)
+					(name "EN"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -19.54 -4 0)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -19.54 -8 0)
+					(length 2.54)
+					(name "VIN"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 19.54 -4 180)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at 19.54 -8 180)
+					(length 2.54)
+					(name "VOUT_3V3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "TP4056_TYPEC_PROTECTION_MODULE_1"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U?"
+				(at 0 20 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "TP4056 Type-C protected charger M"
+				(at 0 -20 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "TP4056_TYPEC_PROTECTION_MODULE_1_0_1"
+				(rectangle
+					(start -17 17)
+					(end 17 -17)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "TP4056_TYPEC_PROTECTION_MODULE_1_1_1"
+				(pin power_in line
+					(at -19.54 -4 0)
+					(length 2.54)
+					(name "USB_GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -19.54 -8 0)
+					(length 2.54)
+					(name "USB_5V"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at 19.54 -4 180)
+					(length 2.54)
+					(name "B-"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at 19.54 -8 180)
+					(length 2.54)
+					(name "B+"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+	)
+	(text "MASTER NODE"
+		(exclude_from_sim no)
+		(at 217.24 50.27 0)
+		(effects
+			(font
+				(size 1.7 1.7)
+			)
+			(justify left)
+		)
+		(uuid "0f6c32f5-5544-51d9-a891-68997a199e85")
+	)
+	(text "Soldier Tracking and Assesment Tactical System (S.T.A.T)\n"
+		(exclude_from_sim no)
+		(at 137.922 34.29 0)
+		(effects
+			(font
+				(size 2.54 2.54)
+				(thickness 0.34)
+				(bold yes)
+			)
+			(justify left)
+		)
+		(uuid "21ec13a0-4b01-50b7-a669-fbc6262f3ca2")
+	)
+	(text "1. Use 3.3V-compatible logic for BU01, ST7789, MAX30102, and LSM303DLHC."
+		(exclude_from_sim no)
+		(at 28.702 255.62 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "3103f088-87ef-580a-9ca3-35220473618d")
+	)
+	(text "Notes:"
+		(exclude_from_sim no)
+		(at 28.702 247.62 0)
+		(effects
+			(font
+				(size 1.7 1.7)
+			)
+			(justify left)
+		)
+		(uuid "680b2045-1941-5a23-9702-bf4f63aaedc9")
+	)
+	(text "SLAVE NODE, BUILD TWO COPIES: Slave 1 and Slave 2"
+		(exclude_from_sim no)
+		(at 22.86 87.376 0)
+		(effects
+			(font
+				(size 1.7 1.7)
+			)
+			(justify left)
+		)
+		(uuid "ad85949b-6164-54fa-88e4-eb9e310d5ed1")
+	)
+	(text "2. If BU01 is configured for UART, replace SPI nets with TX/RX nets before firmware bring-up."
+		(exclude_from_sim no)
+		(at 28.702 261.62 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "ae126da5-03fd-5e5d-8c02-995d1ead2aea")
+	)
+	(text "4. TP4056 modules with protection are not ideal power-path/load-sharing chargers; test charge-while-running behavior on bench."
+		(exclude_from_sim no)
+		(at 28.702 273.62 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "f79cb8c6-d94e-594e-bac8-ff84732f745c")
+	)
+	(text "3. Confirm battery divider values from ESP32 ADC range and desired sleep current."
+		(exclude_from_sim no)
+		(at 28.702 267.62 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "f948ad44-7ecf-543b-a419-e802f6595b7a")
+	)
+	(wire
+		(pts
+			(xy 314.78 76.27) (xy 318.78 76.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "02d769f0-e062-57f2-83c2-e3e8e6d67763")
+	)
+	(wire
+		(pts
+			(xy 249.7 134.27) (xy 244.7 134.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "03332ebf-8074-5f2a-b0fc-b1fd9d51f24b")
+	)
+	(wire
+		(pts
+			(xy 181.4 114.4) (xy 177.4 114.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "03aa21df-a6c1-513d-9d8c-856fbab965d4")
+	)
+	(wire
+		(pts
+			(xy 288.78 118.27) (xy 293.78 118.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "05a24376-10bd-5ad6-95c3-222281c9e614")
+	)
+	(wire
+		(pts
+			(xy 373.7 72.27) (xy 369.7 72.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "05c29d0f-9a41-5e75-8fbb-08d515b3ea8b")
+	)
+	(wire
+		(pts
+			(xy 325.7 70.27) (xy 321.7 70.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0ba283ba-9ea9-596e-a3c9-138389e636fb")
+	)
+	(wire
+		(pts
+			(xy 184.48 222.4) (xy 189.48 222.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0cd0c56b-47dd-5f30-b6b5-6a8c602bf079")
+	)
+	(wire
+		(pts
+			(xy 96.48 190.4) (xy 101.48 190.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0d1b055a-e69b-50df-9fea-0c2bc354a025")
+	)
+	(wire
+		(pts
+			(xy 174.48 142.4) (xy 179.48 142.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "118b7874-fb8e-5ec7-9519-98d4200dc03f")
+	)
+	(wire
+		(pts
+			(xy 174.48 158.4) (xy 179.48 158.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "142355ad-f130-5cdf-9c2d-33648adeb845")
+	)
+	(wire
+		(pts
+			(xy 288.78 126.27) (xy 293.78 126.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "16595b67-3b84-5187-9f6a-aa6b98153860")
+	)
+	(wire
+		(pts
+			(xy 133.4 104.4) (xy 129.4 104.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "181006f2-3a70-573c-a5cb-f11db8d75ae9")
+	)
+	(wire
+		(pts
+			(xy 174.48 154.4) (xy 179.48 154.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "191bf17e-ae7c-5a75-8457-48f2c8239771")
+	)
+	(wire
+		(pts
+			(xy 57.4 158.4) (xy 52.4 158.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1b9551fc-df2c-581c-8901-8e5c6a366b1a")
+	)
+	(wire
+		(pts
+			(xy 90.48 108.4) (xy 94.48 108.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1f678a96-b299-5f5b-a187-aa608151d822")
+	)
+	(wire
+		(pts
+			(xy 135.4 146.4) (xy 130.4 146.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1f897a9a-1439-587f-b71f-81722169fe2a")
+	)
+	(wire
+		(pts
+			(xy 174.48 202.31) (xy 179.48 200.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "21d90011-9216-5758-b197-1ae4c0443e96")
+	)
+	(wire
+		(pts
+			(xy 174.48 162.4) (xy 179.48 162.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "228c7094-91c0-50aa-8163-0143051f9cf4")
+	)
+	(wire
+		(pts
+			(xy 90.48 116.4) (xy 94.48 116.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2658fe9f-9bee-5743-8eae-469169a52b89")
+	)
+	(wire
+		(pts
+			(xy 161.4 222.4) (xy 156.4 222.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "30f07505-b2ff-503f-a299-7df81616d542")
+	)
+	(wire
+		(pts
+			(xy 215.41 223.77) (xy 210.41 223.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "32077796-937e-5c8c-8b03-71b0b07ccb91")
+	)
+	(wire
+		(pts
+			(xy 51.4 104.4) (xy 47.4 104.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "32925792-4adc-5e3e-9216-147fec327a5b")
+	)
+	(wire
+		(pts
+			(xy 51.4 108.4) (xy 47.4 108.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "32ed0dd0-6d34-52c7-b188-9cf00ab39d4a")
+	)
+	(wire
+		(pts
+			(xy 146.48 222.4) (xy 151.48 222.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3659b118-58d3-5f62-b6ab-17257aea6a6c")
+	)
+	(wire
+		(pts
+			(xy 174.48 186.31) (xy 179.48 184.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3a70c569-b511-5048-8acc-aee6d54b44aa")
+	)
+	(wire
+		(pts
+			(xy 288.78 138.27) (xy 293.78 138.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3bdc4d93-a0ea-583e-a10f-9327b4f3f40f")
+	)
+	(wire
+		(pts
+			(xy 181.4 118.4) (xy 177.4 118.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3c6bab2d-4e95-544d-ac48-4967765c674c")
+	)
+	(wire
+		(pts
+			(xy 99.4 118.4) (xy 95.4 118.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3d64d879-828a-5155-a357-4463f22283a9")
+	)
+	(wire
+		(pts
+			(xy 364.78 62.27) (xy 368.78 62.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3e58b4b4-bcbc-5ea7-a643-6bc025bfd5ab")
+	)
+	(wire
+		(pts
+			(xy 233.78 74.27) (xy 237.78 74.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "40a041bc-e96d-50b6-aad1-f813ef6dcb78")
+	)
+	(wire
+		(pts
+			(xy 135.4 142.4) (xy 130.4 142.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4adf3a21-5267-5404-8390-e2534ea7e756")
+	)
+	(wire
+		(pts
+			(xy 96.48 174.4) (xy 101.48 174.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "50248ef9-f956-5dea-8fa3-4b62ad365154")
+	)
+	(wire
+		(pts
+			(xy 254.49 225.77) (xy 259.49 225.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5123c153-b44c-505d-8b3b-296ac1580bb5")
+	)
+	(wire
+		(pts
+			(xy 291.7 76.27) (xy 287.7 76.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5161fc09-d1a8-5670-86fc-ef022b6b4a21")
+	)
+	(wire
+		(pts
+			(xy 366.78 126.27) (xy 371.78 126.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "51fb51d3-3e50-55f5-8df1-9c9f94c86906")
+	)
+	(wire
+		(pts
+			(xy 135.4 180.4) (xy 130.4 180.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "52127aed-f3f4-54ff-ae4d-475bad693566")
+	)
+	(wire
+		(pts
+			(xy 174.48 194.31) (xy 179.48 192.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5b34b7db-108b-533a-b4c8-dcbd398e20e3")
+	)
+	(wire
+		(pts
+			(xy 41.48 116.4) (xy 45.48 116.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5d08a9dd-ae29-5b52-a14d-2e045b912da8")
+	)
+	(wire
+		(pts
+			(xy 215.41 227.77) (xy 210.41 227.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6ba6db18-c5ea-5433-a0a0-074a029491ab")
+	)
+	(wire
+		(pts
+			(xy 366.78 122.27) (xy 371.78 122.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6baeb813-4205-55f8-817d-d7eaaae7aa5c")
+	)
+	(wire
+		(pts
+			(xy 215.41 187.77) (xy 210.41 187.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6d7df9bd-7bdd-5018-bfbe-51825ffd7c00")
+	)
+	(wire
+		(pts
+			(xy 364.78 66.27) (xy 368.78 66.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6dd76435-3b5a-5074-ae68-a1e5f66e8ca1")
+	)
+	(wire
+		(pts
+			(xy 366.78 134.27) (xy 371.78 134.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6e789fbc-6d21-5f6e-b2ed-8be4e5524aa6")
+	)
+	(wire
+		(pts
+			(xy 96.48 170.4) (xy 101.48 170.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7296d64b-5ca3-56e3-86ab-95772f309788")
+	)
+	(wire
+		(pts
+			(xy 41.48 108.4) (xy 45.48 108.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "767d91a0-0a8b-5b0b-8758-e90c2bd41d0f")
+	)
+	(wire
+		(pts
+			(xy 325.7 66.27) (xy 321.7 66.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "78102054-7581-56b0-955f-7bf1d8ef5914")
+	)
+	(wire
+		(pts
+			(xy 133.4 108.4) (xy 129.4 108.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "794f39b0-285a-5a6d-a634-76f21c3e454b")
+	)
+	(wire
+		(pts
+			(xy 366.78 118.27) (xy 371.78 118.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7ff7c84d-0c0e-5b43-8bb4-5359c1e2f27a")
+	)
+	(wire
+		(pts
+			(xy 174.48 190.31) (xy 179.48 188.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "82365360-e36a-529b-a5c6-c3f125192e85")
+	)
+	(wire
+		(pts
+			(xy 325.7 62.27) (xy 321.7 62.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8771c176-eefa-5b02-a572-c5baa8416579")
+	)
+	(wire
+		(pts
+			(xy 96.48 194.4) (xy 101.48 194.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8788d735-dea9-5e55-80c9-828a3fbe960e")
+	)
+	(wire
+		(pts
+			(xy 96.48 162.4) (xy 101.48 162.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8c3758d4-244c-54de-90bb-af1365b15e4d")
+	)
+	(wire
+		(pts
+			(xy 327.7 122.27) (xy 322.7 122.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8c7e3a2f-93d4-57cd-85f8-74f197ec8dd3")
+	)
+	(wire
+		(pts
+			(xy 373.7 76.27) (xy 369.7 76.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8cc29291-dd20-5051-ba75-1a8b869ea0bd")
+	)
+	(wire
+		(pts
+			(xy 90.48 120.4) (xy 94.48 120.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8f7d70a4-7cd4-5528-9b73-824521ed36a6")
+	)
+	(wire
+		(pts
+			(xy 90.48 104.4) (xy 94.48 104.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "94b0979a-72ca-55af-a1ca-ca37ccc8f8d6")
+	)
+	(wire
+		(pts
+			(xy 254.49 229.77) (xy 259.49 229.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "96b9ce64-6ce3-57c2-b784-ad459b4a3a14")
+	)
+	(wire
+		(pts
+			(xy 122.48 118.4) (xy 126.48 118.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9ff90559-3c97-5b8f-89df-31fb90e109a9")
+	)
+	(wire
+		(pts
+			(xy 215.41 183.77) (xy 210.41 183.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a1cd1199-b7bd-529a-b705-bd756d385d63")
+	)
+	(wire
+		(pts
+			(xy 233.78 66.27) (xy 237.78 66.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a521c1b8-8b3f-5f05-bec2-7f7106edfcb7")
+	)
+	(wire
+		(pts
+			(xy 327.7 118.27) (xy 322.7 118.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ab7cc490-1396-5135-816a-85f36d8f87c7")
+	)
+	(wire
+		(pts
+			(xy 288.78 114.27) (xy 293.78 114.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "acdd799b-aea4-5ee1-931e-510a0fe9d10f")
+	)
+	(wire
+		(pts
+			(xy 249.7 114.27) (xy 244.7 114.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b4f590b0-e34a-5a1e-a2b9-729448440caf")
+	)
+	(wire
+		(pts
+			(xy 282.78 74.27) (xy 286.78 74.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b74f1868-a6c3-591d-ab24-ee4a1c9af075")
+	)
+	(wire
+		(pts
+			(xy 57.4 182.4) (xy 52.4 182.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "bfe4377b-2472-5676-841c-72f565ac2958")
+	)
+	(wire
+		(pts
+			(xy 174.48 150.4) (xy 179.48 150.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c0cf38d8-2b35-5932-89b7-ce59d6117a0e")
+	)
+	(wire
+		(pts
+			(xy 57.4 178.4) (xy 52.4 178.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c283bcad-0073-592f-ad46-739aa3114234")
+	)
+	(wire
+		(pts
+			(xy 243.7 62.27) (xy 239.7 62.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c2e7d91e-88d7-5677-a382-1b3ee926718e")
+	)
+	(wire
+		(pts
+			(xy 135.4 184.4) (xy 130.4 184.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c3d354d3-8511-55e9-bb15-257657ee500a")
+	)
+	(wire
+		(pts
+			(xy 96.48 186.4) (xy 101.48 186.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c6561591-58bd-593b-9811-0a7ffff3f939")
+	)
+	(wire
+		(pts
+			(xy 288.78 122.27) (xy 293.78 122.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c7d9c5b1-438c-5156-870d-89aeb5726cb2")
+	)
+	(wire
+		(pts
+			(xy 133.4 112.4) (xy 129.4 112.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c84b39c0-747e-5aab-9028-35319ef3a08c")
+	)
+	(wire
+		(pts
+			(xy 243.7 66.27) (xy 239.7 66.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ca381ad3-2510-593e-a32c-747eb4c075de")
+	)
+	(wire
+		(pts
+			(xy 65.4 222.4) (xy 60.4 222.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ce781c61-7d18-5d82-90b8-41a7bafed20f")
+	)
+	(wire
+		(pts
+			(xy 254.49 193.77) (xy 259.49 193.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d0efc66f-467d-5a9d-8e59-b1ac314af1db")
+	)
+	(wire
+		(pts
+			(xy 282.78 78.27) (xy 286.78 78.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d1ed35b8-fc41-5f21-9360-602359918924")
+	)
+	(wire
+		(pts
+			(xy 249.7 138.27) (xy 244.7 138.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d51feed5-b4d9-5b70-a400-ff7f2a8fe255")
+	)
+	(wire
+		(pts
+			(xy 249.7 118.27) (xy 244.7 118.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d7a43455-3826-5953-8225-a89eaac208d8")
+	)
+	(wire
+		(pts
+			(xy 366.78 138.27) (xy 371.78 138.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d993ccfe-8928-5d42-8158-1bd5ef0a80f6")
+	)
+	(wire
+		(pts
+			(xy 96.48 182.4) (xy 101.48 182.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "dafaccb3-4a60-56c3-b9df-6dfc5ef7b0eb")
+	)
+	(wire
+		(pts
+			(xy 174.48 180.4) (xy 179.48 180.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "dd2af06e-bdee-5ea5-81f8-019833bb6068")
+	)
+	(wire
+		(pts
+			(xy 96.48 178.4) (xy 101.48 178.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e133b73a-19b6-5175-b2dd-c37ecad7c881")
+	)
+	(wire
+		(pts
+			(xy 57.4 162.4) (xy 52.4 162.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e505a32d-56a4-5d23-9177-9e94be8aa6c8")
+	)
+	(wire
+		(pts
+			(xy 254.49 189.77) (xy 259.49 189.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e5fce9fd-2e1d-5bfd-9c82-48cd8c302efd")
+	)
+	(wire
+		(pts
+			(xy 172.48 104.4) (xy 176.48 104.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e6c2b51a-5604-512e-b0e8-776d6f2194fe")
+	)
+	(wire
+		(pts
+			(xy 254.49 233.77) (xy 259.49 233.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e7b9a486-2204-5ad3-aafb-764767f58aa3")
+	)
+	(wire
+		(pts
+			(xy 123.4 222.4) (xy 118.4 222.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e8356c47-f5e6-5c5d-a949-6dea43d25a46")
+	)
+	(wire
+		(pts
+			(xy 88.48 222.4) (xy 93.48 222.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ed37d0e7-9e0b-5568-8ec8-5b05cdbd2d2d")
+	)
+	(wire
+		(pts
+			(xy 172.48 108.4) (xy 176.48 108.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "eea53261-366d-54c8-a2f0-da25b5ddf5c7")
+	)
+	(wire
+		(pts
+			(xy 366.78 130.27) (xy 371.78 130.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f33ecafc-9823-5069-a8a6-5e1587cbfccf")
+	)
+	(wire
+		(pts
+			(xy 96.48 158.4) (xy 101.48 158.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f42fd7d4-ddf4-57b8-baef-ab4ec49073d2")
+	)
+	(wire
+		(pts
+			(xy 174.48 146.4) (xy 179.48 146.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f717fc14-354f-5f8e-b1df-8904f3b09bca")
+	)
+	(wire
+		(pts
+			(xy 96.48 166.4) (xy 101.48 166.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f8bcc7b4-4391-59bb-859e-d09d6869ae78")
+	)
+	(wire
+		(pts
+			(xy 254.49 185.77) (xy 259.49 185.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fea0fe4c-509e-5d93-8908-3be5d828630b")
+	)
+	(wire
+		(pts
+			(xy 174.48 198.31) (xy 179.48 196.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ffb5e274-efc5-545d-a961-82dc15019b48")
+	)
+	(label "GND_M"
+		(at 321.7 66.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "03415140-7248-57fe-82d9-ee0a687e8e7f")
+	)
+	(label "UWB_SCK_M"
+		(at 371.78 118.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "0376bec9-6df4-5d7c-a0eb-5e846eb37ac1")
+	)
+	(label "VIN_REG_M"
+		(at 321.7 70.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "04d403c6-1b56-5a9f-807a-cfe5ecabe3a5")
+	)
+	(label "+3V3_S"
+		(at 210.41 183.77 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "06375be9-8294-5b1c-b4d6-f9a5de80ea90")
+	)
+	(label "+3V3_S"
+		(at 130.4 142.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "066961ca-3bd6-5e8c-ae0b-865f53ce24a2")
+	)
+	(label "+3V3_S"
+		(at 210.41 223.77 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "08c31b6d-a6d6-52a9-b799-5af01fc23c3e")
+	)
+	(label "VBAT_S"
+		(at 45.48 108.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "0b81b6d9-0196-5eb0-bbd2-f59d87ebe69c")
+	)
+	(label "GND_M"
+		(at 368.78 66.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "0ce7dd01-61a6-57d7-9929-8b98089f0af0")
+	)
+	(label "I2C_SCL_S"
+		(at 259.49 185.77 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "0f29762b-266f-5435-bc51-351f913d12cd")
+	)
+	(label "UWB_RST_M"
+		(at 244.7 138.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "0f455422-5e18-51bd-8348-54c9638b8c25")
+	)
+	(label "+3V3_M"
+		(at 244.7 114.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "163d9349-a9bc-5862-aadc-6dfc1d89cb6e")
+	)
+	(label "VBAT_S"
+		(at 118.4 222.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "176e7d97-80ce-5ab1-9c1f-ee8c5a078b29")
+	)
+	(label "+3V3_S"
+		(at 176.48 104.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "178a2306-9eb5-5068-a23e-e03dc32fdca7")
+	)
+	(label "TFT_DC_S"
+		(at 101.48 190.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "18693307-5ed6-5aac-b47f-9862a5588362")
+	)
+	(label "GND_S"
+		(at 52.4 162.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "18b20fab-b850-566d-8118-45ee57556bb1")
+	)
+	(label "GND_S"
+		(at 210.41 187.77 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "18ca9bb0-3e3d-578d-8838-b4d98fcf2517")
+	)
+	(label "+3V3_S"
+		(at 179.48 200.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "19e60ebf-de42-57dc-85ba-7e5c3afb7630")
+	)
+	(label "SPI_MOSI_S"
+		(at 101.48 162.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "1ad4da47-a2b6-582c-8257-021bd5fbbf5a")
+	)
+	(label "SPI_SCK_S"
+		(at 179.48 180.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "1c2ed75f-34bf-5755-9562-feba678e3450")
+	)
+	(label "GND_S"
+		(at 94.48 120.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "1ebd4deb-1c23-5f5f-a431-7d03cbc7ccdd")
+	)
+	(label "VBAT_M"
+		(at 237.78 66.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "24af1ff4-5b1f-51cd-b90e-cfec4e37e5c4")
+	)
+	(label "+3V3_M"
+		(at 322.7 118.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "29af29b1-39b5-5931-8ce4-a71d172279f8")
+	)
+	(label "SPI_SCK_S"
+		(at 101.48 158.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "2d4063ac-325b-5887-a82e-51a273d65352")
+	)
+	(label "I2C_SDA_S"
+		(at 259.49 189.77 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "2f6836ca-cd6d-57cb-8b87-3c41f29fb594")
+	)
+	(label "TFT_CS_S"
+		(at 179.48 196.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "308cc5d9-e557-59a8-b9ca-af4b45730354")
+	)
+	(label "BAT_ADC_S"
+		(at 101.48 182.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "30924d99-bf27-5d46-8e23-e9e26795cc71")
+	)
+	(label "I2C_SDA_S"
+		(at 259.49 229.77 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "35493921-31f2-5075-9251-4f6eef51cd23")
+	)
+	(label "GND_M"
+		(at 286.78 78.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "363df151-bd82-5f60-8874-96c8d30a0ad7")
+	)
+	(label "I2C_SCL_S"
+		(at 101.48 178.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "36ad5197-c935-5cda-a3de-81e121d7b695")
+	)
+	(label "GND_S"
+		(at 45.48 116.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "3960096d-d92f-56cd-bb34-4662c92f75ea")
+	)
+	(label "USB5V_S"
+		(at 47.4 104.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "399dc9aa-1c5c-51b2-942f-58af3c8e062f")
+	)
+	(label "VIN_REG_S"
+		(at 129.4 112.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "3b7e1bba-2a70-5d6e-b1fd-f68208cfc636")
+	)
+	(label "UWB_MOSI_M"
+		(at 293.78 118.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "3bb6a994-9237-5448-9add-e144c61c773d")
+	)
+	(label "GND_S"
+		(at 93.48 222.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "3c2f5068-15bd-5075-9505-0bc33992302e")
+	)
+	(label "UWB_RST_S"
+		(at 52.4 182.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "3e1df1f2-47eb-5dbe-af66-433d78cf2f76")
+	)
+	(label "SOS_S"
+		(at 60.4 222.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "411519e0-26c8-5cfd-aa8b-f657a2df31f5")
+	)
+	(label "TFT_RST_S"
+		(at 179.48 188.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "42169b8c-cd89-504b-a7ee-bfbfaadf4641")
+	)
+	(label "GND_M"
+		(at 244.7 118.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "45119db8-b04b-5287-9759-464416116919")
+	)
+	(label "UWB_MISO_M"
+		(at 293.78 122.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "4912167a-bd61-521e-bcb3-deeb056ca0b0")
+	)
+	(label "+3V3_S"
+		(at 130.4 180.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "4fb3f4a8-1ec0-503d-9200-fce6602bfd14")
+	)
+	(label "UWB_MISO_M"
+		(at 371.78 126.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "5121d0f1-b6fa-5d42-8563-707dc9db9e1d")
+	)
+	(label "SPI_MOSI_S"
+		(at 179.48 146.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "53b3ecdd-7338-5654-9cbc-f96f266dc6a9")
+	)
+	(label "TFT_DC_S"
+		(at 179.48 192.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "587446d7-669a-557e-a320-d9dd8f3edb43")
+	)
+	(label "SW_IN_M"
+		(at 287.7 76.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "5c02a332-3d8e-5fd9-8b86-110a908deaf2")
+	)
+	(label "GND_S"
+		(at 47.4 108.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "5e271d29-320c-552c-b933-d2b75c58c69f")
+	)
+	(label "LSM303_INT_S"
+		(at 259.49 233.77 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "5fcc9624-56e1-54c1-af47-2e122f893f64")
+	)
+	(label "GND_S"
+		(at 94.48 108.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "634e18f1-54b4-51e7-86e8-025dd6d57c33")
+	)
+	(label "GND_S"
+		(at 130.4 184.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "64755c6f-4d32-5c3d-89a0-5de2d5e79c91")
+	)
+	(label "GND_M"
+		(at 369.7 76.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "6a1e1335-773e-5766-bcbe-59e21eeb64fb")
+	)
+	(label "UWB_IRQ_S"
+		(at 179.48 158.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "6ad31a29-7b23-5a46-984d-7ebe9a2b31d5")
+	)
+	(label "SPI_SCK_S"
+		(at 179.48 142.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "73a8d133-f552-5158-b154-4023c789432b")
+	)
+	(label "GND_S"
+		(at 129.4 108.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "76d9b525-d3e3-51b4-a619-84b27295f5d3")
+	)
+	(label "GND_M"
+		(at 239.7 66.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "77b93152-f950-51e6-8ec7-c5cc434f2740")
+	)
+	(label "+3V3_M"
+		(at 369.7 72.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "78ba5ffb-e14b-54b4-857d-c0520b6b389a")
+	)
+	(label "UWB_IRQ_M"
+		(at 371.78 134.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "7ce7fa1f-907b-5bd9-90eb-2b3ed82eaa6b")
+	)
+	(label "GND_M"
+		(at 322.7 122.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "7e26b6bb-cb71-53d6-bc78-c2084154db53")
+	)
+	(label "UWB_IRQ_S"
+		(at 52.4 178.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "81897db0-f05e-5e90-bd81-c082056223dc")
+	)
+	(label "SPI_MOSI_S"
+		(at 179.48 184.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "82b4b62a-ea57-5a91-8beb-f71d8f784562")
+	)
+	(label "GND_S"
+		(at 177.4 118.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "842828f6-15bb-5e37-b5a2-a43d0a95db26")
+	)
+	(label "UWB_CS_S"
+		(at 179.48 154.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "863b16fc-7b6a-5c79-894d-fbdd03344e3c")
+	)
+	(label "+3V3_S"
+		(at 177.4 114.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "88a24fe6-7005-5672-8c10-126b0f98057a")
+	)
+	(label "UWB_MISO_S"
+		(at 179.48 150.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "8f06debc-8019-5356-8e78-89a5baffe00c")
+	)
+	(label "UWB_RST_S"
+		(at 179.48 162.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "90e742df-4b55-592a-ad11-f5f60ea44403")
+	)
+	(label "UWB_IRQ_M"
+		(at 244.7 134.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "91e78d9b-57b4-5812-bc93-603345c327fd")
+	)
+	(label "VBAT_S"
+		(at 94.48 104.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "984f457a-52c2-5391-9e93-f59e73c5a1b3")
+	)
+	(label "SOS_S"
+		(at 101.48 186.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "9b5bd07d-0ee7-5454-868e-5dabab2a8410")
+	)
+	(label "USB5V_M"
+		(at 239.7 62.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "9de78a39-6057-505e-98cb-e35385375587")
+	)
+	(label "UWB_CS_M"
+		(at 293.78 126.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "a6db9915-8c07-5311-a937-44ff9c666a42")
+	)
+	(label "+3V3_S"
+		(at 52.4 158.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "a8871380-e6e3-5c6d-9729-fc4ee139da9e")
+	)
+	(label "SW_IN_S"
+		(at 94.48 116.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "a90e82ff-f3a5-5f20-934f-7934b1ab4cd7")
+	)
+	(label "VIN_REG_M"
+		(at 321.7 62.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "a9c0563d-d562-56ec-9f6b-95cfed56d17e")
+	)
+	(label "GND_S"
+		(at 176.48 108.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "ae15480b-3719-5828-aceb-673245763066")
+	)
+	(label "SW_IN_M"
+		(at 286.78 74.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "ae7eb3d7-40d3-5a17-92a2-9fe16cc9c369")
+	)
+	(label "VIN_REG_M"
+		(at 318.78 76.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "af962c25-db8d-5428-871b-1809fa87fb11")
+	)
+	(label "VBAT_M"
+		(at 272.31 74.74 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "b1b7b0d4-b567-5e12-b584-3c43abdb88f3")
+	)
+	(label "BAT_ADC_S"
+		(at 156.4 222.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "b27d74ff-a8cd-5d4d-98bf-458d6fb6e996")
+	)
+	(label "GND_M"
+		(at 237.78 74.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "b5085d1d-a67d-5615-9849-702acf10cfb8")
+	)
+	(label "SW_IN_S"
+		(at 95.4 118.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "b6278584-73dc-5e4d-9ca8-7f70799dfe5d")
+	)
+	(label "UWB_CS_M"
+		(at 371.78 130.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "b66273c1-6e39-5b56-8f0f-59de85b348fa")
+	)
+	(label "UWB_MOSI_M"
+		(at 371.78 122.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "bf0d8326-9de2-581d-9cbc-cdcba2744f34")
+	)
+	(label "+3V3_M"
+		(at 368.78 62.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "bf22b8b1-ec7b-52f3-b596-9642547d1478")
+	)
+	(label "GND_S"
+		(at 210.41 227.77 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "bfbaa27a-e441-5d6b-b085-6a09e84d89bd")
+	)
+	(label "VIN_REG_S"
+		(at 129.4 104.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "c0ce3daf-979e-5f13-bfc9-5a978021d940")
+	)
+	(label "VIN_REG_S"
+		(at 126.48 118.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "cd9f0c9d-4849-565a-82de-13cb2d7ab856")
+	)
+	(label "MAX30102_INT_S"
+		(at 259.49 193.77 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "ce1ab51b-0400-5934-ba9b-a2b850ee1683")
+	)
+	(label "BAT_ADC_S"
+		(at 151.48 222.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "d32991d3-4666-5dcf-afae-d2476320a861")
+	)
+	(label "I2C_SDA_S"
+		(at 101.48 174.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "d470fe22-13f2-599e-a6a5-f09faf519f53")
+	)
+	(label "TFT_RST_S"
+		(at 101.48 194.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "d93113a0-b4c0-51d0-b500-2be20d03eb87")
+	)
+	(label "I2C_SCL_S"
+		(at 259.49 225.77 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "da9182d1-3780-5343-ab96-28c62a1cb894")
+	)
+	(label "GND_S"
+		(at 189.48 222.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "e06083cb-f696-59ae-aab9-7a6d21a10ca8")
+	)
+	(label "GND_S"
+		(at 130.4 146.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "e4c2c029-3b2a-55cd-9dc8-6817f525c076")
+	)
+	(label "GND_M"
+		(at 272.31 78.74 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "e970e5d7-6d36-5677-bd11-49e8eb2730d5")
+	)
+	(label "UWB_MISO_S"
+		(at 101.48 166.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "eb79340b-4e61-501b-aab7-d1a5cba1b2e0")
+	)
+	(label "UWB_SCK_M"
+		(at 293.78 114.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "ef579d7e-e26c-50fb-87e6-4b2e971c2756")
+	)
+	(label "BAT_ADC_M"
+		(at 293.78 138.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "f5d76037-665c-5ecd-b349-3155be63637e")
+	)
+	(label "UWB_RST_M"
+		(at 371.78 138.27 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "f98d0855-1236-5a87-a6c8-fcbf000f2dbb")
+	)
+	(label "UWB_CS_S"
+		(at 101.48 170.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "fc8ff86f-9abf-545b-8fba-a9654a9ead85")
+	)
+	(symbol
+		(lib_id "BPMWATCH:ST7789_1IN3_TFT")
+		(at 154.94 194.31 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "25a54b21-2be2-5d9a-a4fe-faad921b8e15")
+		(property "Reference" "U9"
+			(at 154.94 174.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "ST7789 TFT slave display"
+			(at 154.94 214.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical"
+			(at 154.94 194.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 154.94 194.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 154.94 194.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "78904399-8054-5d0e-bd2a-225d27b9cdfb")
+		)
+		(pin "2"
+			(uuid "265bf1d6-5de5-52e1-836e-fa543d0f6359")
+		)
+		(pin "3"
+			(uuid "9ffe44dd-8adf-5787-9215-b81afdc67750")
+		)
+		(pin "4"
+			(uuid "a2afd596-cab9-5e69-a9f7-47a4d4c354e5")
+		)
+		(pin "5"
+			(uuid "5bfd2d94-a01e-567c-8071-287e28126b9e")
+		)
+		(pin "6"
+			(uuid "1eaf17bf-8d0b-5c68-97c9-a750b92c5951")
+		)
+		(pin "7"
+			(uuid "78b366f4-f2b5-5af0-981a-32633d7b509b")
+		)
+		(pin "8"
+			(uuid "8f57a223-34b4-5148-b4bc-b8aa24b5fe2a")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "U9")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "BPMWATCH:POWER_FILTER_CAPACITOR")
+		(at 192.94 116.4 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "28d87e97-d747-5dc0-9cb5-afe54301636c")
+		(property "Reference" "C2"
+			(at 192.94 108.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Bulk/local filter caps S"
+			(at 192.94 124.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+			(at 192.94 116.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 192.94 116.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 192.94 116.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "b77427ff-5b97-5084-912b-0f1afabeb829")
+		)
+		(pin "2"
+			(uuid "b6e0fd0f-c4a5-5e67-a0a7-e7a201a662c6")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "C2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "BPMWATCH:ESP32_WROOM_32_MODULE")
+		(at 269.24 128.27 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "37e04d7b-0c60-5ad7-b388-25e57253cb73")
+		(property "Reference" "U3"
+			(at 269.24 108.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "ESP32-WROOM-32 master"
+			(at 269.24 148.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "RF_Module:ESP32-WROOM-32"
+			(at 269.24 128.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.espressif.com/sites/default/files/documentation/esp32-wroom-32_datasheet_en.pdf"
+			(at 269.24 128.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 269.24 128.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "3b748b43-1855-50d5-a3e3-50de2c292d9f")
+		)
+		(pin "2"
+			(uuid "25a54b21-2be2-5d9a-a4fe-faad921b8e14")
+		)
+		(pin "3"
+			(uuid "79e312c2-1c6f-5cbd-9d54-13fdbe4b09ed")
+		)
+		(pin "4"
+			(uuid "66835247-8429-5ae0-93fa-7fa0b7e4c7b9")
+		)
+		(pin "5"
+			(uuid "e615c2a7-0bd7-5127-a6aa-f800555af511")
+		)
+		(pin "6"
+			(uuid "f94c0eb9-caec-552f-b07b-e1e22a28fb10")
+		)
+		(pin "7"
+			(uuid "57da9e76-7c1d-53ab-9184-a18edd91b72e")
+		)
+		(pin "8"
+			(uuid "cdae6d89-5638-5010-99f7-68a3d0474ce1")
+		)
+		(pin "9"
+			(uuid "17a53707-029b-5b2d-bec1-8fcb65c7fef9")
+		)
+		(pin "10"
+			(uuid "ab3f1fe4-79a0-5edc-84bf-729557bc53e6")
+		)
+		(pin "11"
+			(uuid "7873df7e-5650-5b1e-9839-cb26c7d942c2")
+		)
+		(pin "12"
+			(uuid "54e9c41e-61cd-5da7-86d7-f45981b950df")
+		)
+		(pin "13"
+			(uuid "234a71b3-5b8b-52e1-a899-fc38da45abcd")
+		)
+		(pin "14"
+			(uuid "47a258a5-f3a2-52e3-9983-34c8f111aa2d")
+		)
+		(pin "15"
+			(uuid "a5229c03-f0bd-5087-8add-02684bd1ea59")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "U3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "BPMWATCH:BU01_UWB_BREAKOUT")
+		(at 154.94 152.4 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "3b748b43-1855-50d5-a3e3-50de2c292da0")
+		(property "Reference" "U8"
+			(at 154.94 132.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "BU01 UWB breakout slave"
+			(at 154.94 172.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical"
+			(at 154.94 152.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 154.94 152.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 154.94 152.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "7873df7e-5650-5b1e-9839-cb26c7d942c3")
+		)
+		(pin "2"
+			(uuid "54e9c41e-61cd-5da7-86d7-f45981b950e0")
+		)
+		(pin "3"
+			(uuid "234a71b3-5b8b-52e1-a899-fc38da45abce")
+		)
+		(pin "4"
+			(uuid "47a258a5-f3a2-52e3-9983-34c8f111aa2e")
+		)
+		(pin "5"
+			(uuid "a5229c03-f0bd-5087-8add-02684bd1ea5a")
+		)
+		(pin "6"
+			(uuid "9f16c8d2-a15b-50aa-847a-09a78cc24a6a")
+		)
+		(pin "7"
+			(uuid "184edd8f-388d-51f6-9ed7-d94784c50fd2")
+		)
+		(pin "8"
+			(uuid "be1baf78-a54e-5ed5-90cd-ae4ac2f69e1d")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "U8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "BPMWATCH:602030_LIPO")
+		(at 28.94 112.4 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "4547ad87-e3e9-5b4c-9e1e-f5cfcb1bc404")
+		(property "Reference" "BT2"
+			(at 28.94 101.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "602030 Li-Po S"
+			(at 28.94 123.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_JST:JST_PH_S2B-PH-K_1x02_P2.00mm_Horizontal"
+			(at 28.94 112.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 28.94 112.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 28.94 112.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "ff1f115f-1bdb-51f5-8880-381ed6326071")
+		)
+		(pin "2"
+			(uuid "b8da341d-8dd5-59de-8afb-be68bf184053")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "BT2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "BPMWATCH:BU01_UWB_BREAKOUT")
+		(at 347.24 128.27 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "48d7c3b5-630e-5b38-8e93-5d614d10db99")
+		(property "Reference" "U4"
+			(at 347.24 108.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "BU01 UWB breakout master"
+			(at 347.24 148.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical"
+			(at 347.24 128.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 347.24 128.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 347.24 128.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "2a25f1d5-60a5-538d-91ae-25d51cf7832a")
+		)
+		(pin "2"
+			(uuid "34051dc6-ec3a-5548-a014-415587415021")
+		)
+		(pin "3"
+			(uuid "58839372-5dae-5392-afc6-40cf11aeafcf")
+		)
+		(pin "4"
+			(uuid "fcdcd23a-e18a-5193-81c4-d8bbf4b89647")
+		)
+		(pin "5"
+			(uuid "5c431861-c331-5434-a531-ed1c079e28e0")
+		)
+		(pin "6"
+			(uuid "d51e34f1-5eab-50b2-bcc6-71f7aa9aa72d")
+		)
+		(pin "7"
+			(uuid "06d005ef-5b0e-59a2-8df5-1db43a3b2a18")
+		)
+		(pin "8"
+			(uuid "8329b534-1c74-5cb1-8e54-a58ec53e88dc")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "U4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "BPMWATCH:BATTERY_DIVIDER_RESISTOR")
+		(at 172.94 222.4 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "50ad32f4-5e49-5aa2-b889-7b6b3e1f2adb")
+		(property "Reference" "R2"
+			(at 172.94 214.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Lower battery divider resistor"
+			(at 172.94 230.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+			(at 172.94 222.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 172.94 222.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 172.94 222.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "d869db7c-401a-5818-ae9c-fcff872a9cfd")
+		)
+		(pin "2"
+			(uuid "9cb70200-8785-5307-8da4-d7935e98069d")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "R2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "BPMWATCH:ESP32_WROOM_32_MODULE")
+		(at 76.94 172.4 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "533cc7f6-87bd-551b-9453-e39029bb0a64")
+		(property "Reference" "U7"
+			(at 76.94 152.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "ESP32-WROOM-32 slave"
+			(at 76.94 192.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "RF_Module:ESP32-WROOM-32"
+			(at 76.94 172.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.espressif.com/sites/default/files/documentation/esp32-wroom-32_datasheet_en.pdf"
+			(at 76.94 172.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 76.94 172.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "cdbbef71-827c-5e8a-bc90-dce6228fed69")
+		)
+		(pin "2"
+			(uuid "9b8301b6-5db4-565d-8cf0-89ae12a512ee")
+		)
+		(pin "3"
+			(uuid "99e0ed26-42d2-5fb8-ae88-cf44283a567b")
+		)
+		(pin "4"
+			(uuid "4e5a2069-54ae-5e01-b7cd-4d7fda153329")
+		)
+		(pin "5"
+			(uuid "06af476a-db33-5fe4-971c-85c6bbde85dd")
+		)
+		(pin "6"
+			(uuid "563f1af5-464b-540a-afc6-932604e08e2e")
+		)
+		(pin "7"
+			(uuid "928d6cee-70b2-5b03-9d7a-6c8a9b4e5df8")
+		)
+		(pin "8"
+			(uuid "734b156e-02c1-5af7-833c-aa6a7ae52afc")
+		)
+		(pin "9"
+			(uuid "e1f50c7b-b017-5090-905e-f71736b661a6")
+		)
+		(pin "10"
+			(uuid "9f39b70c-3eb6-5cdc-b3a9-bd20583030a2")
+		)
+		(pin "11"
+			(uuid "fab5b9e7-545b-5735-8968-efc31fd983b4")
+		)
+		(pin "12"
+			(uuid "2afed01f-52f8-52b2-bf12-b71cd135e623")
+		)
+		(pin "13"
+			(uuid "1f667c93-db63-54be-ae0f-f0df45d59ed4")
+		)
+		(pin "14"
+			(uuid "54f71292-c887-5cb0-b041-c37e3351e178")
+		)
+		(pin "15"
+			(uuid "b1e72e96-cf82-5d22-b8e2-6b0301147362")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "U7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "BPMWATCH:LSM303DLHC_BREAKOUT")
+		(at 234.95 231.77 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "66835247-8429-5ae0-93fa-7fa0b7e4c7ba")
+		(property "Reference" "U11"
+			(at 234.95 211.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "LSM303DLHC accel/compass breakout"
+			(at 234.95 251.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical"
+			(at 234.95 231.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.st.com/resource/en/datasheet/lsm303dlhc.pdf"
+			(at 234.95 231.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 234.95 231.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "188039e1-9e20-554e-a3b4-95540fffc691")
+		)
+		(pin "2"
+			(uuid "f05b02dd-7378-5817-8ab2-bf09da5d0bf3")
+		)
+		(pin "3"
+			(uuid "e957fa1c-569f-5933-8dc0-1e8c3a53b6cf")
+		)
+		(pin "4"
+			(uuid "96a34cca-0d33-52fa-aa12-ad88cdba3b57")
+		)
+		(pin "5"
+			(uuid "d5a4dfeb-bd5a-5bc0-80b3-79017a704a78")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "U11")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "BPMWATCH:MAX30102_BREAKOUT")
+		(at 234.95 191.77 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "79e312c2-1c6f-5cbd-9d54-13fdbe4b09ee")
+		(property "Reference" "U10"
+			(at 234.95 171.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "MAX30102 BPM breakout"
+			(at 234.95 211.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical"
+			(at 234.95 191.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.analog.com/media/en/technical-documentation/data-sheets/MAX30102.pdf"
+			(at 234.95 191.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 234.95 191.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "cf411da1-1d8c-53d7-baee-4db4e069f90e")
+		)
+		(pin "2"
+			(uuid "c93a19ba-39ad-5e32-a409-6505bff917b8")
+		)
+		(pin "3"
+			(uuid "ea6d37bd-6257-5a20-b141-ca4e7194391d")
+		)
+		(pin "4"
+			(uuid "ca42b334-b07b-5136-9b7a-f82aa854da02")
+		)
+		(pin "5"
+			(uuid "5ff62a33-5c9f-55c6-9396-48d3dc169e0d")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "U10")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "BPMWATCH:SOS_BUTTON")
+		(at 76.94 222.4 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "7bcae8c4-783a-5f85-83c0-473a69d519be")
+		(property "Reference" "SW3"
+			(at 76.94 214.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SOS momentary button"
+			(at 76.94 230.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H4.3mm"
+			(at 76.94 222.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 76.94 222.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 76.94 222.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "00e335ed-e136-5372-8b99-bf8e62acf956")
+		)
+		(pin "2"
+			(uuid "e3790b18-1291-5e0d-ad72-5132776e9959")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "SW3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "BPMWATCH:TPS63802_BUCK_BOOST_MODULE")
+		(at 345.24 70.27 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "82186369-9b52-5c4c-973f-a9a991f78896")
+		(property "Reference" "U2"
+			(at 345.24 50.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "TPS63802 3.3V buck-boost M"
+			(at 345.24 90.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical"
+			(at 345.24 70.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/tps63802.pdf"
+			(at 345.24 70.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 345.24 70.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "f3562d2a-e6c3-5454-967a-71f78c2b08dd")
+		)
+		(pin "2"
+			(uuid "8349c217-5180-5220-b6e7-ab7b0eda7e38")
+		)
+		(pin "3"
+			(uuid "abaae96a-d5c5-50fc-ac18-e83c22d189db")
+		)
+		(pin "4"
+			(uuid "6822fd8c-c9e8-5d05-830a-d5f7392f4ab3")
+		)
+		(pin "5"
+			(uuid "84ea1cec-17ac-5959-bb20-bd66fe6b8c7f")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "U2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "BPMWATCH:POWER_SWITCH")
+		(at 303.24 76.27 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "83bd4744-2330-5dd5-a649-cb41568c1316")
+		(property "Reference" "SW1"
+			(at 303.24 68.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Power switch M"
+			(at 303.24 84.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Button_Switch_THT:SW_Slide_SPDT_Straight_CK_OS102011MS2Q"
+			(at 303.24 76.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 303.24 76.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 303.24 76.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "7bcae8c4-783a-5f85-83c0-473a69d519bd")
+		)
+		(pin "2"
+			(uuid "cc82e502-7f06-5fa5-8a3e-eb385ddfad16")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "SW1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "BPMWATCH:602030_LIPO")
+		(at 221.24 70.27 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "c3084251-40e4-5e5c-9937-137ee9afd5d2")
+		(property "Reference" "BT1"
+			(at 221.24 59.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "602030 Li-Po M"
+			(at 221.24 81.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_JST:JST_PH_S2B-PH-K_1x02_P2.00mm_Horizontal"
+			(at 221.24 70.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 221.24 70.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 221.24 70.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "cc3bf5fb-1309-5f41-acc5-9b064c0149f6")
+		)
+		(pin "2"
+			(uuid "905114cd-829c-5e8d-93cd-e5c34cad7e12")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "BT1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "BPMWATCH:POWER_SWITCH")
+		(at 110.94 118.4 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "c39573a1-a770-53dd-9e0e-56f1d228312a")
+		(property "Reference" "SW2"
+			(at 110.94 110.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Power switch S"
+			(at 110.94 126.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Button_Switch_THT:SW_Slide_SPDT_Straight_CK_OS102011MS2Q"
+			(at 110.94 118.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 110.94 118.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 110.94 118.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "5ef80ccf-7a28-5cb6-8d22-9f31f05e85a5")
+		)
+		(pin "2"
+			(uuid "272f5f0f-700c-5a95-a8f9-494af8dc291b")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "SW2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_name "TP4056_TYPEC_PROTECTION_MODULE_1")
+		(lib_id "BPMWATCH:TP4056_TYPEC_PROTECTION_MODULE")
+		(at 263.24 70.27 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "c395b0de-71aa-56a8-91f5-6c7065733d86")
+		(property "Reference" "U1"
+			(at 263.24 50.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "TP4056 Type-C protected charger M"
+			(at 263.24 90.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical"
+			(at 263.24 70.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 263.24 70.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 263.24 70.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "5c69c484-48d8-5bad-8a25-9da89b0114f3")
+		)
+		(pin "2"
+			(uuid "6a23ee45-d5f7-5785-8fd6-0e649187ba0c")
+		)
+		(pin "3"
+			(uuid "3a189256-7749-5d2c-96db-dde9d917ec4c")
+		)
+		(pin "4"
+			(uuid "d765b9c0-5e10-5840-b4b3-24232a146972")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "U1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "BPMWATCH:POWER_FILTER_CAPACITOR")
+		(at 385.24 74.27 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "c8f08676-6432-5250-8c29-2b91987faae5")
+		(property "Reference" "C1"
+			(at 385.24 66.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Bulk/local filter caps M"
+			(at 385.24 82.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+			(at 385.24 74.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 385.24 74.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 385.24 74.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "58f3b0d8-2fdc-5929-a1c6-4b1a4d59641b")
+		)
+		(pin "2"
+			(uuid "4b8ddc08-3e87-5deb-af5b-8a9bf9150945")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "C1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "BPMWATCH:TP4056_TYPEC_PROTECTION_MODULE")
+		(at 70.94 112.4 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "e615c2a7-0bd7-5127-a6aa-f800555af512")
+		(property "Reference" "U5"
+			(at 70.94 92.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "TP4056 Type-C protected charger S"
+			(at 70.94 132.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical"
+			(at 70.94 112.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 70.94 112.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 70.94 112.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "0d008200-adb3-5d13-9fff-64b409c9f095")
+		)
+		(pin "2"
+			(uuid "24b09ccc-d19f-5371-961c-8c926934b2bf")
+		)
+		(pin "3"
+			(uuid "7aeae4b8-56fc-5a47-ad32-1abb6fbbe0c9")
+		)
+		(pin "4"
+			(uuid "f45f7354-40c7-5a4f-8e40-5d7320933126")
+		)
+		(pin "5"
+			(uuid "2845682d-60fb-5ca5-809e-6495c7e18753")
+		)
+		(pin "6"
+			(uuid "e53ade33-59b6-52af-ad87-702a21eeded6")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "U5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "BPMWATCH:BATTERY_DIVIDER_RESISTOR")
+		(at 134.94 222.4 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "f8ceb606-8d14-561a-80f4-9e31ddde992c")
+		(property "Reference" "R1"
+			(at 134.94 214.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Upper battery divider resistor"
+			(at 134.94 230.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+			(at 134.94 222.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 134.94 222.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 134.94 222.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "3753ff63-2216-5063-b5b9-d5a7b03127fc")
+		)
+		(pin "2"
+			(uuid "efebaa10-c132-5141-944f-bb16f0f321da")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "R1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "BPMWATCH:TPS63802_BUCK_BOOST_MODULE")
+		(at 152.94 112.4 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "f94c0eb9-caec-552f-b07b-e1e22a28fb11")
+		(property "Reference" "U6"
+			(at 152.94 92.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "TPS63802 3.3V buck-boost S"
+			(at 152.94 132.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical"
+			(at 152.94 112.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/tps63802.pdf"
+			(at 152.94 112.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 152.94 112.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "b40dd7aa-4c25-5b40-9c81-ff85ca15430f")
+		)
+		(pin "2"
+			(uuid "089b6f66-67ec-5789-b2ab-bd61178c1f45")
+		)
+		(pin "3"
+			(uuid "92e18fc6-6d11-53f2-bb8a-9ee3117b6353")
+		)
+		(pin "4"
+			(uuid "9a8a4618-a273-550b-a764-48c12b95713f")
+		)
+		(pin "5"
+			(uuid "a8924d36-d5e3-5b2e-8c7c-fb5f7cb6b0be")
+		)
+		(instances
+			(project "bpmwatch"
+				(path "/e42585d0-2e1d-502e-8438-b8cb180404dc"
+					(reference "U6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)

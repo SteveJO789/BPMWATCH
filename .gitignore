@@ -10,3 +10,6 @@
 *.map
 *.hex
 test-logs/*.local.md
+hardware/kicad/**/.mcp-backups/
+hardware/kicad/**/*-backups/
+hardware/kicad/**/fp-info-cache

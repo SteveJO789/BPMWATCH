@@ -16,7 +16,7 @@ Slot 4: Master collects latest distance packets
 Slot 5: Master broadcasts TeamMapPacket
 ```
 
-The exact BU01/DW1000 protocol is still TODO. Keep the schedule deterministic so multiple nodes do not range at the same time.
+The exact B&T BU01 DW1000 LDO UWB breakout protocol is still TODO. Keep the schedule deterministic so multiple nodes do not range at the same time, and confirm whether the purchased breakout exposes UART mode or requires direct SPI control.
 
 ## Collision Avoidance
 

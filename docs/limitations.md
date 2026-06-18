@@ -7,4 +7,4 @@
 - The map can flip or rotate because there is no absolute heading reference in the MVP.
 - MAX30102 BPM readings are not medical grade.
 - Battery percentage is an estimate until calibrated against real discharge data.
-- BU01/DW1000 protocol details must be confirmed on the actual module.
+- B&T BU01 DW1000 LDO UWB breakout protocol, pinout, power input pin, and UART/SPI mode must be confirmed on the actual module.

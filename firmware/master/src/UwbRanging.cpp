@@ -1,7 +1,23 @@
 #include "UwbRanging.h"
 
+#include <DW1000.h>
+#include <SPI.h>
+
+namespace {
+constexpr int kUwbSck = 18;
+constexpr int kUwbMiso = 19;
+constexpr int kUwbMosi = 23;
+constexpr int kUwbCs = 5;
+constexpr int kUwbIrq = 34;
+constexpr int kUwbRst = 4;
+}
+
 void UwbRanging::begin() {
-  // TODO: Initialize BU01/DW1000 UART or SPI after confirming module mode.
+  Serial.println("B&T BU01 DW1000 using default SPI");
+  SPI.begin(kUwbSck, kUwbMiso, kUwbMosi, kUwbCs);
+  DW1000.begin(kUwbIrq, kUwbRst);
+  DW1000.select(kUwbCs);
+  // TODO: Replace mock distances with real DW1000 ranging exchange.
 }
 
 DistancePacket UwbRanging::readPair(uint8_t fromId, uint8_t toId) {

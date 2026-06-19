@@ -419,9 +419,9 @@ Enough hardware for 1 master + 2 slave relative map prototype
 
 Bring-up note, 2026-06-18:
 
-- Master MAC: `FC:FA:31:FE:8C:E0`
+- Master MAC: `0C:8A:D3:7C:E5:A4`
 - Slave 1 MAC: `1C:75:C4:F4:E9:D4`
-- Slave 2 MAC: `0C:8A:D3:7C:E5:A4`
+- Slave 2 MAC: `FC:FA:31:FE:8C:E0`
 - Current milestone reached: Phase 3.2 ST7789 240x240 display test.
 
 ### 3.2 ST7789 240x240 Display Test

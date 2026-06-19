@@ -2,13 +2,13 @@
 
 Thai version: `docs/arduino-ide-uwb-pair-test-th.md`
 
-This guide is for running the BPMWATCH `uwb_pair_test` with Arduino IDE instead of PlatformIO.
+This guide is for running the S.T.A.T `uwb_pair_test` with Arduino IDE instead of PlatformIO.
 
-The test is a first bring-up smoke test for the B&T BU01 DW1000 LDO module. It initializes DW1000 on the ESP32 default SPI bus and prints a mock distance once per second. It does not perform real two-node ranging yet.
+This test performs real two-node ranging between one Master/Anchor and one Slave 1/Tag. The Master also creates the `S.T.A.T-UWB` Wi-Fi access point and serves a live monitor at `http://192.168.4.1`.
 
 ## Hardware
 
-Use one ESP32 and one B&T BU01 DW1000 LDO module.
+Use two ESP32 boards and two B&T BU01 DW1000 LDO modules with the same wiring on both nodes.
 
 | BU01 / DW1000 Signal | ESP32 Pin | Notes |
 |---|---:|---|
@@ -73,69 +73,38 @@ Restart Arduino IDE after copying the library.
 
 Arduino IDE expects an `.ino` file inside a folder with the same name.
 
-Create this folder:
+The sketch is already available here:
 
 ```text
 C:\Work\Fastwork\BPMWATCH\arduino\uwb_pair_test_arduino
 ```
 
-Create this file:
-
-```text
-C:\Work\Fastwork\BPMWATCH\arduino\uwb_pair_test_arduino\uwb_pair_test_arduino.ino
-```
-
-Paste this code:
+Open `uwb_pair_test_arduino.ino` in Arduino IDE. The role switch is at the top:
 
 ```cpp
-#include <DW1000.h>
-#include <SPI.h>
-
-constexpr int UWB_SCK = 18;
-constexpr int UWB_MISO = 19;
-constexpr int UWB_MOSI = 23;
-constexpr int UWB_CS = 5;
-constexpr int UWB_IRQ = 34;
-constexpr int UWB_RST = 4;
-
-void setup() {
-  Serial.begin(115200);
-  delay(500);
-  Serial.println("B&T BU01 DW1000 SPI pair ranging test");
-  Serial.println("DW1000 uses default global SPI.");
-  Serial.println("Keep no-CS ST7789 on a separate SPIClass bus.");
-
-  SPI.begin(UWB_SCK, UWB_MISO, UWB_MOSI, UWB_CS);
-  DW1000.begin(UWB_IRQ, UWB_RST);
-  DW1000.select(UWB_CS);
-
-  Serial.println("DW1000 default-SPI init path complete; ranging protocol still needs calibration.");
-}
-
-void loop() {
-  static uint32_t lastMs = 0;
-  if (millis() - lastMs >= 1000) {
-    lastMs = millis();
-    Serial.println("Mock pair distance: 2.00 m quality=2");
-  }
-}
+#define UWB_IS_MASTER 1
 ```
+
+Use `1` for the Master/Anchor. Use `0` for the Slave 1/Tag.
 
 ## Upload And Check Output
 
-1. Connect the ESP32 by USB.
-2. Select the correct COM port.
-3. Click Upload.
-4. Open Serial Monitor at `115200`.
+1. Set `UWB_IS_MASTER` to `1`, select the Master's COM port, and upload.
+2. Set `UWB_IS_MASTER` to `0`, select the Slave 1 COM port, and upload.
+3. Open Serial Monitor at `115200` to see connection and range messages.
+4. Connect a phone or computer to Wi-Fi `S.T.A.T-UWB` using password `statuwb123`.
+5. Open `http://192.168.4.1` to monitor distance, RX power, quality, and update count.
 
 Expected output:
 
 ```text
-B&T BU01 DW1000 SPI pair ranging test
-DW1000 uses default global SPI.
-Keep no-CS ST7789 on a separate SPIClass bus.
-DW1000 default-SPI init path complete; ranging protocol still needs calibration.
-Mock pair distance: 2.00 m quality=2
+S.T.A.T real UWB pair ranging test
+Role: MASTER / ANCHOR
+Wi-Fi AP: S.T.A.T-UWB
+Password: statuwb123
+Monitor: http://192.168.4.1
+UWB peer connected: short address 0x...
+Range #1: 1.02 m, RX -76.4 dBm, quality 8.0
 ```
 
 ## Troubleshooting
@@ -156,7 +125,7 @@ If Serial Monitor prints nothing, check:
 - The selected COM port is correct.
 - ESP32 reset button was pressed after opening Serial Monitor.
 
-If DW1000 init runs but later real ranging fails, check:
+If DW1000 initializes but real ranging fails, check:
 
 - BU01 has stable power.
 - All SPI wires are short and correct.

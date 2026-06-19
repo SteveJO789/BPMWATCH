@@ -100,9 +100,9 @@ Confirmed UWB hardware:
 
 Current node labels:
 
-- Master: `FC:FA:31:FE:8C:E0`
+- Master: `0C:8A:D3:7C:E5:A4`
 - Slave 1: `1C:75:C4:F4:E9:D4`
-- Slave 2: `0C:8A:D3:7C:E5:A4`
+- Slave 2: `FC:FA:31:FE:8C:E0`
 
 Firmware still contains placeholders where BU01 protocol details, real pins, and sensor calibration must be confirmed on hardware.
 

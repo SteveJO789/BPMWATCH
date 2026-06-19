@@ -4,43 +4,59 @@
 
 - [x] ESP32 blink upload succeeds.
 - [x] MAC address prints for all 3 boards.
-- [ ] ST7789 240x240 display shows text and simple map points.
+- [x] ST7789 240x240 display shows text and simple map points.
 - [ ] I2C scanner detects GY-511 addresses `0x19` and `0x1E`.
 - [ ] I2C scanner detects MAX30102 address `0x57`.
-- [ ] MAX30102 reads raw IR and BPM.
-- [ ] LSM303DLHC reads acceleration and compass values.
+- [x] MAX30102 reads raw IR.
+- [x] MAX30102 BPM calculation firmware builds successfully.
+- [ ] Verify BPM output against a reference heart-rate measurement.
+- [x] LSM303DLHC reads acceleration and compass values.
 - [ ] SOS button input changes state reliably.
 - [ ] Battery ADC reads stable values.
-- [ ] TP4056 Type-C charger with protection charges the 602030 Li-Po safely.
+- [x] TP4056 Type-C charger with protection charges the 602030 Li-Po safely.
 - [ ] TPS63802 buck-boost output stays stable during ESP32 Wi-Fi/UWB bursts.
 
-Current bring-up status, 2026-06-18:
+Current bring-up status, 2026-06-19:
 
 - Phase 3.1 ESP32 board labeling is complete.
-- Phase 3.2 ST7789 240x240 display test is the active milestone.
-- Master MAC: `FC:FA:31:FE:8C:E0`
+- Phase 3.2 ST7789 240x240 display test is complete.
+- Phase 3.3 MAX30102 raw IR and BPM firmware implementation is complete; BPM accuracy still needs bench verification.
+- Phase 3.4 GY-511 basic initialization and heading output work; remaining motion and multi-board checks are still open.
+- Phase 3.5 UWB pair-ranging implementation and bench validation is the active milestone.
+- Master MAC: `0C:8A:D3:7C:E5:A4`
 - Slave 1 MAC: `1C:75:C4:F4:E9:D4`
-- Slave 2 MAC: `0C:8A:D3:7C:E5:A4`
+- Slave 2 MAC: `FC:FA:31:FE:8C:E0`
 
 ## GY-511 / LSM303DLHC Sensor Test
 
-- [ ] Wire GY-511 VCC to 3.3V, GND to GND, SDA to GPIO21, and SCL to GPIO22.
+- [x] Wire GY-511 VCC to 3.3V, GND to GND, SDA to GPIO21, and SCL to GPIO22.
 - [ ] Run `firmware/tests/i2c_scanner_test`.
 - [ ] Confirm accelerometer I2C address `0x19`.
 - [ ] Confirm magnetometer I2C address `0x1E`.
 - [ ] If MAX30102 is on the same bus, confirm it appears separately at `0x57`.
-- [ ] Run `firmware/tests/gy511_test`.
-- [ ] Confirm Serial Monitor prints `GY-511 init OK`.
+- [x] Run `firmware/tests/gy511_test`.
+- [x] Confirm Serial Monitor prints `GY-511 init OK`.
 - [ ] Tilt the module and confirm accelerometer X/Y/Z values change.
 - [ ] Rotate the module and confirm magnetometer X/Y/Z values change.
-- [ ] Confirm heading prints in the expected `0-359 deg` range.
+- [x] Confirm heading prints in the expected `0-359 deg` range.
 - [ ] Repeat the same test for the Slave 1 GY-511 module.
 - [ ] Repeat the same test for the Slave 2 GY-511 module.
 - [ ] Save any bad wiring, missing address, or unstable heading notes before integrating into slave firmware.
 
 ## UWB Pair Test
 
-- Arduino IDE users should follow `docs/arduino-ide-uwb-pair-test.md` or Thai version `docs/arduino-ide-uwb-pair-test-th.md`.
+- Implementation guide in Thai: `docs/uwb-pair-ranging-ap-implementation-th.md`.
+- Arduino IDE users can also follow `docs/arduino-ide-uwb-pair-test.md` or `docs/arduino-ide-uwb-pair-test-th.md`.
+- [x] Initialize B&T BU01 DW1000 LDO through the ESP32 default SPI bus.
+- [x] Keep the no-CS ST7789 on a separate `SPIClass` bus.
+- [x] Implement one firmware source with Master/Anchor and Slave 1/Tag roles.
+- [x] Build both PlatformIO environments: `master` and `tag`.
+- [x] Master creates Wi-Fi AP `S.T.A.T-UWB` and serves the monitor at `http://192.168.4.1`.
+- [ ] Upload Master/Anchor firmware to the Master ESP32.
+- [ ] Upload Slave 1/Tag firmware to the Slave 1 ESP32.
+- [ ] Confirm both Serial Monitors report a connected UWB peer.
+- [ ] Confirm real distance, RX power, and quality values update continuously.
+- [ ] Confirm the web monitor displays the same live ranging data.
 - [ ] Master <-> Slave 1 at 1m, 2m, 5m, 10m.
 - [ ] Master <-> Slave 2 at 1m, 2m, 5m, 10m.
 - [ ] Slave 1 <-> Slave 2 at 1m, 2m, 5m, 10m.

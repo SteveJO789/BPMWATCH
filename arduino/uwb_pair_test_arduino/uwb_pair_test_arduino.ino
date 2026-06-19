@@ -2,9 +2,8 @@
 #include <DW1000Ranging.h>
 #include <SPI.h>
 
-#ifndef UWB_IS_MASTER
+// Set to 1 for Master/Anchor, or 0 for Slave 1/Tag.
 #define UWB_IS_MASTER 1
-#endif
 
 #if UWB_IS_MASTER
 #include <WebServer.h>

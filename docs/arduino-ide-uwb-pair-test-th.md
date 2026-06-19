@@ -1,12 +1,12 @@
 # คู่มือ Arduino IDE: UWB Pair Test
 
-คู่มือนี้ใช้สำหรับรัน BPMWATCH `uwb_pair_test` ด้วย Arduino IDE แทน PlatformIO
+คู่มือนี้ใช้สำหรับรัน S.T.A.T `uwb_pair_test` ด้วย Arduino IDE แทน PlatformIO
 
-เทสต์นี้เป็น smoke test ขั้นแรกสำหรับโมดูล B&T BU01 DW1000 LDO โดยจะเริ่มต้น DW1000 บน SPI bus หลักของ ESP32 และพิมพ์ค่า mock distance ทุก 1 วินาที เทสต์นี้ยังไม่ใช่ real two-node ranging
+เทสต์นี้ใช้วัดระยะจริงระหว่าง Master/Anchor และ Slave 1/Tag โดย Master จะสร้าง Wi-Fi AP ชื่อ `S.T.A.T-UWB` และมีหน้ามอนิเตอร์ที่ `http://192.168.4.1`
 
 ## ฮาร์ดแวร์
 
-ใช้ ESP32 1 ตัว และโมดูล B&T BU01 DW1000 LDO 1 ตัว
+ใช้ ESP32 2 ตัว และโมดูล B&T BU01 DW1000 LDO 2 ตัว โดยต่อสายเหมือนกันทั้งสอง node
 
 | สัญญาณ BU01 / DW1000 | ขา ESP32 | หมายเหตุ |
 |---|---:|---|
@@ -71,69 +71,38 @@ return -1;
 
 Arduino IDE ต้องการไฟล์ `.ino` อยู่ใน folder ที่มีชื่อเดียวกัน
 
-สร้าง folder นี้:
+ไฟล์ sketch พร้อมใช้งานอยู่ที่:
 
 ```text
 C:\Work\Fastwork\BPMWATCH\arduino\uwb_pair_test_arduino
 ```
 
-สร้างไฟล์นี้:
-
-```text
-C:\Work\Fastwork\BPMWATCH\arduino\uwb_pair_test_arduino\uwb_pair_test_arduino.ino
-```
-
-ใส่ code นี้:
+เปิดไฟล์ `uwb_pair_test_arduino.ino` ด้วย Arduino IDE แล้วเลือก role ที่บรรทัดบนสุด:
 
 ```cpp
-#include <DW1000.h>
-#include <SPI.h>
-
-constexpr int UWB_SCK = 18;
-constexpr int UWB_MISO = 19;
-constexpr int UWB_MOSI = 23;
-constexpr int UWB_CS = 5;
-constexpr int UWB_IRQ = 34;
-constexpr int UWB_RST = 4;
-
-void setup() {
-  Serial.begin(115200);
-  delay(500);
-  Serial.println("B&T BU01 DW1000 SPI pair ranging test");
-  Serial.println("DW1000 uses default global SPI.");
-  Serial.println("Keep no-CS ST7789 on a separate SPIClass bus.");
-
-  SPI.begin(UWB_SCK, UWB_MISO, UWB_MOSI, UWB_CS);
-  DW1000.begin(UWB_IRQ, UWB_RST);
-  DW1000.select(UWB_CS);
-
-  Serial.println("DW1000 default-SPI init path complete; ranging protocol still needs calibration.");
-}
-
-void loop() {
-  static uint32_t lastMs = 0;
-  if (millis() - lastMs >= 1000) {
-    lastMs = millis();
-    Serial.println("Mock pair distance: 2.00 m quality=2");
-  }
-}
+#define UWB_IS_MASTER 1
 ```
+
+ใช้ค่า `1` สำหรับ Master/Anchor และใช้ค่า `0` สำหรับ Slave 1/Tag
 
 ## Upload และตรวจ output
 
-1. ต่อ ESP32 ด้วย USB
-2. เลือก COM port ให้ถูกต้อง
-3. กด Upload
-4. เปิด Serial Monitor ที่ `115200`
+1. ตั้ง `UWB_IS_MASTER` เป็น `1` เลือก COM port ของ Master แล้วกด Upload
+2. ตั้ง `UWB_IS_MASTER` เป็น `0` เลือก COM port ของ Slave 1 แล้วกด Upload
+3. เปิด Serial Monitor ที่ `115200` เพื่อดูสถานะการเชื่อมต่อและค่าระยะ
+4. เชื่อมต่อโทรศัพท์หรือคอมพิวเตอร์กับ Wi-Fi `S.T.A.T-UWB` รหัสผ่าน `statuwb123`
+5. เปิด `http://192.168.4.1` เพื่อดู distance, RX power, quality และจำนวนครั้งที่อัปเดต
 
 output ที่ควรเห็น:
 
 ```text
-B&T BU01 DW1000 SPI pair ranging test
-DW1000 uses default global SPI.
-Keep no-CS ST7789 on a separate SPIClass bus.
-DW1000 default-SPI init path complete; ranging protocol still needs calibration.
-Mock pair distance: 2.00 m quality=2
+S.T.A.T real UWB pair ranging test
+Role: MASTER / ANCHOR
+Wi-Fi AP: S.T.A.T-UWB
+Password: statuwb123
+Monitor: http://192.168.4.1
+UWB peer connected: short address 0x...
+Range #1: 1.02 m, RX -76.4 dBm, quality 8.0
 ```
 
 ## Troubleshooting
@@ -154,7 +123,7 @@ Mock pair distance: 2.00 m quality=2
 - เลือก COM port ถูกต้อง
 - ลองกด reset บน ESP32 หลังเปิด Serial Monitor
 
-ถ้า DW1000 init ได้ แต่ตอนทำ real ranging ในอนาคตไม่ผ่าน ให้ตรวจ:
+ถ้า DW1000 init ได้ แต่ real ranging ไม่ผ่าน ให้ตรวจ:
 
 - BU01 มีไฟเลี้ยงนิ่งพอ
 - สาย SPI สั้นและต่อถูกต้อง

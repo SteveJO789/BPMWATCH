@@ -43,6 +43,6 @@ Pin choices must be confirmed on real ESP32 boards and the actual B&T BU01 DW100
 
 | Node | ID | MAC Address |
 |---|---:|---|
-| Master | 0 | `FC:FA:31:FE:8C:E0` |
+| Master | 0 | `0C:8A:D3:7C:E5:A4` |
 | Slave 1 | 1 | `1C:75:C4:F4:E9:D4` |
-| Slave 2 | 2 | `0C:8A:D3:7C:E5:A4` |
+| Slave 2 | 2 | `FC:FA:31:FE:8C:E0` |

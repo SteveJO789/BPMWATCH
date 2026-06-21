@@ -16,7 +16,9 @@
 - Master ทำงานเป็น UWB Anchor
 - Slave 1 ทำงานเป็น UWB Tag
 - ทั้งสอง node ใช้ `DW1000.MODE_LONGDATA_RANGE_ACCURACY`
-- เปิด range filter และใช้ค่า filter เท่ากับ `5`
+- calibrated build ใช้ antenna delay `16555` และ application median filter 5 samples
+- Master recovery ใช้ timeout 5 วินาทีก่อนเคยเชื่อมต่อ และ 15 วินาทีหลังเคยเชื่อมต่อ
+- เว็บแสดง `STALE` พร้อมค่าล่าสุดระหว่าง packet gap และนับ sample ที่ถูกปฏิเสธ
 - Master สร้าง Wi-Fi AP ชื่อ `S.T.A.T-UWB`
 - เว็บมอนิเตอร์อ่านข้อมูลจาก `/api/status` ทุก 500 ms
 - Serial Monitor ของทั้งสอง node แสดง distance, RX power และ quality
@@ -31,6 +33,9 @@
 | Password | `statuwb123` |
 | Web monitor | `http://192.168.4.1` |
 | Serial baud rate | `115200` |
+| Calibration antenna delay | `16555` |
+| Range filter | Application median 5 samples |
+| Master recovery timeout | Discovery `5000 ms`, connected `15000 ms` |
 
 ## การต่อสาย
 
@@ -155,8 +160,9 @@ Error = ระยะเฉลี่ยที่วัดได้ - ระยะ
 
 - วางโมดูลให้อยู่นิ่งและเสาอากาศอยู่ในแนวเดียวกัน
 - หลีกเลี่ยงโลหะ กำแพง และร่างกายที่บังเส้นทางสัญญาณ
-- เก็บค่าหลาย sample แล้วใช้ค่าเฉลี่ย
-- ทำ antenna-delay calibration เป็นขั้นตอนถัดไปหลัง real ranging ทำงานต่อเนื่องแล้ว
+- เก็บ raw range หลาย sample ที่ระยะจริง 1 m, 2 m และ 5 m โดยปิด range filter
+- ปรับ `UWB_ANTENNA_DELAY` หลังยืนยันว่า error เป็น systematic bias
+- เปิด range filter กลับหลัง calibration ผ่านแล้วเท่านั้น
 
 ## เกณฑ์ผ่านขั้นแรก
 

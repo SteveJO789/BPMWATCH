@@ -30,6 +30,10 @@
 #include "DW1000Ranging.h"
 #include "DW1000Device.h"
 
+#ifndef UWB_TRACE_FRAMES
+#define UWB_TRACE_FRAMES false
+#endif
+
 DW1000RangingClass DW1000Ranging;
 
 
@@ -385,6 +389,15 @@ void DW1000RangingClass::loop() {
 		
 		// TODO cc
 		int messageType = detectMessageType(data);
+		if(UWB_TRACE_FRAMES) {
+			if(messageType == BLINK) {
+				Serial.println("[TAG] BLINK TX done interrupt");
+			}
+			else {
+				Serial.print("[UWB] TX done interrupt; type=");
+				Serial.println(messageType);
+			}
+		}
 		
 		if(messageType != POLL_ACK && messageType != POLL && messageType != RANGE)
 			return;
@@ -452,6 +465,10 @@ void DW1000RangingClass::loop() {
 		DW1000.getData(data, LEN_DATA);
 		
 		int messageType = detectMessageType(data);
+		if(UWB_TRACE_FRAMES) {
+			Serial.print("[UWB] RX interrupt; type=");
+			Serial.println(messageType);
+		}
 		
 		//we have just received a BLINK message from tag
 		if(messageType == BLINK && _type == ANCHOR) {
@@ -778,6 +795,9 @@ void DW1000RangingClass::transmitBlink() {
 	transmitInit();
 	_globalMac.generateBlinkFrame(data, _currentAddress, _currentShortAddress);
 	transmit(data);
+	if(UWB_TRACE_FRAMES) {
+		Serial.println("[TAG] BLINK queued");
+	}
 }
 
 void DW1000RangingClass::transmitRangingInit(DW1000Device* myDistantDevice) {

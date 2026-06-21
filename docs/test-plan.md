@@ -52,15 +52,25 @@ Current bring-up status, 2026-06-19:
 - [x] Implement one firmware source with Master/Anchor and Slave 1/Tag roles.
 - [x] Build both PlatformIO environments: `master` and `tag`.
 - [x] Master creates Wi-Fi AP `S.T.A.T-UWB` and serves the monitor at `http://192.168.4.1`.
-- [ ] Upload Master/Anchor firmware to the Master ESP32.
-- [ ] Upload Slave 1/Tag firmware to the Slave 1 ESP32.
-- [ ] Confirm both Serial Monitors report a connected UWB peer.
-- [ ] Confirm real distance, RX power, and quality values update continuously.
-- [ ] Confirm the web monitor displays the same live ranging data.
-- [ ] Master <-> Slave 1 at 1m, 2m, 5m, 10m.
+- [x] Confirm `BLINK -> RANGING_INIT -> POLL -> RANGE_REPORT` works on the bench.
+- [x] Add adaptive Master recovery: 5 seconds during discovery and 15 seconds after a connection.
+- [x] Capture unfiltered raw ranges at 1m with antenna delay `16384` (stable raw range approximately 2.48m).
+- [x] Measure the first calibration pass at 1m with antenna delay `16640` (stable raw range approximately 0.26m).
+- [x] Measure the interpolated calibration pass at 1m with antenna delay `16555` (approximately 0.94m average).
+- [x] Capture unfiltered raw ranges at 2m (approximately 2.32m average) and 5m (approximately 4.7m average).
+- [x] Keep calibrated antenna delay `16555` and enable the application median filter with 5 samples.
+- [x] Pass filtered 5m stability test: 471 samples/60s, 4.999m average, no reconnect or recovery.
+- [x] Accept 10m retest with limitation: 138 samples/30s, median 10.17m, no outliers, one peer inactive/recovery.
+- [x] Record 20m extended-range result: median 20.26m with only 26 samples/30s and three recoveries.
+- [x] Upload Master/Anchor firmware to the Master ESP32.
+- [x] Upload Slave 1/Tag firmware to the Slave 1 ESP32.
+- [x] Confirm both Serial Monitors report a connected UWB peer.
+- [x] Confirm real distance, RX power, and quality values update continuously.
+- [x] Confirm the web monitor displays the same live ranging data.
+- [x] Master <-> Slave 1 at 1m, 2m, 5m, 10m.
 - [ ] Master <-> Slave 2 at 1m, 2m, 5m, 10m.
 - [ ] Slave 1 <-> Slave 2 at 1m, 2m, 5m, 10m.
-- [ ] Log errors and quality values.
+- [x] Document current calibration errors and quality observations in this checklist.
 
 ## UWB Triangle Test
 

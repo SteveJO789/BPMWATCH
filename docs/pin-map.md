@@ -37,5 +37,6 @@ The old `FC:FA:31:FE:8C:E0` board is outside the current two-node product and ma
 
 - The vendored DW1000 library owns default global `SPI`.
 - The no-CS ST7789 must stay on dedicated HSPI because it cannot be deselected on a shared bus.
+- The confirmed ZJY-IPS130-V2.0 initialization uses a manual RES pulse, `SPI_MODE3`, and 8 MHz transactions set through `tft.setSPISpeed(8000000)` after `init()`.
 - GY-511 uses `0x19` and `0x1E`; MAX30102 uses `0x57`, so they can share I2C GPIO21/22.
 - All module signal levels must remain 3.3V-compatible.

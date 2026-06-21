@@ -1,6 +1,6 @@
 # BPMWATCH
 
-BPMWATCH is a two-node wearable Radar MVP built with ESP32, B&T BU01/DW1000 ranging, GY-511 heading and motion sensing, MAX30102 heart-rate sensing, ESP-NOW Peer data, and a no-CS ST7789 240x240 display.
+BPMWATCH is a two-node wearable Radar MVP built with ESP32, B&T BU01/DW1000 ranging, GY-511 heading and motion sensing, MAX30102 heart-rate sensing, ESP-NOW Peer data, and a no-CS ZJY-IPS130-V2.0 ST7789 240x240 display.
 
 Each node places itself at the center of a north-up radar screen and shows the other node as a distance-scaled dot. The direction is a movement-based visual estimate, not a true UWB angle measurement.
 
@@ -33,7 +33,7 @@ See:
 
 - ESP32-WROOM-32
 - B&T BU01 DW1000 LDO UWB breakout
-- IPS TFT LCD 240x240 ST7789 display without a CS pin
+- ZJY-IPS130-V2.0 IPS TFT LCD 240x240 ST7789 display without a CS pin
 - GY-511 / LSM303DLHC accelerometer and compass
 - MAX30102 heart-rate sensor
 - 602030 Li-Po battery
@@ -70,7 +70,7 @@ Both nodes use the same buses and pin map. Only the MAC address and fixed DW1000
 Completed:
 
 - ESP32 identity and STA MAC capture.
-- ST7789 no-CS display bring-up on a dedicated `SPIClass` bus.
+- ZJY-IPS130-V2.0 display bring-up using dedicated `SPIClass`, manual reset, `SPI_MODE3`, and 8 MHz display transactions.
 - GY-511 I2C discovery, initialization, and heading output.
 - MAX30102 raw IR and BPM calculation bring-up.
 - Real Node A to Node B DW1000 ranging.
@@ -100,6 +100,7 @@ The diagnostic environments retain the literal names `master` and `tag` for comp
 - Keep all ESP32, DW1000, ST7789, GY-511, and MAX30102 signal levels 3.3V-compatible.
 - Confirm the exact BU01 breakout power-input label before applying power.
 - Keep the no-CS ST7789 on dedicated HSPI; do not share the DW1000 default SPI bus.
+- Initialize ZJY-IPS130-V2.0 with `tft.init(240, 240, SPI_MODE3)` and call `tft.setSPISpeed(8000000)` after init.
 - Feed Li-Po voltage to an ESP32 ADC only through a safe resistor divider.
 - Verify TPS63802 stability during ESP32 radio and UWB current bursts.
 

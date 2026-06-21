@@ -11,7 +11,7 @@ The diagnostic firmware may still print `MASTER / ANCHOR` and `SLAVE 1 / TAG`. T
 
 - [x] ESP32 blink upload succeeds.
 - [x] STA MAC addresses are recorded for the two current product boards.
-- [x] ST7789 240x240 test displays text and map points on the tested wearable hardware.
+- [x] ZJY-IPS130-V2.0 displays colors, text, and map points with manual reset, `SPI_MODE3`, and 8 MHz transactions.
 - [x] I2C scanner detects GY-511 addresses `0x19` and `0x1E`.
 - [x] I2C scanner detects MAX30102 address `0x57`.
 - [x] MAX30102 reads raw IR.
@@ -24,6 +24,7 @@ The diagnostic firmware may still print `MASTER / ANCHOR` and `SLAVE 1 / TAG`. T
 
 - [ ] Add ST7789, GY-511, and MAX30102 to Node A.
 - [ ] Confirm Node A display pins `14/13/25/26/27`.
+- [ ] Confirm Node A passes the corrected `st7789_display_test` startup sequence.
 - [ ] Confirm Node A GY-511 and MAX30102 share I2C `21/22`.
 - [ ] Confirm Node B uses the same current pin contract.
 - [ ] Confirm both nodes remain stable with display, sensors, UWB, and ESP-NOW active.

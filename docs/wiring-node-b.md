@@ -4,7 +4,7 @@ Node B is an equal Radar Node with the fixed DW1000 Tag radio role. Its ESP32 ST
 
 ## Modules
 
-Node B contains ESP32, BU01/DW1000, no-CS ST7789, GY-511, MAX30102, and the protected battery power chain.
+Node B contains ESP32, BU01/DW1000, no-CS ZJY-IPS130-V2.0 ST7789, GY-511, MAX30102, and the protected battery power chain.
 
 ## Signal Wiring
 
@@ -17,7 +17,7 @@ Node B contains ESP32, BU01/DW1000, no-CS ST7789, GY-511, MAX30102, and the prot
 | GY-511 SDA / SCL | GPIO21 / GPIO22 |
 | MAX30102 SDA / SCL | GPIO21 / GPIO22 |
 
-The no-CS ST7789 uses dedicated HSPI. GY-511 and MAX30102 share I2C GPIO21/22.
+The no-CS ST7789 uses dedicated HSPI. Initialize the tested ZJY-IPS130-V2.0 with a manual RES pulse, `SPI_MODE3`, and 8 MHz transactions. GY-511 and MAX30102 share I2C GPIO21/22.
 
 ## Power
 

@@ -48,7 +48,7 @@
   <text x="108" y="360" class="text">MAX30102</text>
   <text x="108" y="381" class="small">local BPM source</text>
   <rect x="285" y="330" width="175" height="68" rx="10" class="module"/>
-  <text x="305" y="360" class="text">ST7789 240x240</text>
+  <text x="305" y="360" class="text">ZJY ST7789 240x240</text>
   <text x="305" y="381" class="small">self-centered radar</text>
 
   <rect x="790" y="155" width="430" height="280" rx="18" class="nodeB"/>
@@ -64,7 +64,7 @@
   <text x="838" y="360" class="text">MAX30102</text>
   <text x="838" y="381" class="small">local BPM source</text>
   <rect x="1015" y="330" width="175" height="68" rx="10" class="module"/>
-  <text x="1035" y="360" class="text">ST7789 240x240</text>
+  <text x="1035" y="360" class="text">ZJY ST7789 240x240</text>
   <text x="1035" y="381" class="small">self-centered radar</text>
 
   <path d="M490 245 C595 195 685 195 790 245" class="uwb"/>

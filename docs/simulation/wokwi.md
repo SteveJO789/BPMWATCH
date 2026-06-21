@@ -14,7 +14,7 @@ Do not use it to validate current Node A/B data flow, movement-bearing estimatio
 
 ## Current Hardware Display
 
-Real hardware uses a no-CS ST7789 240x240 display:
+Real hardware uses a no-CS ZJY-IPS130-V2.0 ST7789 240x240 display:
 
 - Module `SCL` is SPI SCK.
 - Module `SDA` is SPI MOSI.
@@ -22,6 +22,7 @@ Real hardware uses a no-CS ST7789 240x240 display:
 - `DC` selects command/data.
 - `RES` resets the display.
 - The display runs on dedicated HSPI and does not share the DW1000 default SPI bus.
+- The physical panel requires a manual reset pulse, `SPI_MODE3`, and 8 MHz display transactions; the ILI9341 surrogate does not validate this hardware-specific contract.
 
 Wokwi does not provide a built-in ST7789 part matching this module, so the ILI9341 may remain a visual surrogate in a future Radar simulation.
 

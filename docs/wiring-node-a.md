@@ -4,7 +4,7 @@ Node A is an equal Radar Node with the fixed DW1000 Anchor radio role. Its ESP32
 
 ## Modules
 
-Node A must contain ESP32, BU01/DW1000, no-CS ST7789, GY-511, MAX30102, and the protected battery power chain. This adds the display and sensors that were absent from the former Master hardware definition.
+Node A must contain ESP32, BU01/DW1000, no-CS ZJY-IPS130-V2.0 ST7789, GY-511, MAX30102, and the protected battery power chain. This adds the display and sensors that were absent from the former Master hardware definition.
 
 ## Signal Wiring
 
@@ -18,6 +18,8 @@ Node A must contain ESP32, BU01/DW1000, no-CS ST7789, GY-511, MAX30102, and the 
 | MAX30102 SDA / SCL | GPIO21 / GPIO22 |
 
 The ST7789 labels `SCL` and `SDA` mean SPI SCK and MOSI on this display. They are not I2C.
+
+The confirmed display startup sequence is RES high/low/high, `tft.init(240, 240, SPI_MODE3)`, then `tft.setSPISpeed(8000000)`. Default `SPI_MODE0` did not light the tested ZJY-IPS130-V2.0 panel.
 
 ## Power
 

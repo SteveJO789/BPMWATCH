@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <BluetoothSerial.h>
 #include <Wire.h>
 #include <math.h>
 
@@ -6,6 +7,16 @@ constexpr int I2C_SDA = 21;
 constexpr int I2C_SCL = 22;
 constexpr uint8_t LSM303_ACCEL_ADDR = 0x19;
 constexpr uint8_t LSM303_MAG_ADDR = 0x1E;
+
+BluetoothSerial SerialBT;
+bool bluetoothReady = false;
+
+void logLine(const char* message) {
+  Serial.println(message);
+  if (bluetoothReady) {
+    SerialBT.println(message);
+  }
+}
 
 bool writeRegister(uint8_t address, uint8_t reg, uint8_t value) {
   Wire.beginTransmission(address);
@@ -53,14 +64,22 @@ bool initGy511() {
 void setup() {
   Serial.begin(115200);
   delay(500);
+
+  SerialBT.enableSSP(false, false);
+  bluetoothReady = SerialBT.begin("BPMWATCH-GY511");
+  if (!bluetoothReady) {
+    Serial.println("Bluetooth SPP init failed; continuing with USB Serial.");
+  }
+
   Wire.begin(I2C_SDA, I2C_SCL);
-  Serial.println("BPMWATCH GY-511 / LSM303DLHC test");
-  Serial.println("Expected addresses: accel=0x19 mag=0x1E");
+  logLine("BPMWATCH GY-511 / LSM303DLHC test");
+  logLine("Bluetooth device: BPMWATCH-GY511 SSP (no PIN)");
+  logLine("Expected addresses: accel=0x19 mag=0x1E");
 
   if (!initGy511()) {
-    Serial.println("GY-511 init failed. Run i2c_scanner_test and check wiring.");
+    logLine("GY-511 init failed. Run i2c_scanner_test and check wiring.");
   } else {
-    Serial.println("GY-511 init OK");
+    logLine("GY-511 init OK");
   }
 }
 
@@ -72,7 +91,7 @@ void loop() {
   const bool magOk = readRegisters(LSM303_MAG_ADDR, 0x03, mag, sizeof(mag));
 
   if (!accelOk || !magOk) {
-    Serial.println("Read failed. Check SDA/SCL, power, and module addresses.");
+    logLine("Read failed. Check SDA/SCL, power, and module addresses.");
     delay(1000);
     return;
   }
@@ -90,20 +109,11 @@ void loop() {
     heading += 360.0f;
   }
 
-  Serial.print("accel=");
-  Serial.print(ax);
-  Serial.print(",");
-  Serial.print(ay);
-  Serial.print(",");
-  Serial.print(az);
-  Serial.print(" mag=");
-  Serial.print(mx);
-  Serial.print(",");
-  Serial.print(my);
-  Serial.print(",");
-  Serial.print(mz);
-  Serial.print(" heading=");
-  Serial.println(heading, 1);
+  char sample[128]{};
+  snprintf(sample, sizeof(sample),
+           "accel=%d,%d,%d mag=%d,%d,%d heading=%.1f",
+           ax, ay, az, mx, my, mz, heading);
+  logLine(sample);
 
   delay(500);
 }

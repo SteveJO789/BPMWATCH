@@ -12,6 +12,7 @@ byte validRateCount = 0;
 long lastBeat = 0;
 float bpm = 0;
 int averageBpm = 0;
+uint32_t lastPrintMs = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -57,17 +58,22 @@ void loop() {
     lastBeat = now;
   }
 
-  Serial.print("IR=");
-  Serial.print(irValue);
-  Serial.print(", BPM=");
-  Serial.print(bpm, 1);
-  Serial.print(", Avg BPM=");
-  Serial.print(averageBpm);
+  if (millis() - lastPrintMs >= 200) {
+    lastPrintMs = millis();
 
-  if (irValue < 50000) {
-    Serial.print(" No finger?");
+    Serial.print("IR=");
+    Serial.print(irValue);
+    Serial.print(", BPM=");
+    Serial.print(bpm, 1);
+    Serial.print(", Avg BPM=");
+    Serial.print(averageBpm);
+
+    if (irValue < 50000) {
+      Serial.print(" No finger?");
+    }
+
+    Serial.println();
   }
 
-  Serial.println();
   delay(20);
 }

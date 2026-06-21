@@ -8,22 +8,40 @@ constexpr int DISPLAY_SDA = 13;  // Module label SDA, SPI MOSI on separate displ
 constexpr int DISPLAY_BLC = 25;
 constexpr int DISPLAY_DC = 26;
 constexpr int DISPLAY_RES = 27;
+constexpr uint32_t DISPLAY_SPI_HZ = 8000000;
 
 SPIClass displaySpi(HSPI);
 Adafruit_ST7789 tft(&displaySpi, -1, DISPLAY_DC, DISPLAY_RES);
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("ST7789 240x240 display test");
+  delay(500);
+  Serial.println("ZJY-IPS130-V2.0 ST7789 240x240 display test");
   Serial.println("Module labels: SCL=SPI SCK, SDA=SPI MOSI, BLC=backlight, DC=data/command, RES=reset");
   Serial.println("Display uses HSPI/SPIClass so default SPI remains available for DW1000/BU01.");
 
   pinMode(DISPLAY_BLC, OUTPUT);
   digitalWrite(DISPLAY_BLC, HIGH);
 
+  pinMode(DISPLAY_RES, OUTPUT);
+  digitalWrite(DISPLAY_RES, HIGH);
+  delay(50);
+  digitalWrite(DISPLAY_RES, LOW);
+  delay(50);
+  digitalWrite(DISPLAY_RES, HIGH);
+  delay(50);
+
   displaySpi.begin(DISPLAY_SCL, -1, DISPLAY_SDA, -1);
-  tft.init(240, 240);
+  tft.init(240, 240, SPI_MODE3);
+  tft.setSPISpeed(DISPLAY_SPI_HZ);
   tft.setRotation(0);
+
+  tft.fillScreen(ST77XX_RED);
+  delay(500);
+  tft.fillScreen(ST77XX_GREEN);
+  delay(500);
+  tft.fillScreen(ST77XX_BLUE);
+  delay(500);
   tft.fillScreen(ST77XX_BLACK);
   tft.setTextColor(ST77XX_WHITE);
   tft.setTextSize(2);

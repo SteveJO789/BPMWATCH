@@ -16,7 +16,7 @@ The MVP targets clear visual behavior, not accurate 2D localization.
 - UWB carries distance only.
 - ESP-NOW carries Peer BPM and reciprocal-bearing estimates.
 - Production firmware has no AP, webserver, or browser dashboard.
-- The display is ST7789 240x240 only; OLED support is outside the MVP.
+- The display is the no-CS ZJY-IPS130-V2.0 ST7789 240x240; OLED support is outside the MVP.
 - The old three-node triangle architecture is legacy.
 
 ## Node Identity
@@ -32,7 +32,7 @@ Each node contains:
 
 - ESP32-WROOM-32
 - B&T BU01 DW1000 LDO UWB breakout
-- No-CS ST7789 240x240 display
+- No-CS ZJY-IPS130-V2.0 ST7789 240x240 display
 - GY-511 / LSM303DLHC
 - MAX30102
 - 602030 Li-Po, protected TP4056 charger, TPS63802 3.3V supply, and power switch
@@ -42,6 +42,12 @@ Bus allocation:
 - DW1000 default SPI: `SCK=18`, `MISO=19`, `MOSI=23`, `CS=5`, `IRQ=34`, `RST=4`
 - ST7789 dedicated HSPI: `SCK=14`, `MOSI=13`, `BLC=25`, `DC=26`, `RST=27`
 - Shared sensor I2C: `SDA=21`, `SCL=22`
+
+Display initialization contract:
+
+- Pulse RES high/low/high before initialization.
+- Call `tft.init(240, 240, SPI_MODE3)`.
+- Call `tft.setSPISpeed(8000000)` after initialization.
 
 ## Production Firmware Target
 
@@ -82,7 +88,7 @@ One source tree builds two environments:
 ### 1. Hardware Bring-Up
 
 - [x] Identify both ESP32 STA MAC addresses.
-- [x] Validate no-CS ST7789 wiring and dedicated HSPI.
+- [x] Validate ZJY-IPS130-V2.0 wiring, dedicated HSPI, manual reset, `SPI_MODE3`, and 8 MHz transactions.
 - [x] Detect GY-511 at `0x19` and `0x1E`.
 - [x] Detect MAX30102 at `0x57`.
 - [x] Calculate BPM from MAX30102 test firmware.

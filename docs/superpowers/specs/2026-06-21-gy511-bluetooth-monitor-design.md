@@ -14,14 +14,14 @@ Allow the soldered ESP32 and GY-511 test assembly to be monitored from Windows a
 
 ## Runtime Design
 
-The sketch creates an ESP32 `BluetoothSerial` endpoint named `BPMWATCH-GY511` with legacy pairing PIN `1234`. Each startup, status, error, and sensor-data line is written to both USB `Serial` and Bluetooth serial.
+The sketch creates an ESP32 `BluetoothSerial` endpoint named `BPMWATCH-GY511` using Secure Simple Pairing (SSP) in Just Works mode. Each startup, status, error, and sensor-data line is written to both USB `Serial` and Bluetooth serial.
 
 Bluetooth startup failure must not block I2C setup or GY-511 sampling. The sketch reports the failure over USB and continues operating as the original USB-only sensor test.
 
 ## Data Flow
 
 1. The ESP32 initializes USB serial.
-2. It starts Bluetooth SPP and configures the pairing PIN.
+2. It enables SSP before starting Bluetooth SPP.
 3. It initializes I2C and the GY-511.
 4. Every 500 ms, it reads accelerometer and magnetometer registers and calculates heading.
 5. It formats one complete diagnostic line and sends the same line to both serial transports.
@@ -32,13 +32,13 @@ Bluetooth startup failure must not block I2C setup or GY-511 sampling. The sketc
 2. Upload the diagnostic firmware over USB.
 3. Disconnect USB completely.
 4. Restore TPS63802 power.
-5. Pair Windows with `BPMWATCH-GY511` using PIN `1234`.
+5. Pair Windows with `BPMWATCH-GY511`. No PIN is required.
 6. Open the outgoing Bluetooth SPP COM port at 115200 baud. The SPP transport does not depend on UART baud electrically, but 115200 keeps terminal configuration consistent with the USB monitor.
 
 ## Verification
 
 - The PlatformIO environment builds successfully.
-- Source-level checks confirm the device name, PIN, Bluetooth startup, and dual-output behavior.
+- Source-level checks confirm the device name, SSP-before-startup ordering, absence of legacy PIN configuration, and dual-output behavior.
 - With hardware, Windows can pair and receive GY-511 readings while USB is disconnected.
 - If Bluetooth initialization fails, USB still reports the failure and GY-511 sampling continues.
 

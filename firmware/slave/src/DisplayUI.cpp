@@ -1,6 +1,8 @@
 #include "DisplayUI.h"
 
 namespace {
+constexpr uint32_t kDisplaySpiHz = 8000000;
+
 int mapCoord(float value, float minValue, float maxValue, int minPixel, int maxPixel) {
   if (value < minValue) {
     value = minValue;
@@ -21,14 +23,24 @@ DisplayUI::DisplayUI()
     : displaySpi_(HSPI), tft_(&displaySpi_, kDisplayCs, kDisplayDc, kDisplayReset) {}
 
 void DisplayUI::begin() {
-  Serial.println("ST7789 240x240 display using HSPI/SPIClass");
+  Serial.println("ZJY-IPS130-V2.0 ST7789 240x240 using HSPI/SPIClass");
+  Serial.println("Display init: SPI_MODE3, 8 MHz");
   Serial.println("Default SPI is reserved for DW1000/BU01.");
 
   pinMode(kDisplayBacklight, OUTPUT);
   digitalWrite(kDisplayBacklight, HIGH);
 
+  pinMode(kDisplayReset, OUTPUT);
+  digitalWrite(kDisplayReset, HIGH);
+  delay(50);
+  digitalWrite(kDisplayReset, LOW);
+  delay(50);
+  digitalWrite(kDisplayReset, HIGH);
+  delay(50);
+
   displaySpi_.begin(kDisplaySck, -1, kDisplayMosi, kDisplayCs);
-  tft_.init(240, 240);
+  tft_.init(240, 240, SPI_MODE3);
+  tft_.setSPISpeed(kDisplaySpiHz);
   tft_.setRotation(0);
   tft_.fillScreen(ST77XX_BLACK);
   tft_.setTextWrap(false);

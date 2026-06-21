@@ -18,7 +18,7 @@ The MVP prioritizes useful visual behavior over positioning accuracy.
 - Node A uses STA MAC `0C:8A:D3:7C:E5:A4` and the fixed DW1000 Anchor radio role.
 - Node B uses STA MAC `1C:75:C4:F4:E9:D4` and the fixed DW1000 Tag radio role.
 - Anchor and Tag are radio roles only. Product UI and documentation use Node A, Node B, current node, and Peer.
-- Both nodes use ESP32, B&T BU01/DW1000, GY-511/LSM303DLHC, MAX30102, and a no-CS ST7789 240x240 display.
+- Both nodes use ESP32, B&T BU01/DW1000, GY-511/LSM303DLHC, MAX30102, and a no-CS ZJY-IPS130-V2.0 ST7789 240x240 display.
 - The existing working two-node DW1000 ranging flow, calibration, filtering, and recovery behavior remain the baseline.
 - ESP-NOW carries Peer BPM and accepted bearing estimates. It does not create a Wi-Fi AP or browser UI.
 - The existing `firmware/tests/uwb_pair_test` remains an unchanged diagnostic test, including its AP monitor.
@@ -78,6 +78,13 @@ Both nodes use the same pin contract:
 | MAX30102 | Shared I2C | SDA 21, SCL 22 |
 
 The display must remain on its dedicated `SPIClass`; the no-CS ST7789 must not share the DW1000 bus.
+
+The bench-confirmed display initialization contract is:
+
+1. Drive RES high, low, then high with 50 ms holds.
+2. Start the dedicated HSPI bus.
+3. Call `tft.init(240, 240, SPI_MODE3)`.
+4. Call `tft.setSPISpeed(8000000)` after init so subsequent transactions use 8 MHz.
 
 ## Core Data Structures
 
@@ -194,7 +201,7 @@ radiusPx = constrain(
 
 ## Screen Geometry and Rendering
 
-The only supported display is the no-CS ST7789 240x240:
+The only supported display is the no-CS ZJY-IPS130-V2.0 ST7789 240x240:
 
 - Center: `(120, 120)`
 - Radar radius: `100 px`

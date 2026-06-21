@@ -8,7 +8,7 @@ The current target has two equivalent Radar Nodes. Exact purchased breakouts mus
 |---|---:|---|---|
 | ESP32-WROOM-32 | 2 | `RF_Module:ESP32-WROOM-32` only for a bare castellated module; use the exact dev-board headers otherwise | Confirm board variant |
 | BU01 UWB breakout | 2 | Custom footprint from the exact BU01 package drawing | Confirm pad pattern and antenna keepout |
-| No-CS ST7789 240x240 | 2 | Match the purchased header count, board outline, and mounting holes | Existing schematic symbol may not match |
+| ZJY-IPS130-V2.0 no-CS ST7789 240x240 | 2 | Measure the purchased header count, board outline, and mounting holes | Existing schematic symbol may not match |
 | MAX30102 breakout | 2 | Custom breakout/header footprint from measured board | Confirm row spacing and orientation |
 | GY-511 / LSM303DLHC | 2 | Header plus measured board outline | Confirm header direction and axis marking |
 | Protected TP4056 Type-C module | 2 | Custom module footprint matching exact IN/BAT/OUT pads | Board variants differ |

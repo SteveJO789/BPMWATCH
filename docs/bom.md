@@ -6,7 +6,7 @@ Node A and Node B use the same hardware. Quantities below are for the complete t
 |---|---|---:|
 | ESP32-WROOM-32 board | 3.3V logic, Wi-Fi/ESP-NOW, 4MB flash or more | 2 |
 | B&T BU01 DW1000 LDO breakout | SPI interface, confirmed power-input pin, 3.3V-safe signals | 2 |
-| IPS TFT LCD 240x240 ST7789 | No-CS module exposing SCL/SCK, SDA/MOSI, BLC, DC, RES | 2 |
+| ZJY-IPS130-V2.0 IPS TFT LCD 240x240 ST7789 | No-CS module exposing SCL/SCK, SDA/MOSI, BLC, DC, RES; requires `SPI_MODE3` | 2 |
 | GY-511 / LSM303DLHC | I2C accelerometer and compass, addresses `0x19` and `0x1E` | 2 |
 | MAX30102 breakout | I2C heart-rate sensor, address `0x57` | 2 |
 | 602030 Li-Po battery | 3.7V cell; verify actual capacity and discharge rating | 2 |

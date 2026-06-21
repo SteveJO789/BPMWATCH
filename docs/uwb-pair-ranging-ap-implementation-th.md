@@ -1,8 +1,10 @@
-# คู่มือพัฒนา UWB Pair Ranging และ Web Monitor ผ่าน Wi-Fi AP
+# คู่มือ Diagnostic UWB Pair Ranging และ Web Monitor ผ่าน Wi-Fi AP
 
-คู่มือนี้อธิบายการนำโค้ด UWB pair test ของ S.T.A.T ไปใช้งานกับ ESP32 จำนวน 2 ตัวและโมดูล B&T BU01 DW1000 LDO จำนวน 2 ตัว โดยใช้ SPI สำหรับ UWB และให้ Master สร้าง Wi-Fi AP สำหรับดูค่าระยะผ่านเว็บเบราว์เซอร์
+คู่มือนี้อธิบาย diagnostic `uwb_pair_test` ของ S.T.A.T สำหรับ ESP32 2 ตัวและ B&T BU01 DW1000 LDO 2 ตัว โดยใช้ SPI สำหรับ UWB และให้ฝั่ง Anchor สร้าง Wi-Fi AP สำหรับดูค่าระยะผ่านเว็บเบราว์เซอร์
 
-สถานะปัจจุบันเป็นการทดสอบคู่ `Master <-> Slave 1` เท่านั้น ยังไม่ใช่ระบบสามโหนดและยังไม่ได้ปรับ antenna delay เพื่อสอบเทียบความแม่นยำ
+> AP และ web monitor ในเอกสารนี้เป็นเครื่องมือ diagnostic เท่านั้น Production Radar firmware ใช้ Node A/Node B, ไม่มี application-level Master/Slave และไม่มี AP/webserver
+
+คู่ที่ทดสอบแล้วคือ `Node A/Anchor <-> Node B/Tag` โดยใช้ antenna delay `16555` และ application median filter 5 samples
 
 ## ไฟล์ที่เกี่ยวข้อง
 
@@ -13,13 +15,13 @@
 
 ## หลักการทำงาน
 
-- Master ทำงานเป็น UWB Anchor
-- Slave 1 ทำงานเป็น UWB Tag
+- Node A ทำงานเป็น UWB Anchor
+- Node B ทำงานเป็น UWB Tag
 - ทั้งสอง node ใช้ `DW1000.MODE_LONGDATA_RANGE_ACCURACY`
 - calibrated build ใช้ antenna delay `16555` และ application median filter 5 samples
-- Master recovery ใช้ timeout 5 วินาทีก่อนเคยเชื่อมต่อ และ 15 วินาทีหลังเคยเชื่อมต่อ
+- Anchor recovery ใช้ timeout 5 วินาทีก่อนเคยเชื่อมต่อ และ 15 วินาทีหลังเคยเชื่อมต่อ
 - เว็บแสดง `STALE` พร้อมค่าล่าสุดระหว่าง packet gap และนับ sample ที่ถูกปฏิเสธ
-- Master สร้าง Wi-Fi AP ชื่อ `S.T.A.T-UWB`
+- Anchor ฝั่ง diagnostic สร้าง Wi-Fi AP ชื่อ `S.T.A.T-UWB`
 - เว็บมอนิเตอร์อ่านข้อมูลจาก `/api/status` ทุก 500 ms
 - Serial Monitor ของทั้งสอง node แสดง distance, RX power และ quality
 
@@ -27,19 +29,19 @@
 
 | รายการ | ค่า |
 |---|---|
-| Master EUI | `0C:8A:D3:7C:E5:A4:00:01` |
-| Slave 1 EUI | `1C:75:C4:F4:E9:D4:00:01` |
+| Node A / Anchor EUI | `0C:8A:D3:7C:E5:A4:00:01` |
+| Node B / Tag EUI | `1C:75:C4:F4:E9:D4:00:01` |
 | Wi-Fi AP | `S.T.A.T-UWB` |
 | Password | `statuwb123` |
 | Web monitor | `http://192.168.4.1` |
 | Serial baud rate | `115200` |
 | Calibration antenna delay | `16555` |
 | Range filter | Application median 5 samples |
-| Master recovery timeout | Discovery `5000 ms`, connected `15000 ms` |
+| Anchor recovery timeout | Discovery `5000 ms`, connected `15000 ms` |
 
 ## การต่อสาย
 
-ต่อ ESP32 กับ BU01 เหมือนกันทั้ง Master และ Slave 1:
+ต่อ ESP32 กับ BU01 เหมือนกันทั้ง Node A และ Node B:
 
 | BU01 / DW1000 | ESP32 |
 |---|---:|
@@ -61,22 +63,24 @@
 - `master`: กำหนด `UWB_IS_MASTER=1`
 - `tag`: กำหนด `UWB_IS_MASTER=0`
 
+ชื่อ environment และ macro เป็นชื่อเดิมของ test ที่ผ่านการทดสอบแล้ว โดย `master` หมายถึง Node A/Anchor และ `tag` หมายถึง Node B/Tag
+
 Build ทั้งสอง role:
 
 ```powershell
 & "$env:USERPROFILE\.platformio\penv\Scripts\platformio.exe" run -d firmware\tests\uwb_pair_test -e master -e tag
 ```
 
-Upload Master โดยเปลี่ยน `COM_MASTER` เป็น port จริง:
+Upload Node A/Anchor โดยเปลี่ยน `COM_NODE_A` เป็น port จริง:
 
 ```powershell
-& "$env:USERPROFILE\.platformio\penv\Scripts\platformio.exe" run -d firmware\tests\uwb_pair_test -e master -t upload --upload-port COM_MASTER
+& "$env:USERPROFILE\.platformio\penv\Scripts\platformio.exe" run -d firmware\tests\uwb_pair_test -e master -t upload --upload-port COM_NODE_A
 ```
 
-Upload Slave 1 โดยเปลี่ยน `COM_SLAVE1` เป็น port จริง:
+Upload Node B/Tag โดยเปลี่ยน `COM_NODE_B` เป็น port จริง:
 
 ```powershell
-& "$env:USERPROFILE\.platformio\penv\Scripts\platformio.exe" run -d firmware\tests\uwb_pair_test -e tag -t upload --upload-port COM_SLAVE1
+& "$env:USERPROFILE\.platformio\penv\Scripts\platformio.exe" run -d firmware\tests\uwb_pair_test -e tag -t upload --upload-port COM_NODE_B
 ```
 
 ## Upload ด้วย Arduino IDE
@@ -84,17 +88,17 @@ Upload Slave 1 โดยเปลี่ยน `COM_SLAVE1` เป็น port จ
 1. Copy folder `lib/DW1000` ไปที่ `Documents\Arduino\libraries\DW1000`
 2. Restart Arduino IDE
 3. เปิด `arduino/uwb_pair_test_arduino/uwb_pair_test_arduino.ino`
-4. เลือกบอร์ด `ESP32 Dev Module` และ COM port ของ Master
-5. ตั้ง `#define UWB_IS_MASTER 1` แล้ว Upload ลง Master
+4. เลือกบอร์ด `ESP32 Dev Module` และ COM port ของ Node A
+5. ตั้ง `#define UWB_IS_MASTER 1` แล้ว Upload ลง Node A
 6. เปลี่ยนเป็น `#define UWB_IS_MASTER 0`
-7. เลือก COM port ของ Slave 1 แล้ว Upload
+7. เลือก COM port ของ Node B แล้ว Upload
 8. เปิด Serial Monitor ที่ `115200`
 
 ## วิธีทดสอบ
 
-1. เปิด Master และ Slave 1 โดยวางห่างกันประมาณ 1 เมตรและหันเสาอากาศในแนวเดียวกัน
-2. ตรวจ Serial Monitor ของ Master ว่ามี `Role: MASTER / ANCHOR`
-3. ตรวจ Serial Monitor ของ Slave 1 ว่ามี `Role: SLAVE 1 / TAG`
+1. เปิด Node A และ Node B โดยวางห่างกันประมาณ 1 เมตรและหันเสาอากาศในแนวเดียวกัน
+2. ตรวจ Serial Monitor ของ Node A ว่ามี `Role: MASTER / ANCHOR` ซึ่งเป็นข้อความเดิมของ diagnostic firmware
+3. ตรวจ Serial Monitor ของ Node B ว่ามี `Role: SLAVE 1 / TAG` ซึ่งเป็นข้อความเดิมของ diagnostic firmware
 4. รอข้อความ `UWB peer connected`
 5. ตรวจว่ามีข้อความ `Range #...` ต่อเนื่อง
 6. เชื่อมต่อโทรศัพท์หรือคอมพิวเตอร์กับ Wi-Fi `S.T.A.T-UWB`
@@ -121,10 +125,10 @@ Range #1: 1.02 m, RX -76.4 dBm, quality 8.0
 
 | Pair | ระยะจริง (m) | ระยะเฉลี่ย (m) | Error (m) | RX power (dBm) | Quality | หมายเหตุ |
 |---|---:|---:|---:|---:|---:|---|
-| M-S1 | 1 | | | | | |
-| M-S1 | 2 | | | | | |
-| M-S1 | 5 | | | | | |
-| M-S1 | 10 | | | | | |
+| Node A-Node B | 1 | | | | | |
+| Node A-Node B | 2 | | | | | |
+| Node A-Node B | 5 | | | | | |
+| Node A-Node B | 10 | | | | | |
 
 คำนวณ error ด้วยสูตร:
 
@@ -138,7 +142,7 @@ Error = ระยะเฉลี่ยที่วัดได้ - ระยะ
 
 - ตรวจ VCC และ GND ของทั้งสอง node
 - ตรวจ SCK, MISO, MOSI, CS, IRQ และ RST
-- ตรวจว่าตัวหนึ่งเป็น Master และอีกตัวเป็น Tag
+- ตรวจว่า Node A ใช้ Anchor build และ Node B ใช้ Tag build
 - ตรวจว่าทั้งสองตัวใช้ mode และ library รุ่นเดียวกัน
 - ลดระยะเหลือประมาณ 0.5-1 เมตรเพื่อเริ่มทดสอบ
 
@@ -153,7 +157,7 @@ Error = ระยะเฉลี่ยที่วัดได้ - ระยะ
 
 - ตรวจว่าเชื่อมต่อ Wi-Fi `S.T.A.T-UWB` ไม่ใช่ Wi-Fi อื่น
 - เปิด `http://192.168.4.1` โดยใช้ `http` ไม่ใช่ `https`
-- ตรวจ Serial Monitor ของ Master ว่าแสดง IP address
+- ตรวจ Serial Monitor ของ Node A/Anchor ว่าแสดง IP address
 - ปิด mobile data ชั่วคราวถ้าโทรศัพท์พยายามสลับออกจาก Wi-Fi ที่ไม่มีอินเทอร์เน็ต
 
 ### ระยะคลาดเคลื่อนมาก
@@ -166,9 +170,9 @@ Error = ระยะเฉลี่ยที่วัดได้ - ระยะ
 
 ## เกณฑ์ผ่านขั้นแรก
 
-- Master และ Slave 1 พบกันต่อเนื่อง
+- Node A และ Node B พบกันต่อเนื่อง
 - Serial Monitor แสดงค่าระยะจริงโดยไม่ใช่ mock data
 - เว็บมอนิเตอร์แสดงข้อมูลเดียวกับ Serial Monitor
 - ทดสอบ 1 m, 2 m, 5 m และ 10 m พร้อมบันทึก error, RX power และ quality
 
-เมื่อผ่านเกณฑ์นี้แล้วจึงเริ่ม antenna-delay calibration และทดสอบคู่ `Master <-> Slave 2` กับ `Slave 1 <-> Slave 2`
+ผล calibration ปัจจุบันถูกบันทึกไว้ใน `test-logs/uwb-pair-test.md` ขั้นต่อไปคือยืนยัน ranging เดิมหลังติดตั้ง ST7789, GY-511 และ MAX30102 ครบทั้งสอง node ก่อน integrate production Radar firmware

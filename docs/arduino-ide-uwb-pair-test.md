@@ -4,7 +4,9 @@ Thai version: `docs/arduino-ide-uwb-pair-test-th.md`
 
 This guide is for running the S.T.A.T `uwb_pair_test` with Arduino IDE instead of PlatformIO.
 
-This test performs real two-node ranging between one Master/Anchor and one Slave 1/Tag. The Master also creates the `S.T.A.T-UWB` Wi-Fi access point and serves a live monitor at `http://192.168.4.1`.
+> Diagnostic scope: this test keeps its historical AP monitor and legacy role labels. Production Radar firmware has no AP, webserver, or application-level Master/Slave.
+
+This test performs real two-node ranging between Node A/Anchor and Node B/Tag. The diagnostic Anchor creates the `S.T.A.T-UWB` Wi-Fi access point and serves a live monitor at `http://192.168.4.1`.
 
 ## Hardware
 
@@ -85,17 +87,19 @@ Open `uwb_pair_test_arduino.ino` in Arduino IDE. The role switch is at the top:
 #define UWB_IS_MASTER 1
 ```
 
-Use `1` for the Master/Anchor. Use `0` for the Slave 1/Tag.
+Use `1` for Node A/Anchor. Use `0` for Node B/Tag. The macro name is retained for compatibility with the tested sketch.
 
 ## Upload And Check Output
 
-1. Set `UWB_IS_MASTER` to `1`, select the Master's COM port, and upload.
-2. Set `UWB_IS_MASTER` to `0`, select the Slave 1 COM port, and upload.
+1. Set `UWB_IS_MASTER` to `1`, select Node A's COM port, and upload.
+2. Set `UWB_IS_MASTER` to `0`, select Node B's COM port, and upload.
 3. Open Serial Monitor at `115200` to see connection and range messages.
 4. Connect a phone or computer to Wi-Fi `S.T.A.T-UWB` using password `statuwb123`.
 5. Open `http://192.168.4.1` to monitor distance, RX power, quality, and update count.
 
 Expected output:
+
+The literal `MASTER / ANCHOR` text below is a legacy diagnostic string. It means Node A/Anchor in the current architecture.
 
 ```text
 S.T.A.T real UWB pair ranging test
@@ -131,10 +135,12 @@ If DW1000 initializes but real ranging fails, check:
 - All SPI wires are short and correct.
 - CS is connected to GPIO5.
 - IRQ is connected to GPIO34.
-- Both nodes share the same future ranging firmware and timing schedule.
+- Both nodes use the same tested ranging mode, antenna delay, and vendored library.
 
 ## Important SPI Rule
 
 For BPMWATCH, DW1000 uses the default global `SPI` bus because the library directly owns `SPI`.
 
 The no-CS ST7789 display must stay on a separate `SPIClass` bus. Do not place a no-CS ST7789 display on the same SPI bus as DW1000.
+
+For current production architecture and wiring, see `docs/architecture.md`, `docs/pin-map.md`, `docs/wiring-node-a.md`, and `docs/wiring-node-b.md`.

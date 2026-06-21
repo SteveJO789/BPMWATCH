@@ -1,21 +1,21 @@
-# BPMWATCH KiCad Schematic
+# BPMWATCH KiCad Schematic Status
 
-This folder contains the first BPMWATCH KiCad schematic.
+The KiCad files in this folder predate the 2026-06-21 two-node Radar pivot. They describe an unequal Master/repeated-Slave concept and are not the current wiring source of truth.
 
-Scope:
+Use [`docs/pin-map.md`](../../../docs/pin-map.md), [`docs/wiring-node-a.md`](../../../docs/wiring-node-a.md), and [`docs/wiring-node-b.md`](../../../docs/wiring-node-b.md) for current bench wiring.
 
-- Module-level wiring schematic, not a production PCB.
-- One master node and one repeated slave node design.
-- Breakout modules are represented as connector-style blocks.
-- ESP32 GPIO choices are starter assignments and must be confirmed on real boards.
-- BU01 UART/SPI mode is still a hardware confirmation item.
+## Required Schematic Revision
 
-Reference sources used:
+The next schematic revision must contain two equivalent Radar Nodes:
 
-- ESP32-WROOM-32 datasheet, Espressif
-- BU01 UWB breakout/module public pinout references
-- IPS TFT LCD 240x240 ST7789 display module references
-- LSM303DLHC datasheet, STMicroelectronics
-- MAX30102 datasheet, Analog Devices/Maxim
-- TP4056 protection module references
-- TPS63802 datasheet, Texas Instruments
+- ESP32-WROOM-32
+- BU01/DW1000 on default SPI
+- No-CS ST7789 on dedicated HSPI
+- GY-511 and MAX30102 on shared I2C GPIO21/22
+- Protected Li-Po charging and TPS63802 3.3V rail
+
+Only the node identity and fixed DW1000 Anchor/Tag role differ.
+
+## Existing Artifact Use
+
+The existing schematic and exports remain historical module-level interconnect references. They are not production PCB signoff, and their Master/Slave labels must not be copied into new designs.

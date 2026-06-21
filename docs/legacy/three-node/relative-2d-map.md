@@ -1,4 +1,6 @@
-# Relative 2D Map
+# Legacy Relative 2D Map
+
+> Superseded on 2026-06-21. This document describes the former three-node triangle architecture and is retained only for project history.
 
 The map solver uses 3 measured distances:
 

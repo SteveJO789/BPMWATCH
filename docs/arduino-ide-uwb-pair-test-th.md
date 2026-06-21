@@ -2,7 +2,9 @@
 
 คู่มือนี้ใช้สำหรับรัน S.T.A.T `uwb_pair_test` ด้วย Arduino IDE แทน PlatformIO
 
-เทสต์นี้ใช้วัดระยะจริงระหว่าง Master/Anchor และ Slave 1/Tag โดย Master จะสร้าง Wi-Fi AP ชื่อ `S.T.A.T-UWB` และมีหน้ามอนิเตอร์ที่ `http://192.168.4.1`
+> ขอบเขต diagnostic: เทสต์นี้ยังเก็บ AP monitor และชื่อ role แบบเดิมไว้ แต่ production Radar firmware จะไม่มี AP, webserver หรือ application-level Master/Slave
+
+เทสต์นี้ใช้วัดระยะจริงระหว่าง Node A/Anchor และ Node B/Tag โดย Anchor ฝั่ง diagnostic จะสร้าง Wi-Fi AP ชื่อ `S.T.A.T-UWB` และมีหน้ามอนิเตอร์ที่ `http://192.168.4.1`
 
 ## ฮาร์ดแวร์
 
@@ -83,17 +85,19 @@ C:\Work\Fastwork\BPMWATCH\arduino\uwb_pair_test_arduino
 #define UWB_IS_MASTER 1
 ```
 
-ใช้ค่า `1` สำหรับ Master/Anchor และใช้ค่า `0` สำหรับ Slave 1/Tag
+ใช้ค่า `1` สำหรับ Node A/Anchor และใช้ค่า `0` สำหรับ Node B/Tag ชื่อ macro เดิมยังคงอยู่เพื่อให้ตรงกับ sketch ที่ผ่านการทดสอบแล้ว
 
 ## Upload และตรวจ output
 
-1. ตั้ง `UWB_IS_MASTER` เป็น `1` เลือก COM port ของ Master แล้วกด Upload
-2. ตั้ง `UWB_IS_MASTER` เป็น `0` เลือก COM port ของ Slave 1 แล้วกด Upload
+1. ตั้ง `UWB_IS_MASTER` เป็น `1` เลือก COM port ของ Node A แล้วกด Upload
+2. ตั้ง `UWB_IS_MASTER` เป็น `0` เลือก COM port ของ Node B แล้วกด Upload
 3. เปิด Serial Monitor ที่ `115200` เพื่อดูสถานะการเชื่อมต่อและค่าระยะ
 4. เชื่อมต่อโทรศัพท์หรือคอมพิวเตอร์กับ Wi-Fi `S.T.A.T-UWB` รหัสผ่าน `statuwb123`
 5. เปิด `http://192.168.4.1` เพื่อดู distance, RX power, quality และจำนวนครั้งที่อัปเดต
 
 output ที่ควรเห็น:
+
+ข้อความ `MASTER / ANCHOR` ด้านล่างเป็น string เดิมของ diagnostic firmware และหมายถึง Node A/Anchor ในสถาปัตยกรรมปัจจุบัน
 
 ```text
 S.T.A.T real UWB pair ranging test
@@ -136,3 +140,5 @@ Range #1: 1.02 m, RX -76.4 dBm, quality 8.0
 สำหรับ BPMWATCH ให้ DW1000 ใช้ global `SPI` bus หลัก เพราะ library นี้เรียกใช้ `SPI` โดยตรง
 
 จอ ST7789 แบบไม่มี CS ต้องอยู่บน `SPIClass` อีก bus หนึ่ง อย่าเอา ST7789 no-CS ไปอยู่ SPI bus เดียวกับ DW1000
+
+เอกสาร production ปัจจุบันอยู่ที่ `docs/architecture.md`, `docs/pin-map.md`, `docs/wiring-node-a.md` และ `docs/wiring-node-b.md`

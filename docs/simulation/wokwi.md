@@ -1,62 +1,38 @@
-# Wokwi Simulation
+# Wokwi Simulation Status
 
-The Wokwi simulation is for firmware behavior before real hardware is ready.
+The checked-in `firmware/sim/wokwi` project predates the two-node Radar pivot. It demonstrates the superseded three-node triangle UI with mocked values and is not validation of the current Radar MVP.
 
-It simulates:
+## Current Use
 
-- ESP32 master firmware loop
-- Adjustable fake BU01 UWB distances for `M-S1`, `M-S2`, and `S1-S2`
-- Adjustable fake MAX30102 BPM values
-- Fake battery values
-- Adjustable fake GY-511 heading value
-- Relative 2D map solving through the real `RelativeMapSolver`
-- Color TFT rendering through Wokwi's ILI9341 display part
+The old simulation may still be used to inspect:
 
-It does not simulate real BU01 UWB radio physics.
+- ESP32 display rendering through Wokwi's ILI9341 visual surrogate
+- Basic SPI display behavior
+- Historical triangle-map UI behavior
 
-## Display Target
+Do not use it to validate current Node A/B data flow, movement-bearing estimation, ESP-NOW, reciprocal bearing, or auto-range behavior.
 
-The current hardware target is an IPS TFT LCD 240x240 module with an ST7789 controller. The module labels are:
+## Current Hardware Display
 
-- `SCL`: SPI clock / SCK
-- `SDA`: SPI data / MOSI
-- `BLC`: backlight control
-- `DC`: data/command
-- `RES`: reset
+Real hardware uses a no-CS ST7789 240x240 display:
 
-Wokwi does not provide a built-in `wokwi-st7789` part, so the simulation uses `wokwi-ili9341` as a visual surrogate. This lets the map appear on a screen in Wokwi. The real hardware test remains ST7789 no-CS.
+- Module `SCL` is SPI SCK.
+- Module `SDA` is SPI MOSI.
+- `BLC` controls the backlight.
+- `DC` selects command/data.
+- `RES` resets the display.
+- The display runs on dedicated HSPI and does not share the DW1000 default SPI bus.
 
-## Run
+Wokwi does not provide a built-in ST7789 part matching this module, so the ILI9341 may remain a visual surrogate in a future Radar simulation.
 
-```bash
-cd firmware/sim/wokwi
-pio run
-```
+## Replacement Simulation Requirements
 
-Open the folder in Wokwi or use the Wokwi extension with `wokwi.toml`. The Serial Monitor should print one map frame per second.
+A current simulation must model one Radar Node screen with controllable inputs for:
 
-## Adaptive Inputs
+- UWB distance
+- Compass heading
+- Forward/right acceleration
+- Peer BPM validity and value
+- UWB and ESP-NOW link states
 
-The diagram has six knob potentiometers:
-
-| Control | Simulates | Range |
-|---|---|---:|
-| `UWB dM1` | Master to Slave 1 distance | 0.5-6.0 m |
-| `UWB dM2` | Master to Slave 2 distance | 0.5-6.0 m |
-| `UWB d12` | Slave 1 to Slave 2 distance | 0.5-6.0 m |
-| `MAX30102 S1 BPM` | Slave 1 heart rate | 45-160 BPM |
-| `MAX30102 S2 BPM` | Slave 2 heart rate | 45-160 BPM |
-| `GY-511 heading` | Heading angle | 0-359 deg |
-
-Move the UWB knobs into an impossible triangle to test `mapValid=0`.
-
-Expected output shape:
-
-```text
-BPMWATCH Wokwi simulation
-Display hardware target:
-- Real hardware: IPS TFT LCD 240x240 with ST7789 controller
-- Wokwi visual surrogate: ILI9341 SPI TFT
-- Real module labels: SCL=SPI SCK, SDA=SPI MOSI, BLC=backlight, DC=data/command, RES=reset
-mapValid=1 M=(0.00,0.00) S1=(2.45,0.00) S2=(...) BPM=.../... BAT=... heading=...
-```
+It must show the north-up radar, movement-bearing response, automatic `5/10/20/40m` scale, retained UWB-lost dot, and stale Peer BPM behavior.

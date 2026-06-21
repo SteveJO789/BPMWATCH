@@ -1,4 +1,6 @@
-# Master Wiring
+# Legacy Master Wiring
+
+> Superseded on 2026-06-21. Current wiring is documented in `docs/wiring-node-a.md` and `docs/wiring-node-b.md`.
 
 The master uses ESP32-WROOM-32 + B&T BU01 DW1000 LDO UWB breakout and battery power.
 

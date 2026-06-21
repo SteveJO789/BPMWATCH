@@ -1,4 +1,6 @@
-# Slave Wiring
+# Legacy Slave Wiring
+
+> Superseded on 2026-06-21. Current wiring is documented in `docs/wiring-node-a.md` and `docs/wiring-node-b.md`.
 
 Each slave uses ESP32-WROOM-32, B&T BU01 DW1000 LDO UWB breakout, an IPS TFT LCD 240x240 ST7789 display, GY-511/LSM303DLHC motion/compass sensor, MAX30102 BPM sensor, SOS button, and battery power.
 

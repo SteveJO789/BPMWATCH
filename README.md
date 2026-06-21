@@ -1,118 +1,108 @@
 # BPMWATCH
 
-BPMWATCH is a low-cost wearable team monitoring prototype using ESP32-WROOM-32, BU01 UWB ranging, BPM sensing, motion/compass sensing, battery monitoring, and a shared relative 2D team map.
+BPMWATCH is a two-node wearable Radar MVP built with ESP32, B&T BU01/DW1000 ranging, GY-511 heading and motion sensing, MAX30102 heart-rate sensing, ESP-NOW Peer data, and a no-CS ST7789 240x240 display.
 
-The current architecture follows `relative_2d_map_architecture.svg`: no GPS, no fixed anchors, 1 master node, 2 slave wearable nodes, and UWB distance measurements between all 3 node pairs.
+Each node places itself at the center of a north-up radar screen and shows the other node as a distance-scaled dot. The direction is a movement-based visual estimate, not a true UWB angle measurement.
 
-## Relative 2D Map Concept
+## Current Architecture
 
-The master collects these distances:
+The product has two equal Radar Nodes:
 
-- Master <-> Slave 1
-- Master <-> Slave 2
-- Slave 1 <-> Slave 2
+| Product node | ESP32 STA MAC | Fixed DW1000 role |
+|---|---|---|
+| Node A | `0C:8A:D3:7C:E5:A4` | Anchor |
+| Node B | `1C:75:C4:F4:E9:D4` | Tag |
 
-From those 3 distances, the master solves a triangle and broadcasts the same `TeamMapPacket` back to every screen. This is a team-relative map, not a real-world GPS map.
+Anchor and Tag are radio protocol roles only. There is no application-level Master or Slave.
 
-## MVP Scope
+The two links have separate responsibilities:
 
-- 1 Master Node
-- 2 Slave/Wearable Nodes
-- 3 B&T BU01 DW1000 LDO UWB breakout modules
-- 2 BPM sensors
-- 2 IPS TFT LCD 240x240 ST7789 display modules
-- 2 LSM303DLHC accelerometer/compass modules
-- SOS button and power switch on wearable nodes
-- Shared relative 2D map on each slave screen
+- **UWB:** calibrated distance ranging only.
+- **ESP-NOW:** Peer BPM and accepted reciprocal-bearing estimates.
 
-## Hardware Overview
+Production firmware will not create a Wi-Fi AP, webserver, or browser dashboard. The existing AP monitor remains only in the diagnostic `uwb_pair_test`.
 
-Master:
+See:
 
-- ESP32-WROOM-32
-- B&T BU01 DW1000 LDO UWB breakout
-- TP4056 Type-C charger with protection
-- TPS63802 buck-boost module
-- 602030 Li-Po battery
-- Power switch and power-filter capacitors
+- [Architecture workflow](radar_2d_map_architecture.svg)
+- [Architecture](docs/architecture.md)
+- [Radar MVP design spec](docs/superpowers/specs/2026-06-21-radar-2d-map-mvp-design.md)
+- [Test plan](docs/test-plan.md)
 
-Each slave:
+## Hardware Per Node
 
 - ESP32-WROOM-32
 - B&T BU01 DW1000 LDO UWB breakout
-- IPS TFT LCD 240x240 ST7789 display module with SCL/SCK, SDA/MOSI, BLC, DC, and RES pins
-- LSM303DLHC accelerometer/compass sensor
-- MAX30102 BPM sensor
-- SOS button
-- TP4056 Type-C charger with protection
-- TPS63802 buck-boost module
+- IPS TFT LCD 240x240 ST7789 display without a CS pin
+- GY-511 / LSM303DLHC accelerometer and compass
+- MAX30102 heart-rate sensor
 - 602030 Li-Po battery
-- Power switch and power-filter capacitors
+- TP4056 Type-C charger with protection
+- TPS63802 3.3V buck-boost supply
+- Power switch, decoupling capacitors, and enclosure
 
-## Firmware Overview
+Both nodes use the same buses and pin map. Only the MAC address and fixed DW1000 role differ.
 
-- `firmware/master`: collects slave status, manages UWB distances, solves the relative map, broadcasts `TeamMapPacket`.
-- `firmware/slave`: reads BPM and battery, sends status, receives map packet, draws the team map.
-- `firmware/tests`: small hardware validation projects.
-- `firmware/sim/wokwi`: Wokwi simulation project with mocked UWB, BPM, battery, and GY-511 data.
-- `tools/mac-address-scanner`: prints ESP32 MAC address for node setup.
-- `docs/arduino-ide-uwb-pair-test.md` and `docs/arduino-ide-uwb-pair-test-th.md`: Arduino IDE guides for the BU01/DW1000 pair test.
+## Radar Behavior
 
-## Build Instructions
+- North-up display with the current node at `(120,120)`.
+- UWB distance is filtered with an EMA and mapped to an automatic `5/10/20/40m` range.
+- GY-511 acceleration and compass heading provide a visual movement-bearing heuristic.
+- Decreasing distance places the Peer along the estimated movement bearing.
+- Increasing distance places the Peer approximately 180 degrees behind that bearing.
+- ESP-NOW mirrors an accepted bearing to the other display with a reciprocal 180-degree transform.
+- If UWB is lost, the last Peer dot remains as an inactive outline.
+- If ESP-NOW is stale, radar ranging continues and Peer BPM displays `--`.
 
-1. Open this folder in VS Code.
-2. Install the PlatformIO extension.
-3. Open `firmware/tests/esp32_blink`.
-4. Connect an ESP32 board.
-5. Build and upload from PlatformIO.
+## Repository Map
 
-Command-line example:
-
-```bash
-cd firmware/master
-pio run
-```
-
-## Development Phases
-
-1. Validate ESP32 boards and MAC addresses.
-2. Validate ST7789 240x240 display, GY-511/LSM303DLHC sensor, and MAX30102 sensor.
-3. Validate BU01 UWB pair ranging.
-4. Validate 3-node UWB triangle ranging.
-5. Build packet communication.
-6. Build relative map solver.
-7. Build slave display UI.
-8. Build master broadcast flow.
-9. Add battery and field testing.
-
-## Safety Warning
-
-B&T BU01 DW1000 LDO UWB, the ST7789 240x240 display, GY-511/LSM303DLHC, and MAX30102 modules must use 3.3V-compatible signal levels. Confirm the BU01 breakout pin labels before using any regulator/VIN pin, and do not connect 5V directly to 3.3V-only pins.
+- `firmware/radar_node`: approved production target; implementation pending.
+- `firmware/tests/uwb_pair_test`: working two-node UWB diagnostic with AP monitor.
+- `firmware/tests`: focused hardware bring-up projects.
+- `firmware/master` and `firmware/slave`: deprecated pre-pivot production scaffolds; scheduled for legacy relocation during firmware implementation.
+- `firmware/sim/wokwi`: legacy three-node UI simulation; not current Radar MVP validation.
+- `lib/DW1000`: vendored ESP32-compatible DW1000 library.
+- `docs/legacy/three-node`: superseded triangle-map documents and diagrams.
+- `test-logs`: current two-node bench evidence.
 
 ## Current Status
 
-Starter repository created from the project plan. Phase 3.1 ESP32 bring-up and MAC labeling are complete, and the project has reached Phase 3.2 ST7789 240x240 display testing.
+Completed:
 
-Confirmed UWB hardware:
+- ESP32 identity and STA MAC capture.
+- ST7789 no-CS display bring-up on a dedicated `SPIClass` bus.
+- GY-511 I2C discovery, initialization, and heading output.
+- MAX30102 raw IR and BPM calculation bring-up.
+- Real Node A to Node B DW1000 ranging.
+- Antenna delay `16555`, five-sample application median filter, and recovery behavior.
+- Two-node Radar architecture, glossary, workflow SVG, and design specification.
 
-- B&T BU01 DW1000 LDO UWB breakout module
-- Interface mode and exact pinout still need bench confirmation before final wiring.
+Next implementation milestone:
 
-Current node labels:
+1. Create the shared `firmware/radar_node` PlatformIO project.
+2. Integrate UWB range callbacks without the production AP monitor.
+3. Add GY-511 movement-bearing estimation and axis mapping.
+4. Add ESP-NOW Peer BPM and reciprocal bearing.
+5. Render and bench-test the radar on both ST7789 displays.
 
-- Master: `0C:8A:D3:7C:E5:A4`
-- Slave 1: `1C:75:C4:F4:E9:D4`
-- Slave 2: `FC:FA:31:FE:8C:E0`
+## Diagnostic Build
 
-Firmware still contains placeholders where BU01 protocol details, real pins, and sensor calibration must be confirmed on hardware.
+On this Windows machine, PlatformIO is available through:
 
-## TODO
+```powershell
+& "$env:USERPROFILE\.platformio\penv\Scripts\platformio.exe" run -d firmware\tests\uwb_pair_test -e master -e tag
+```
 
-- Confirm ESP32-WROOM-32 dev board/module variant.
-- Confirm B&T BU01 DW1000 LDO UART/SPI mode, pinout, power input pin, and protocol.
-- Confirm actual pin mapping.
-- Confirm 602030 Li-Po capacity and discharge current.
-- Test all 3 UWB pair distances.
-- Tune relative map smoothing.
-- Use no-CS ST7789 firmware mode; the physical display module exposes SCL, SDA, BLC, DC, and RES only.
-- Run `firmware/tests/i2c_scanner_test` before GY-511 and MAX30102 driver tests.
+The diagnostic environments retain the literal names `master` and `tag` for compatibility with tested code. They map to Node A/Anchor and Node B/Tag.
+
+## Electrical Safety
+
+- Keep all ESP32, DW1000, ST7789, GY-511, and MAX30102 signal levels 3.3V-compatible.
+- Confirm the exact BU01 breakout power-input label before applying power.
+- Keep the no-CS ST7789 on dedicated HSPI; do not share the DW1000 default SPI bus.
+- Feed Li-Po voltage to an ESP32 ADC only through a safe resistor divider.
+- Verify TPS63802 stability during ESP32 radio and UWB current bursts.
+
+## Historical Architecture
+
+The former one-Master/two-Slave triangle map is no longer the product direction. Its documentation is retained under [`docs/legacy/three-node`](docs/legacy/three-node/README.md).

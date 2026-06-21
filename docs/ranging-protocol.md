@@ -1,38 +1,62 @@
-# Ranging Protocol
+# Two-Node Communication Protocol
 
-The MVP must measure 3 UWB pairs:
+The current product uses two independent links between Node A and Node B.
 
-- Master <-> Slave 1
-- Master <-> Slave 2
-- Slave 1 <-> Slave 2
+## UWB Distance Link
 
-## Suggested Schedule
+| Node | Fixed role | EUI base |
+|---|---|---|
+| Node A | Anchor | `0C:8A:D3:7C:E5:A4` |
+| Node B | Tag | `1C:75:C4:F4:E9:D4` |
+
+The tested ranging sequence remains:
 
 ```text
-Slot 1: Master ranges Slave 1
-Slot 2: Master ranges Slave 2
-Slot 3: Slave 1 ranges Slave 2
-Slot 4: Master collects latest distance packets
-Slot 5: Master broadcasts TeamMapPacket
+BLINK -> RANGING_INIT -> POLL -> RANGE_REPORT
 ```
 
-The exact B&T BU01 DW1000 LDO UWB breakout protocol is still TODO. Keep the schedule deterministic so multiple nodes do not range at the same time, and confirm whether the purchased breakout exposes UART mode or requires direct SPI control.
+Current ranging constants:
 
-## Collision Avoidance
+- `DW1000.MODE_LONGDATA_RANGE_ACCURACY`
+- Antenna delay `16555`
+- Application median filter: 5 accepted samples
+- Discovery recovery: 5000 ms
+- Connected recovery: 15000 ms
 
-- Use fixed node IDs: Master = 0, Slave 1 = 1, Slave 2 = 2.
-- Only one ranging pair should be active per slot.
-- If a slot times out, mark that pair stale and continue.
+The production UI marks UWB stale after 3000 ms without a valid range, but keeps the last Peer dot indefinitely as an inactive outline.
 
-## Distance Quality
+## ESP-NOW Peer Data Link
 
-Use a simple quality byte at first:
+ESP-NOW operates in Wi-Fi station mode without an AP.
 
-- `0`: invalid or missing
-- `1`: weak/stale
-- `2`: valid
-- `3`: strong/recent
+```cpp
+struct PeerStatusPacket {
+  uint8_t version;
+  uint8_t senderNodeId;
+  uint16_t sequence;
+  uint16_t bpm;
+  float peerBearingDeg;
+  uint8_t flags;
+};
+```
 
-## Timeout Behavior
+Flags identify valid BPM and valid bearing fields.
 
-If any required distance pair is stale, `TeamMapPacket.mapValid` must be `0`.
+- Send status every 500 ms.
+- Send immediately when a bearing estimate is accepted.
+- Use local packet-receive time for freshness.
+- Mark Peer BPM unavailable after 3000 ms without a packet.
+- On a valid received bearing, display `normalizeAngle(peerBearingDeg + 180)`.
+
+## Independent Failure States
+
+| UWB | ESP-NOW | Display behavior |
+|---|---|---|
+| Current | Current | Active Peer dot and Peer BPM |
+| Stale | Current | Inactive last-known dot and current Peer BPM |
+| Current | Stale | Active Peer dot and `PEER BPM:--` |
+| Stale | Stale | Inactive last-known dot and `PEER BPM:--` |
+
+## Diagnostic Compatibility
+
+`firmware/tests/uwb_pair_test` keeps the tested environment names `master` and `tag`, plus its AP monitor. In current terminology these map to Node A/Anchor and Node B/Tag. The AP is diagnostic-only and is not part of production firmware.

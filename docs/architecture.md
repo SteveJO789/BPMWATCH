@@ -1,36 +1,62 @@
-# Architecture
+# Two-Node Radar Architecture
 
-BPMWATCH uses 1 master node and 2 slave wearable nodes.
-
-```text
-        UWB M-S1                UWB M-S2
-Slave 1 <--------> Master <--------> Slave 2
-   ^                                      ^
-   |------------ UWB S1-S2 --------------|
-```
-
-Each slave sends BPM, battery, signal state, and node ID to the master. The master collects all 3 UWB distance pairs, computes a relative 2D map, and broadcasts the same team map back to every screen.
-
-## Data Flow
+BPMWATCH contains two equal wearable Radar Nodes. Each node displays itself at the center and the other node as its Peer.
 
 ```text
-Slave 1 status ----\
-Slave 2 status -----+--> Master --> RelativeMapSolver --> TeamMapPacket
-UWB distances ------/                                \--> all screens
+Node A / DW1000 Anchor  <--- calibrated UWB distance --->  Node B / DW1000 Tag
+          |                                                       |
+          +<------ ESP-NOW: Peer BPM + bearing estimate -------->+
 ```
 
-## Why No GPS
+Anchor and Tag are fixed DW1000 radio roles. They do not create an application-level Master/Slave hierarchy.
 
-GPS does not work reliably indoors, under dense trees, or in many tactical/exploration conditions. It also adds cost and power use. This project only needs team-relative awareness for the MVP.
+## Per-Node Data Flow
 
-## Why No Fixed Anchors
+```text
+DW1000 distance ------\
+GY-511 heading --------+--> Radar state --> north-up ST7789 display
+GY-511 acceleration --/
 
-Fixed anchors make setup harder in outdoor or moving-team scenarios. The SVG architecture assumes every node can move, so the map is generated from distances inside the team.
+Local MAX30102 BPM --> ESP-NOW --> Peer display
+Accepted bearing ----> ESP-NOW --> reciprocal angle on Peer display
+```
 
-## Output Meaning
+## UWB Responsibility
 
-The output is not absolute world coordinates. It is a relative triangle:
+UWB provides distance only. Production firmware retains the proven Anchor/Tag ranging flow, antenna delay `16555`, five-sample median filter, and recovery behavior.
 
-- Master is the reference point.
-- Slave 1 is placed on the x-axis.
-- Slave 2 is computed from the measured distances.
+UWB does not provide direction. The displayed bearing is a visual estimate derived from current-node movement and heading.
+
+## Movement Bearing
+
+The node uses mapped GY-511 acceleration axes to estimate a short-lived horizontal acceleration direction, then rotates that direction into a north-up compass frame.
+
+When cumulative UWB distance changes by more than `0.25m` during accepted movement:
+
+- Decreasing range places the Peer along the movement bearing.
+- Increasing range places the Peer approximately 180 degrees behind it.
+- Stable range keeps the previous Peer bearing.
+
+If one node accepts a bearing, ESP-NOW sends it to the Peer. The Peer applies `+180 degrees` so both displays update when only one node moves.
+
+## ESP-NOW Responsibility
+
+ESP-NOW carries small bidirectional status packets:
+
+- Peer BPM and validity
+- Accepted bearing and validity
+- Node ID, packet version, and sequence
+
+It uses Wi-Fi station mode without creating an AP or browser UI. ESP-NOW freshness and UWB freshness are tracked separately.
+
+## Display Meaning
+
+- North is always at the top.
+- The current node is always at the center.
+- The Peer radius represents filtered UWB distance within the active `5/10/20/40m` band.
+- The Peer angle is an estimate, not a measured UWB angle or geographic position.
+- A gray outline dot means the last UWB position is being retained after link loss.
+
+## Historical Architecture
+
+The former three-node triangle solver and `TeamMapPacket` flow are superseded. Historical documents are under [`legacy/three-node`](legacy/three-node/README.md).

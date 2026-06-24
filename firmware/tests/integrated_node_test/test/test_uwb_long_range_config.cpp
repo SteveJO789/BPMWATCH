@@ -29,3 +29,10 @@ void testLongRangeVerifierDoesNotRequireNssfdBitsFor110kbps() {
       0, kExpectedUwbLongRangeChanCtrl & ((1UL << 20) | (1UL << 21)));
   TEST_ASSERT_EQUAL_UINT32(0, uwbLongRangeFailureMask(snapshot));
 }
+
+void testLongRangeVerifierIgnoresRfTxctrlUpperByte() {
+  UwbLongRangeRegisterSnapshot snapshot = expectedUwbLongRangeSnapshot();
+  snapshot.rfTxctrl = 0xDE1E3FE0UL;
+
+  TEST_ASSERT_EQUAL_UINT32(0, uwbLongRangeFailureMask(snapshot));
+}

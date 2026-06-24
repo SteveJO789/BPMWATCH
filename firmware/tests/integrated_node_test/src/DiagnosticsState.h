@@ -111,6 +111,11 @@ struct Max30102DiagnosticState {
   long maxIrAc1s = 0;
   uint32_t rejectedBeatCount = 0;
   uint32_t lastBeatIntervalMs = 0;
+  uint32_t maxSampleDurationUs = 0;
+  uint32_t maxSampleDurationMaxUs = 0;
+  uint32_t maxLockFailCount = 0;
+  uint32_t maxTaskStackHighWater = 0;
+  bool maxTaskCreated = false;
 };
 
 struct DiagnosticsState {

@@ -34,6 +34,15 @@ void Max30102Sensor::sample(uint32_t nowMs,
     return;
   }
 
+  const uint32_t sampleStartUs = micros();
+  const auto finishSample = [&state, sampleStartUs]() {
+    const uint32_t durationUs = micros() - sampleStartUs;
+    state.maxSampleDurationUs = durationUs;
+    if (durationUs > state.maxSampleDurationMaxUs) {
+      state.maxSampleDurationMaxUs = durationUs;
+    }
+  };
+
   state.lastBeatAgeMs = safeAgeMs(nowMs, lastBeatMs_);
   state.irValue = sensor_.getIR();
   state.fingerPresent = state.irValue >= 30000;
@@ -52,6 +61,7 @@ void Max30102Sensor::sample(uint32_t nowMs,
   if (state.irValue > state.maxIrMax1s) state.maxIrMax1s = state.irValue;
 
   if (!checkForBeat(state.irValue)) {
+    finishSample();
     return;
   }
 
@@ -82,5 +92,6 @@ void Max30102Sensor::sample(uint32_t nowMs,
     }
   }
   lastBeatMs_ = nowMs;
+  finishSample();
 }
 #endif

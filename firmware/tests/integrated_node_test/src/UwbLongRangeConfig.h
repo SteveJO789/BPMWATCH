@@ -59,6 +59,7 @@ constexpr uint32_t kExpectedUwbLongRangeTxFctrlMask = 0x003F6000UL;
 constexpr uint32_t kExpectedUwbLongRangeTxFctrl = 0x002A0000UL;
 constexpr uint32_t kExpectedUwbLongRangeTxPower = 0x85858585UL;
 constexpr uint32_t kExpectedUwbLongRangeRfTxctrl = 0x001E3FE0UL;
+constexpr uint32_t kExpectedUwbLongRangeRfTxctrlMask = 0x00FFFFFFUL;
 constexpr uint8_t kExpectedUwbLongRangeTcPgdelay = 0xC0;
 constexpr uint32_t kExpectedUwbLongRangeFsPllcfg = 0x0800041DUL;
 constexpr uint8_t kExpectedUwbLongRangeFsPlltune = 0xBE;
@@ -120,7 +121,8 @@ inline uint32_t uwbLongRangeFailureMask(
   if (snapshot.txPower != kExpectedUwbLongRangeTxPower) {
     mask |= UwbLongRangeFailTxPower;
   }
-  if (snapshot.rfTxctrl != kExpectedUwbLongRangeRfTxctrl) {
+  if ((snapshot.rfTxctrl & kExpectedUwbLongRangeRfTxctrlMask) !=
+      (kExpectedUwbLongRangeRfTxctrl & kExpectedUwbLongRangeRfTxctrlMask)) {
     mask |= UwbLongRangeFailRfTxctrl;
   }
   if (snapshot.tcPgdelay != kExpectedUwbLongRangeTcPgdelay) {

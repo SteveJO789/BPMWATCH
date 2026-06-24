@@ -26,6 +26,7 @@
 #include "TimeUtils.h"
 #include "UwbDiagnostics.h"
 #include "UwbEventQueue.h"
+#include "UwbRfQuality.h"
 #include "UwbTaskCadence.h"
 #if BPMWATCH_UWB_TASK && defined(ARDUINO_ARCH_ESP32)
 #include <DW1000.h>
@@ -77,6 +78,10 @@
 
 #ifndef BPMWATCH_MAX_SAMPLE_INTERVAL_MS
 #define BPMWATCH_MAX_SAMPLE_INTERVAL_MS 10
+#endif
+
+#ifndef BPMWATCH_I2C_CLOCK_HZ
+#define BPMWATCH_I2C_CLOCK_HZ 400000
 #endif
 #ifndef BPMWATCH_DISCOVERY_DISPLAY_INTERVAL_MS
 #define BPMWATCH_DISCOVERY_DISPLAY_INTERVAL_MS 1000
@@ -185,11 +190,15 @@ void uwbTask(void*) {
 #endif
 
 #if BPMWATCH_MAX_TASK && defined(ARDUINO_ARCH_ESP32)
+TaskHandle_t maxTaskHandle = nullptr;
+
 void maxTask(void*) {
   TickType_t lastWake = xTaskGetTickCount();
   const TickType_t period = pdMS_TO_TICKS(BPMWATCH_MAX_SAMPLE_INTERVAL_MS);
   for (;;) {
+    state.max30102.maxTaskStackHighWater = uxTaskGetStackHighWaterMark(nullptr);
     if (state.max30102.initialized) {
+      // Keep the I2C read out of DiagnosticsLock so logging cannot throttle SPS.
       max30102.sample(millis(), state.max30102);
     }
     vTaskDelayUntil(&lastWake, period);
@@ -267,6 +276,11 @@ void logDiagnostics(const DiagnosticsState& current, uint32_t nowMs) {
   } else if (current.uwb.rxLosNlosHint == 3) {
     losStatus = "NLOS";
   }
+  const char* rfStatus =
+      current.uwb.rxLosNlosHint == 0
+          ? "---"
+          : uwbRfQualityLabel(current.uwb.rxFpPowerDbm,
+                              current.uwb.rxLosNlosDelta);
 
   const char* gyStatus =
       current.gy511.initialized
@@ -284,8 +298,8 @@ void logDiagnostics(const DiagnosticsState& current, uint32_t nowMs) {
       current.uwb.uwbInterruptCount > 0 ? "IRQ" : "SAFETY_POLL";
 
   Serial.printf(
-      "t=%lu %s | UWB=%s peer=%d R#=%lu REC#=%lu AGE=%lums ACT=%lums RCAGE=%lums D=%.2fm STK=%lu IRQ#=%lu IRQPIN=%u IRQMODE=%s P#=%lu EV=%lu/%lu/%lu RST#=%lu RXERR=%lu/%lu RRST#=%lu REG=S:%02X%08lX M:%08lX C:%08lX CFG:%08lX DM:%u LR_OK=%d LR_FAIL=%u LR_FAIL_REASON=%s RX_POWER=%.1f FP_POWER=%.1f DELTA=%.1f LOS=%s RXPACC=%u CIR_PWR=%u FP_AMPL=%u/%u/%u STD_NOISE=%u | ESPNOW=%s TX=%lu/%lu RX=%lu | "
-      "GY=%s H=%.1f A=%d,%d,%d | MAX=%s IR=%ld BPM=%d SPS=%lu BEAT#=%lu IR_MIN=%ld IR_MAX=%ld IRAC=%ld LASTBEAT=%lums REJ#=%lu BI=%lums WHY=%s\n",
+      "t=%lu %s | UWB=%s peer=%d R#=%lu REC#=%lu AGE=%lums ACT=%lums RCAGE=%lums D=%.2fm STK=%lu IRQ#=%lu IRQPIN=%u IRQMODE=%s P#=%lu EV=%lu/%lu/%lu RST#=%lu RXERR=%lu/%lu RRST#=%lu REG=S:%02X%08lX M:%08lX C:%08lX CFG:%08lX DM:%u LR_OK=%d LR_FAIL=%u LR_FAIL_REASON=%s RX_POWER=%.1f FP_POWER=%.1f DELTA=%.1f LOS=%s RF=%s RXPACC=%u CIR_PWR=%u FP_AMPL=%u/%u/%u STD_NOISE=%u | ESPNOW=%s TX=%lu/%lu RX=%lu | "
+      "GY=%s H=%.1f A=%d,%d,%d | MAX=%s IR=%ld BPM=%d SPS=%lu BEAT#=%lu IR_MIN=%ld IR_MAX=%ld IRAC=%ld LASTBEAT=%lums REJ#=%lu BI=%lums WHY=%s MAX_DUR_US=%lu MAX_DUR_MAX_US=%lu MAX_LOCK_FAIL=%lu MAX_TASK_STK=%lu\n",
       static_cast<unsigned long>(nowMs), kNodeConfig.displayLabel, uwbStatus,
       current.uwb.peerPresent ? 1 : 0,
       static_cast<unsigned long>(current.uwb.rangeCount),
@@ -319,6 +333,7 @@ void logDiagnostics(const DiagnosticsState& current, uint32_t nowMs) {
       current.uwb.rxFpPowerDbm,
       current.uwb.rxLosNlosDelta,
       losStatus,
+      rfStatus,
       static_cast<unsigned>(current.uwb.rxPacc),
       static_cast<unsigned>(current.uwb.rxCirPower),
       static_cast<unsigned>(current.uwb.rxFpAmpl1),
@@ -340,7 +355,11 @@ void logDiagnostics(const DiagnosticsState& current, uint32_t nowMs) {
       static_cast<unsigned long>(current.max30102.lastBeatAgeMs),
       static_cast<unsigned long>(current.max30102.rejectedBeatCount),
       static_cast<unsigned long>(current.max30102.lastBeatIntervalMs),
-      maxReason);
+      maxReason,
+      static_cast<unsigned long>(current.max30102.maxSampleDurationUs),
+      static_cast<unsigned long>(current.max30102.maxSampleDurationMaxUs),
+      static_cast<unsigned long>(current.max30102.maxLockFailCount),
+      static_cast<unsigned long>(current.max30102.maxTaskStackHighWater));
 }
 }  // namespace
 
@@ -354,6 +373,9 @@ void setup() {
 
 #if BPMWATCH_ENABLE_I2C_SCAN || BPMWATCH_ENABLE_GY511 || BPMWATCH_ENABLE_MAX30102
   Wire.begin(21, 22);
+  Wire.setClock(BPMWATCH_I2C_CLOCK_HZ);
+  Serial.printf("I2C clock: %lu Hz\n",
+                static_cast<unsigned long>(BPMWATCH_I2C_CLOCK_HZ));
 #endif
 
 #if BPMWATCH_ENABLE_DISPLAY
@@ -419,12 +441,18 @@ void setup() {
 #endif
 
 #if BPMWATCH_MAX_TASK && defined(ARDUINO_ARCH_ESP32)
-  xTaskCreatePinnedToCore(maxTask, "MAXTask", BPMWATCH_MAX_TASK_STACK, nullptr,
-                          BPMWATCH_MAX_TASK_PRIORITY, nullptr,
-                          BPMWATCH_MAX_TASK_CORE);
-  Serial.printf("MAX task: ON priority=%d core=%d stack=%d interval=%dms\n",
-                BPMWATCH_MAX_TASK_PRIORITY, BPMWATCH_MAX_TASK_CORE,
-                BPMWATCH_MAX_TASK_STACK, BPMWATCH_MAX_SAMPLE_INTERVAL_MS);
+  const BaseType_t maxTaskCreateResult = xTaskCreatePinnedToCore(
+      maxTask, "MAXTask", BPMWATCH_MAX_TASK_STACK, nullptr,
+      BPMWATCH_MAX_TASK_PRIORITY, &maxTaskHandle, BPMWATCH_MAX_TASK_CORE);
+  state.max30102.maxTaskCreated = maxTaskCreateResult == pdPASS;
+  Serial.printf(
+      "MAX task: enabled=1 created=%d priority=%d core=%d stack=%d interval=%dms\n",
+      state.max30102.maxTaskCreated ? 1 : 0, BPMWATCH_MAX_TASK_PRIORITY,
+      BPMWATCH_MAX_TASK_CORE, BPMWATCH_MAX_TASK_STACK,
+      BPMWATCH_MAX_SAMPLE_INTERVAL_MS);
+  if (!state.max30102.maxTaskCreated) {
+    Serial.println("MAX task warning: task create failed; loop fallback is disabled for this build");
+  }
 #endif
 }
 

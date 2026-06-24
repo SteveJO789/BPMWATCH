@@ -23,6 +23,7 @@ class UwbDiagnostics {
   UwbRecoveryGate recoveryGate_;
   uint32_t lastObservedRangeCount_ = 0;
   uint32_t lastRegisterSnapshotMs_ = 0;
+  uint32_t lastLoggedLongRangeFailureMask_ = UINT32_MAX;
   bool lastObservedPeerPresent_ = false;
   bool hasEverConnected_ = false;
   char eui_[24]{};
@@ -31,7 +32,7 @@ class UwbDiagnostics {
   void receiverRecover(UwbDiagnosticState& state);
   void configureDw1000LongRangeMode();
   void dumpRegisterSnapshot(UwbDiagnosticState& state);
-  void verifyLongRangeConfig(UwbDiagnosticState& state);
+  void verifyLongRangeConfig(UwbDiagnosticState& state, bool forceFullDump);
   void copyLongRangeSnapshotToState(
       const UwbLongRangeRegisterSnapshot& snapshot,
       UwbDiagnosticState& state);

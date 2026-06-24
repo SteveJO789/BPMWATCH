@@ -176,8 +176,8 @@ void UwbDiagnostics::poll(uint32_t nowMs, UwbDiagnosticState& state) {
   if (nowMs - lastRegisterSnapshotMs_ >= 1000) {
     lastRegisterSnapshotMs_ = nowMs;
     dumpRegisterSnapshot(state);
-    if (!state.longRangeConfigOk && state.spiReady) {
-      verifyLongRangeConfig(state);
+    if (state.spiReady) {
+      verifyLongRangeConfig(state, false);
     }
   }
 
@@ -257,6 +257,8 @@ void UwbDiagnostics::receiverRecover(UwbDiagnosticState& state) {
   DW1000.idle();
   DW1000.resetReceiver();
   DW1000.commitConfiguration();
+  dumpRegisterSnapshot(state);
+  verifyLongRangeConfig(state, true);
   pushUwbEvent(
       {UwbEventType::Recovery, 0, UWB_RECEIVER_RECOVERY_COOLDOWN_MS, {}});
 }
@@ -315,7 +317,8 @@ void UwbDiagnostics::dumpRegisterSnapshot(UwbDiagnosticState& state) {
   state.uwbDeviceMode = deviceMode;
 }
 
-void UwbDiagnostics::verifyLongRangeConfig(UwbDiagnosticState& state) {
+void UwbDiagnostics::verifyLongRangeConfig(UwbDiagnosticState& state,
+                                           bool forceFullDump) {
   const UwbLongRangeRegisterSnapshot snapshot = readLongRangeRegisterSnapshot();
   const uint32_t failureMask = uwbLongRangeFailureMask(snapshot);
   const uint8_t failures = countUwbLongRangeFailures(failureMask);
@@ -334,10 +337,15 @@ void UwbDiagnostics::verifyLongRangeConfig(UwbDiagnosticState& state) {
         '\0';
   }
 
-  Serial.printf("LR_OK=%d LR_FAIL=%u LR_FAIL_REASON=%s\n",
-                failures == 0 ? 1 : 0, static_cast<unsigned>(failures),
-                reason);
-  logLongRangeRegisterSnapshot(snapshot, failureMask);
+  const bool failureReasonChanged =
+      failureMask != lastLoggedLongRangeFailureMask_;
+  if (forceFullDump || failureReasonChanged) {
+    Serial.printf("LR_OK=%d LR_FAIL=%u LR_FAIL_REASON=%s\n",
+                  failures == 0 ? 1 : 0, static_cast<unsigned>(failures),
+                  reason);
+    logLongRangeRegisterSnapshot(snapshot, failureMask);
+    lastLoggedLongRangeFailureMask_ = failureMask;
+  }
 }
 
 void UwbDiagnostics::logLongRangeRegisterSnapshot(
@@ -364,10 +372,12 @@ void UwbDiagnostics::logLongRangeRegisterSnapshot(
                 static_cast<unsigned long>(kExpectedUwbLongRangeTxPower),
                 static_cast<unsigned long>(snapshot.txPower),
                 (failureMask & UwbLongRangeFailTxPower) ? "FAIL" : "OK");
-  Serial.printf("LR_REG=RF_TXCTRL expected=0x%08lX actual=0x%08lX %s\n",
-                static_cast<unsigned long>(kExpectedUwbLongRangeRfTxctrl),
-                static_cast<unsigned long>(snapshot.rfTxctrl),
-                (failureMask & UwbLongRangeFailRfTxctrl) ? "FAIL" : "OK");
+  Serial.printf(
+      "LR_REG=RF_TXCTRL expected=0x%08lX mask=0x%08lX actual=0x%08lX %s\n",
+      static_cast<unsigned long>(kExpectedUwbLongRangeRfTxctrl),
+      static_cast<unsigned long>(kExpectedUwbLongRangeRfTxctrlMask),
+      static_cast<unsigned long>(snapshot.rfTxctrl),
+      (failureMask & UwbLongRangeFailRfTxctrl) ? "FAIL" : "OK");
   Serial.printf("LR_REG=TC_PGDELAY expected=0x%02X actual=0x%02X %s\n",
                 kExpectedUwbLongRangeTcPgdelay, snapshot.tcPgdelay,
                 (failureMask & UwbLongRangeFailTcPgdelay) ? "FAIL" : "OK");
@@ -470,6 +480,7 @@ void UwbDiagnostics::restart(UwbDiagnosticState& state) {
   }
   lastObservedPeerPresent_ = false;
   lastRegisterSnapshotMs_ = 0;
+  lastLoggedLongRangeFailureMask_ = UINT32_MAX;
   rangeFilter_.reset();
 
   DW1000Ranging.initCommunication(kUwbReset, kUwbCs, kUwbIrq);
@@ -504,7 +515,7 @@ void UwbDiagnostics::restart(UwbDiagnosticState& state) {
 
   // Dump registers immediately after init for sanity check
   dumpRegisterSnapshot(state);
-  verifyLongRangeConfig(state);
+  verifyLongRangeConfig(state, true);
 
   recoveryGate_.markActivity(millis());
 }

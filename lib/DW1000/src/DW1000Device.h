@@ -21,9 +21,6 @@
  * @todo complete this class
  */
 
-
-#define INACTIVITY_TIME 1000
-
 #ifndef _DW1000Device_H_INCLUDED
 #define _DW1000Device_H_INCLUDED
 
@@ -87,6 +84,7 @@ public:
 	DW1000Time timeRangeReceived;
 	
 	void    noteActivity();
+	void    resetGracePeriod();
 	boolean isInactive();
 
 
@@ -102,6 +100,7 @@ private:
 	int16_t _RXPower;
 	int16_t _FPPower;
 	int16_t _quality;
+	uint8_t _gracePeriodMissed;
 	
 	void randomShortAddress();
 	

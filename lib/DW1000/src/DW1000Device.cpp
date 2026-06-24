@@ -23,14 +23,17 @@
 
 #include "DW1000Device.h"
 #include "DW1000.h"
+#include "DW1000Inactivity.h"
 
 
 //Constructor and destructor
 DW1000Device::DW1000Device() {
+	_gracePeriodMissed = 0;
 	randomShortAddress();
 }
 
 DW1000Device::DW1000Device(byte deviceAddress[], boolean shortOne) {
+	_gracePeriodMissed = 0;
 	if(!shortOne) {
 		//we have a 8 bytes address
 		setAddress(deviceAddress);
@@ -43,6 +46,7 @@ DW1000Device::DW1000Device(byte deviceAddress[], boolean shortOne) {
 }
 
 DW1000Device::DW1000Device(byte deviceAddress[], byte shortAddress[]) {
+	_gracePeriodMissed = 0;
 	//we have a 8 bytes address
 	setAddress(deviceAddress);
 	//we set the 2 bytes address
@@ -130,14 +134,28 @@ void DW1000Device::randomShortAddress() {
 
 void DW1000Device::noteActivity() {
 	_activity = millis();
+	_gracePeriodMissed = 0;
 }
 
+void DW1000Device::resetGracePeriod() {
+	_gracePeriodMissed = 0;
+	_activity = millis();
+}
 
 boolean DW1000Device::isInactive() {
-	//One second of inactivity
-	if(millis()-_activity > INACTIVITY_TIME) {
+	if(millis()-_activity > dw1000InactivityTimeMs()) {
+		uint32_t graceMs = dw1000InactivityGracePeriodMs();
+		if(_gracePeriodMissed < 255) {
+			_gracePeriodMissed++;
+		}
+		if(_gracePeriodMissed * dw1000InactivityTimeMs() < graceMs) {
+			_activity = millis();
+			return false;
+		}
 		_activity = millis();
+		_gracePeriodMissed = 0;
 		return true;
 	}
+	_gracePeriodMissed = 0;
 	return false;
 }

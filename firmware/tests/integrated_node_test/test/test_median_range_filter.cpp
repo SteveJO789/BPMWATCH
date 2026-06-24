@@ -23,8 +23,18 @@ void testUwbRecoveryGateWaitsFullTimeoutBeforeRecovering();
 void testUwbRecoveryGateDoesNotRepeatUntilTimeoutAfterRecovery();
 void testUwbRecoveryGateActivityAfterRecoveryExtendsWindow();
 void testUwbRecoveryGateObservedRangeActivitySuppressesRepeatedRecovery();
+void testUwbRecoveryGateBlocksRepeatRecoveryEvenWhenActivityIsOld();
+void testUwbRecoveryGateReportsActivityAndRecoveryAges();
 void testUwbTaskCadenceDefaultsZeroToOnePollPerTick();
 void testUwbTaskCadenceYieldsAfterConfiguredPolls();
+void testUwbTaskCadenceUsesIdlePollWhenNoIrqArrives();
+void testUwbTaskCadenceUsesBurstPollsWhenIrqArrives();
+void testDw1000InactivityTimeoutKeepsAtLeastLegacyMinimum();
+void testDw1000InactivityTimeoutAcceptsLongerConfiguredWindow();
+void testDw1000InactivityGracePeriodIsConfigurable();
+void testDw1000InactivityGracePeriodExtendsBeyondTimeout();
+void testClearUwbRangingDevicesRemovesAllKnownPeers();
+void testClearUwbRangingDevicesStopsAtGuardLimit();
 
 void testRejectsInvalidRanges() {
   MedianRangeFilter filter;
@@ -88,7 +98,17 @@ int main() {
   RUN_TEST(testUwbRecoveryGateDoesNotRepeatUntilTimeoutAfterRecovery);
   RUN_TEST(testUwbRecoveryGateActivityAfterRecoveryExtendsWindow);
   RUN_TEST(testUwbRecoveryGateObservedRangeActivitySuppressesRepeatedRecovery);
+  RUN_TEST(testUwbRecoveryGateBlocksRepeatRecoveryEvenWhenActivityIsOld);
+  RUN_TEST(testUwbRecoveryGateReportsActivityAndRecoveryAges);
   RUN_TEST(testUwbTaskCadenceDefaultsZeroToOnePollPerTick);
   RUN_TEST(testUwbTaskCadenceYieldsAfterConfiguredPolls);
+  RUN_TEST(testUwbTaskCadenceUsesIdlePollWhenNoIrqArrives);
+  RUN_TEST(testUwbTaskCadenceUsesBurstPollsWhenIrqArrives);
+  RUN_TEST(testDw1000InactivityTimeoutKeepsAtLeastLegacyMinimum);
+  RUN_TEST(testDw1000InactivityTimeoutAcceptsLongerConfiguredWindow);
+  RUN_TEST(testDw1000InactivityGracePeriodIsConfigurable);
+  RUN_TEST(testDw1000InactivityGracePeriodExtendsBeyondTimeout);
+  RUN_TEST(testClearUwbRangingDevicesRemovesAllKnownPeers);
+  RUN_TEST(testClearUwbRangingDevicesStopsAtGuardLimit);
   return UNITY_END();
 }

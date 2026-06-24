@@ -46,3 +46,26 @@ void testUwbRecoveryGateObservedRangeActivitySuppressesRepeatedRecovery() {
   TEST_ASSERT_FALSE(gate.shouldRecover(31000, 15000));
   TEST_ASSERT_TRUE(gate.shouldRecover(31500, 15000));
 }
+
+void testUwbRecoveryGateBlocksRepeatRecoveryEvenWhenActivityIsOld() {
+  UwbRecoveryGate gate;
+  gate.markActivity(1000);
+
+  TEST_ASSERT_TRUE(gate.shouldRecover(16000, 15000));
+  gate.markRecovery(16000);
+
+  TEST_ASSERT_FALSE(gate.shouldRecover(16001, 15000));
+  TEST_ASSERT_FALSE(gate.shouldRecover(30999, 15000));
+  TEST_ASSERT_TRUE(gate.shouldRecover(31000, 15000));
+}
+
+void testUwbRecoveryGateReportsActivityAndRecoveryAges() {
+  UwbRecoveryGate gate;
+  gate.markActivity(1000);
+  gate.markRecovery(6000);
+
+  TEST_ASSERT_EQUAL_UINT32(6000, gate.lastActivityMs());
+  TEST_ASSERT_EQUAL_UINT32(6000, gate.lastRecoveryMs());
+  TEST_ASSERT_EQUAL_UINT32(3000, gate.activityAgeMs(9000));
+  TEST_ASSERT_EQUAL_UINT32(3000, gate.recoveryAgeMs(9000));
+}

@@ -106,6 +106,11 @@ public:
 	reset pin has been specified (when using `begin(int)`, instead of `begin(int, int)`).
 	*/
 	static void reset();
+
+	/**
+	Resets only the receiver logic using the SOFTRESET RX bit.
+	*/
+	static void resetReceiver();
 	
 	/** 
 	Resets the currently selected DW1000 chip programmatically (via corresponding commands).
@@ -296,6 +301,10 @@ public:
 	static void attachReceiveTimestampAvailableHandler(void (* handleReceiveTimestampAvailable)(void)) {
 		_handleReceiveTimestampAvailable = handleReceiveTimestampAvailable;
 	}
+
+	static void attachInterruptCompleteHandler(void (* handleInterruptComplete)(void)) {
+		_handleInterruptComplete = handleInterruptComplete;
+	}
 	
 	/* device state management. */
 	// idle state
@@ -429,6 +438,7 @@ public:
 	static void (* _handleReceiveFailed)(void);
 	static void (* _handleReceiveTimeout)(void);
 	static void (* _handleReceiveTimestampAvailable)(void);
+	static void (* _handleInterruptComplete)(void);
 	
 	/* register caches. */
 	static byte _syscfg[LEN_SYS_CFG];

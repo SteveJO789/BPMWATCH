@@ -12,3 +12,10 @@ inline bool shouldYieldUwbTask(uint16_t pollCount,
       normalizedUwbPollsPerTick(configuredPollsPerTick);
   return pollCount >= pollsPerTick;
 }
+
+inline uint16_t uwbPollsForTaskWake(uint32_t notificationCount,
+                                    uint16_t configuredIdlePolls,
+                                    uint16_t configuredIrqPolls) {
+  return notificationCount > 0 ? normalizedUwbPollsPerTick(configuredIrqPolls)
+                               : normalizedUwbPollsPerTick(configuredIdlePolls);
+}

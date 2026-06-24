@@ -104,6 +104,9 @@ public:
 	static void useRangeFilter(boolean enabled);
 	// Used for the smoothing algorithm (Exponential Moving Average). newValue must be >= 2. Default 15.
 	static void setRangeFilterValue(uint16_t newValue);
+	static uint32_t getReceiveFailureCount() { return _receiveFailureCount; }
+	static uint32_t getReceiveTimeoutCount() { return _receiveTimeoutCount; }
+	static uint32_t getReceiverResetCount() { return _receiverResetCount; }
 	
 	//Handlers:
 	static void attachNewRange(void (* handleNewRange)(void)) { _handleNewRange = handleNewRange; };
@@ -149,6 +152,9 @@ private:
 	// message sent/received state
 	static volatile boolean _sentAck;
 	static volatile boolean _receivedAck;
+	static volatile uint32_t _receiveFailureCount;
+	static volatile uint32_t _receiveTimeoutCount;
+	static volatile uint32_t _receiverResetCount;
 	// protocol error state
 	static boolean          _protocolFailed;
 	// reset line to the chip
@@ -178,6 +184,8 @@ private:
 	//methods
 	static void handleSent();
 	static void handleReceived();
+	static void handleReceiveFailed();
+	static void handleReceiveTimeout();
 	static void noteActivity();
 	static void resetInactive();
 	

@@ -19,6 +19,7 @@ class UwbDiagnostics {
   MedianRangeFilter rangeFilter_;
   UwbRecoveryGate recoveryGate_;
   uint32_t lastObservedRangeCount_ = 0;
+  uint32_t lastRegisterSnapshotMs_ = 0;
   bool lastObservedPeerPresent_ = false;
   bool hasEverConnected_ = false;
   char eui_[24]{};

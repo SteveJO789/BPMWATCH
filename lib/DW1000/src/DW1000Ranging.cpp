@@ -63,6 +63,9 @@ uint16_t DW1000RangingClass::_rangeFilterValue = 15;
 // message sent/received state
 volatile boolean DW1000RangingClass::_sentAck     = false;
 volatile boolean DW1000RangingClass::_receivedAck = false;
+volatile uint32_t DW1000RangingClass::_receiveFailureCount = 0;
+volatile uint32_t DW1000RangingClass::_receiveTimeoutCount = 0;
+volatile uint32_t DW1000RangingClass::_receiverResetCount = 0;
 
 // protocol error state
 boolean          DW1000RangingClass::_protocolFailed = false;
@@ -128,6 +131,9 @@ void DW1000RangingClass::generalStart() {
 	// attach callback for (successfully) sent and received messages
 	DW1000.attachSentHandler(handleSent);
 	DW1000.attachReceivedHandler(handleReceived);
+	DW1000.attachReceiveFailedHandler(handleReceiveFailed);
+	DW1000.attachReceiveTimeoutHandler(handleReceiveTimeout);
+	DW1000.interruptOnReceiveTimeout(true);
 	// anchor starts in receiving mode, awaiting a ranging poll message
 	
 	
@@ -500,15 +506,23 @@ void DW1000RangingClass::loop() {
 			_globalMac.decodeBlinkFrame(data, address, shortAddress);
 			//we crate a new device with th tag
 			DW1000Device myTag(address, shortAddress);
-			
-			if(addNetworkDevices(&myTag)) {
+
+			const bool addedDevice = addNetworkDevices(&myTag);
+			if(addedDevice) {
 				if(_handleBlinkDevice != 0) {
 					(*_handleBlinkDevice)(&myTag);
 				}
-				//we reply by the transmit ranging init message
-				transmitRangingInit(&myTag);
-				noteActivity();
 			}
+			else {
+				DW1000Device* knownTag = searchDistantDevice(shortAddress);
+				if(knownTag != nullptr) {
+					knownTag->noteActivity();
+				}
+			}
+			// Always reply to BLINK. A restarted tag may need RANGING_INIT even
+			// when the anchor still has the old short address in its device list.
+			transmitRangingInit(&myTag);
+			noteActivity();
 			_expectedMsgId = POLL;
 		}
 		else if(messageType == RANGING_INIT && _type == TAG) {
@@ -667,9 +681,10 @@ void DW1000RangingClass::loop() {
 			else if(_type == TAG) {
 				// get message and parse
 				if(messageType != _expectedMsgId) {
-					// unexpected message, start over again
-					//not needed ?
-					return;
+					// unexpected message, note activity to keep peer alive
+					if(myDistantDevice != nullptr) {
+						myDistantDevice->noteActivity();
+					}
 					_expectedMsgId = POLL_ACK;
 					return;
 				}
@@ -686,7 +701,7 @@ void DW1000RangingClass::loop() {
 					}
 				}
 				else if(messageType == RANGE_REPORT) {
-					
+					myDistantDevice->noteActivity();
 					float curRange;
 					memcpy(&curRange, data+1+SHORT_MAC_LEN, 4);
 					float curRXPower;
@@ -713,6 +728,9 @@ void DW1000RangingClass::loop() {
 				}
 				else if(messageType == RANGE_FAILED) {
 					//not needed as we have a timer;
+					if(myDistantDevice != nullptr) {
+						myDistantDevice->noteActivity();
+					}
 					return;
 					_expectedMsgId = POLL_ACK;
 				}
@@ -748,6 +766,26 @@ void DW1000RangingClass::handleSent() {
 void DW1000RangingClass::handleReceived() {
 	// status change on received success
 	_receivedAck = true;
+}
+
+void DW1000RangingClass::handleReceiveFailed() {
+	++_receiveFailureCount;
+	++_receiverResetCount;
+	if(UWB_TRACE_FRAMES) {
+		Serial.print("[UWB] RX failed; receiver reset #");
+		Serial.println(_receiverResetCount);
+	}
+	DW1000.resetReceiver();
+}
+
+void DW1000RangingClass::handleReceiveTimeout() {
+	++_receiveTimeoutCount;
+	++_receiverResetCount;
+	if(UWB_TRACE_FRAMES) {
+		Serial.print("[UWB] RX timeout; receiver reset #");
+		Serial.println(_receiverResetCount);
+	}
+	DW1000.resetReceiver();
 }
 
 

@@ -7,6 +7,7 @@
 #include "DiagnosticsSync.h"
 #include "NodeConfig.h"
 #include "UwbEventQueue.h"
+#include "UwbRangingDeviceReset.h"
 
 #ifndef UWB_ANTENNA_DELAY
 #define UWB_ANTENNA_DELAY 16555
@@ -21,7 +22,7 @@
 #endif
 
 #ifndef BPMWATCH_TAG_UWB_RECOVERY
-#define BPMWATCH_TAG_UWB_RECOVERY false
+#define BPMWATCH_TAG_UWB_RECOVERY true
 #endif
 
 namespace {
@@ -32,6 +33,26 @@ constexpr int kUwbCs = 5;
 constexpr int kUwbIrq = 34;
 constexpr int kUwbReset = 4;
 constexpr uint32_t kRangeStaleMs = 3000;
+
+uint32_t packDw1000Register32(byte reg) {
+  byte data[4]{};
+  DW1000.readBytes(reg, NO_SUB, data, sizeof(data));
+  uint32_t value = 0;
+  for (uint8_t i = 0; i < sizeof(data); ++i) {
+    value |= static_cast<uint32_t>(data[i]) << (8 * i);
+  }
+  return value;
+}
+
+uint64_t packDw1000SystemStatus() {
+  byte data[LEN_SYS_STATUS]{};
+  DW1000.readBytes(SYS_STATUS, NO_SUB, data, sizeof(data));
+  uint64_t value = 0;
+  for (uint8_t i = 0; i < sizeof(data); ++i) {
+    value |= static_cast<uint64_t>(data[i]) << (8 * i);
+  }
+  return value;
+}
 }  // namespace
 
 UwbDiagnostics* UwbDiagnostics::instance_ = nullptr;
@@ -53,11 +74,30 @@ void UwbDiagnostics::poll(uint32_t nowMs, UwbDiagnosticState& state) {
   bool observedHasRange = false;
   {
     DiagnosticsLock lock;
+    ++state.uwbPollCount;
     state.rangeStale =
         state.hasRange && (nowMs - state.lastRangeMs >= kRangeStaleMs);
+    state.rangeAgeMs = state.hasRange ? nowMs - state.lastRangeMs : 0;
     observedRangeCount = state.rangeCount;
     observedPeerPresent = state.peerPresent;
     observedHasRange = state.hasRange && !state.rangeStale;
+  }
+
+  if (nowMs - lastRegisterSnapshotMs_ >= 1000) {
+    lastRegisterSnapshotMs_ = nowMs;
+    const uint64_t sysStatus = packDw1000SystemStatus();
+    const uint32_t sysMask = packDw1000Register32(SYS_MASK);
+    const uint32_t sysCtrl = packDw1000Register32(SYS_CTRL);
+    const uint32_t sysCfg = packDw1000Register32(SYS_CFG);
+    const uint8_t deviceMode = DW1000._deviceMode;
+    DiagnosticsLock lock;
+    state.uwbSysStatusLow = static_cast<uint32_t>(sysStatus & 0xFFFFFFFFULL);
+    state.uwbSysStatusHigh =
+        static_cast<uint8_t>((sysStatus >> 32) & 0xFFU);
+    state.uwbSysMask = sysMask;
+    state.uwbSysCtrl = sysCtrl;
+    state.uwbSysCfg = sysCfg;
+    state.uwbDeviceMode = deviceMode;
   }
 
   if (observedRangeCount != lastObservedRangeCount_) {
@@ -70,6 +110,15 @@ void UwbDiagnostics::poll(uint32_t nowMs, UwbDiagnosticState& state) {
     hasEverConnected_ = true;
   }
   lastObservedPeerPresent_ = observedPeerPresent;
+
+  {
+    DiagnosticsLock lock;
+    state.uwbActivityAgeMs = recoveryGate_.activityAgeMs(nowMs);
+    state.uwbRecoveryAgeMs = recoveryGate_.recoveryAgeMs(nowMs);
+    state.uwbRxFailureCount = DW1000Ranging.getReceiveFailureCount();
+    state.uwbRxTimeoutCount = DW1000Ranging.getReceiveTimeoutCount();
+    state.uwbReceiverResetCount = DW1000Ranging.getReceiverResetCount();
+  }
 
   if (!kNodeConfig.isAnchor && !BPMWATCH_TAG_UWB_RECOVERY) {
     return;
@@ -95,11 +144,17 @@ void UwbDiagnostics::poll(uint32_t nowMs, UwbDiagnosticState& state) {
 }
 
 void UwbDiagnostics::restart(UwbDiagnosticState& state) {
+  clearUwbRangingDevices(DW1000Ranging);
   {
     DiagnosticsLock lock;
     state.peerPresent = false;
+    state.hasRange = false;
+    state.rangeStale = false;
+    state.rangeAgeMs = 0;
+    ++state.uwbRestartCount;
   }
   lastObservedPeerPresent_ = false;
+  lastRegisterSnapshotMs_ = 0;
   rangeFilter_.reset();
 
   DW1000Ranging.initCommunication(kUwbReset, kUwbCs, kUwbIrq);
@@ -145,6 +200,7 @@ void UwbDiagnostics::handleNewRange() {
 
   if (!rangeFilter_.add(rawDistanceM)) {
     DiagnosticsLock lock;
+    ++state_->uwbRangeEventCount;
     state_->rawDistanceM = rawDistanceM;
     state_->peerPresent = true;
     state_->rejectedCount = rangeFilter_.rejectedCount();
@@ -157,6 +213,7 @@ void UwbDiagnostics::handleNewRange() {
   const uint32_t rejectedCount = rangeFilter_.rejectedCount();
 
   DiagnosticsLock lock;
+  ++state_->uwbRangeEventCount;
   state_->rawDistanceM = rawDistanceM;
   state_->peerPresent = true;
   state_->hasRange = true;
@@ -175,6 +232,7 @@ void UwbDiagnostics::handleNewDevice(DW1000Device* device) {
   }
   {
     DiagnosticsLock lock;
+    ++state_->uwbPeerEventCount;
     state_->peerPresent = true;
   }
   hasEverConnected_ = true;
@@ -185,6 +243,7 @@ void UwbDiagnostics::handleNewDevice(DW1000Device* device) {
 void UwbDiagnostics::handleInactiveDevice(DW1000Device* device) {
   if (state_ != nullptr) {
     DiagnosticsLock lock;
+    ++state_->uwbInactiveEventCount;
     state_->peerPresent = false;
   }
   if (device != nullptr) {

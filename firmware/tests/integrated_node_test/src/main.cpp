@@ -25,6 +25,9 @@
 #include "UwbDiagnostics.h"
 #include "UwbEventQueue.h"
 #include "UwbTaskCadence.h"
+#if BPMWATCH_UWB_TASK && defined(ARDUINO_ARCH_ESP32)
+#include <DW1000.h>
+#endif
 
 #ifndef BPMWATCH_UWB_TASK
 #define BPMWATCH_UWB_TASK false
@@ -44,6 +47,14 @@
 
 #ifndef BPMWATCH_UWB_POLLS_PER_TICK
 #define BPMWATCH_UWB_POLLS_PER_TICK 64
+#endif
+
+#ifndef BPMWATCH_UWB_IDLE_POLLS
+#define BPMWATCH_UWB_IDLE_POLLS 1
+#endif
+
+#ifndef BPMWATCH_UWB_IRQ_BURST_POLLS
+#define BPMWATCH_UWB_IRQ_BURST_POLLS 16
 #endif
 
 #ifndef BPMWATCH_DISCOVERY_DISPLAY_INTERVAL_MS
@@ -71,6 +82,8 @@
 #endif
 
 namespace {
+constexpr int kUwbIrqPin = 34;
+
 DiagnosticsState state;
 #if BPMWATCH_ENABLE_DISPLAY
 DiagnosticsDisplay display;
@@ -103,25 +116,40 @@ uint32_t lastLogMs = 0;
 
 #if BPMWATCH_UWB_TASK && defined(ARDUINO_ARCH_ESP32)
 TaskHandle_t uwbTaskHandle = nullptr;
+volatile uint32_t uwbInterruptWakeCount = 0;
+
+void IRAM_ATTR wakeUwbTaskFromDw1000Interrupt() {
+  ++uwbInterruptWakeCount;
+  BaseType_t higherPriorityTaskWoken = pdFALSE;
+  if (uwbTaskHandle != nullptr) {
+    vTaskNotifyGiveFromISR(uwbTaskHandle, &higherPriorityTaskWoken);
+  }
+  if (higherPriorityTaskWoken == pdTRUE) {
+    portYIELD_FROM_ISR();
+  }
+}
 
 void uwbTask(void*) {
   uint32_t lastStackReportMs = 0;
-  uint16_t pollsSinceDelay = 0;
   for (;;) {
-    const uint32_t nowMs = millis();
-    uwb.poll(nowMs, state.uwb);
-    ++pollsSinceDelay;
+    const uint32_t notificationCount =
+        ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(1));
+    const uint16_t pollCount = uwbPollsForTaskWake(
+        notificationCount, BPMWATCH_UWB_IDLE_POLLS,
+        BPMWATCH_UWB_IRQ_BURST_POLLS);
+    for (uint16_t i = 0; i < pollCount; ++i) {
+      uwb.poll(millis(), state.uwb);
+    }
 #if defined(ARDUINO_ARCH_ESP32)
+    const uint32_t nowMs = millis();
     if (nowMs - lastStackReportMs >= 1000) {
       lastStackReportMs = nowMs;
       DiagnosticsLock lock;
       state.uwb.uwbTaskStackHighWater = uxTaskGetStackHighWaterMark(nullptr);
+      state.uwb.uwbInterruptCount = uwbInterruptWakeCount;
+      state.uwb.uwbIrqPinLevel = digitalRead(kUwbIrqPin) ? 1 : 0;
     }
 #endif
-    if (shouldYieldUwbTask(pollsSinceDelay, BPMWATCH_UWB_POLLS_PER_TICK)) {
-      pollsSinceDelay = 0;
-      vTaskDelay(pdMS_TO_TICKS(1));
-    }
   }
 }
 #endif
@@ -191,14 +219,33 @@ void logDiagnostics(const DiagnosticsState& current, uint32_t nowMs) {
                                                            : "NO_FINGER";
 
   Serial.printf(
-      "t=%lu %s | UWB=%s peer=%d R#=%lu REC#=%lu D=%.2fm STK=%lu | ESPNOW=%s TX=%lu/%lu RX=%lu | "
+      "t=%lu %s | UWB=%s peer=%d R#=%lu REC#=%lu AGE=%lums ACT=%lums RCAGE=%lums D=%.2fm STK=%lu IRQ#=%lu IRQPIN=%u P#=%lu EV=%lu/%lu/%lu RST#=%lu RXERR=%lu/%lu RRST#=%lu REG=S:%02X%08lX M:%08lX C:%08lX CFG:%08lX DM:%u | ESPNOW=%s TX=%lu/%lu RX=%lu | "
       "GY=%s H=%.1f A=%d,%d,%d | MAX=%s IR=%ld BPM=%d\n",
       static_cast<unsigned long>(nowMs), kNodeConfig.displayLabel, uwbStatus,
       current.uwb.peerPresent ? 1 : 0,
       static_cast<unsigned long>(current.uwb.rangeCount),
       static_cast<unsigned long>(current.uwb.recoveryCount),
+      static_cast<unsigned long>(current.uwb.rangeAgeMs),
+      static_cast<unsigned long>(current.uwb.uwbActivityAgeMs),
+      static_cast<unsigned long>(current.uwb.uwbRecoveryAgeMs),
       current.uwb.distanceM,
       static_cast<unsigned long>(current.uwb.uwbTaskStackHighWater),
+      static_cast<unsigned long>(current.uwb.uwbInterruptCount),
+      static_cast<unsigned>(current.uwb.uwbIrqPinLevel),
+      static_cast<unsigned long>(current.uwb.uwbPollCount),
+      static_cast<unsigned long>(current.uwb.uwbRangeEventCount),
+      static_cast<unsigned long>(current.uwb.uwbPeerEventCount),
+      static_cast<unsigned long>(current.uwb.uwbInactiveEventCount),
+      static_cast<unsigned long>(current.uwb.uwbRestartCount),
+      static_cast<unsigned long>(current.uwb.uwbRxFailureCount),
+      static_cast<unsigned long>(current.uwb.uwbRxTimeoutCount),
+      static_cast<unsigned long>(current.uwb.uwbReceiverResetCount),
+      static_cast<unsigned>(current.uwb.uwbSysStatusHigh),
+      static_cast<unsigned long>(current.uwb.uwbSysStatusLow),
+      static_cast<unsigned long>(current.uwb.uwbSysMask),
+      static_cast<unsigned long>(current.uwb.uwbSysCtrl),
+      static_cast<unsigned long>(current.uwb.uwbSysCfg),
+      static_cast<unsigned>(current.uwb.uwbDeviceMode),
       current.uwb.espNowReady ? "OK" : "OFF",
       static_cast<unsigned long>(current.uwb.espNowTxCount),
       static_cast<unsigned long>(current.uwb.espNowTxFailCount),
@@ -261,9 +308,12 @@ void setup() {
   xTaskCreatePinnedToCore(uwbTask, "UWBTask", BPMWATCH_UWB_TASK_STACK, nullptr,
                           BPMWATCH_UWB_TASK_PRIORITY, &uwbTaskHandle,
                           BPMWATCH_UWB_TASK_CORE);
-  Serial.printf("UWB task: ON priority=%d core=%d stack=%d polls_per_tick=%d\n",
+  DW1000.attachInterruptCompleteHandler(wakeUwbTaskFromDw1000Interrupt);
+  Serial.printf(
+      "UWB task: ON priority=%d core=%d stack=%d idle_polls=%d irq_burst=%d\n",
                 BPMWATCH_UWB_TASK_PRIORITY, BPMWATCH_UWB_TASK_CORE,
-                BPMWATCH_UWB_TASK_STACK, BPMWATCH_UWB_POLLS_PER_TICK);
+                BPMWATCH_UWB_TASK_STACK, BPMWATCH_UWB_IDLE_POLLS,
+                BPMWATCH_UWB_IRQ_BURST_POLLS);
 #else
   Serial.println("UWB task: OFF");
 #endif

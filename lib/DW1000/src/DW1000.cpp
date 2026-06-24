@@ -38,6 +38,7 @@ void (* DW1000Class::_handleReceived)(void)                  = 0;
 void (* DW1000Class::_handleReceiveFailed)(void)             = 0;
 void (* DW1000Class::_handleReceiveTimeout)(void)            = 0;
 void (* DW1000Class::_handleReceiveTimestampAvailable)(void) = 0;
+void (* DW1000Class::_handleInterruptComplete)(void)         = 0;
 
 // registers
 byte       DW1000Class::_syscfg[LEN_SYS_CFG];
@@ -329,6 +330,20 @@ void DW1000Class::softReset() {
 	writeBytes(PMSC, PMSC_CTRL0_SUB, pmscctrl0, LEN_PMSC_CTRL0);
 	// force into idle mode
 	idle();
+}
+
+void DW1000Class::resetReceiver() {
+	byte pmscctrl0[LEN_PMSC_CTRL0];
+	readBytes(PMSC, PMSC_CTRL0_SUB, pmscctrl0, LEN_PMSC_CTRL0);
+	const byte originalSysClks = pmscctrl0[0] & 0x03;
+	pmscctrl0[0] = (pmscctrl0[0] & 0xFC) | 0x01;
+	writeBytes(PMSC, PMSC_CTRL0_SUB, pmscctrl0, LEN_PMSC_CTRL0);
+	pmscctrl0[3] &= 0xEF;
+	writeBytes(PMSC, PMSC_CTRL0_SUB, pmscctrl0, LEN_PMSC_CTRL0);
+	pmscctrl0[3] |= 0x10;
+	writeBytes(PMSC, PMSC_CTRL0_SUB, pmscctrl0, LEN_PMSC_CTRL0);
+	pmscctrl0[0] = (pmscctrl0[0] & 0xFC) | originalSysClks;
+	writeBytes(PMSC, PMSC_CTRL0_SUB, pmscctrl0, LEN_PMSC_CTRL0);
 }
 
 void DW1000Class::enableMode(const byte mode[]) {
@@ -746,6 +761,9 @@ void DW1000Class::handleInterrupt() {
 	}
 	// clear all status that is left unhandled
 	clearAllStatus();
+	if(_handleInterruptComplete != 0) {
+		(*_handleInterruptComplete)();
+	}
 }
 
 /* ###########################################################################

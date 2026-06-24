@@ -10,3 +10,12 @@ void testUwbTaskCadenceYieldsAfterConfiguredPolls() {
   TEST_ASSERT_FALSE(shouldYieldUwbTask(63, 64));
   TEST_ASSERT_TRUE(shouldYieldUwbTask(64, 64));
 }
+
+void testUwbTaskCadenceUsesIdlePollWhenNoIrqArrives() {
+  TEST_ASSERT_EQUAL_UINT16(1, uwbPollsForTaskWake(0, 1, 8));
+}
+
+void testUwbTaskCadenceUsesBurstPollsWhenIrqArrives() {
+  TEST_ASSERT_EQUAL_UINT16(8, uwbPollsForTaskWake(1, 1, 8));
+  TEST_ASSERT_EQUAL_UINT16(8, uwbPollsForTaskWake(3, 1, 8));
+}

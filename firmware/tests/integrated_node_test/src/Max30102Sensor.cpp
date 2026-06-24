@@ -1,9 +1,12 @@
+#include "FeatureFlags.h"
+
+#if BPMWATCH_ENABLE_MAX30102
 #include "Max30102Sensor.h"
 
 #include <heartRate.h>
 
 bool Max30102Sensor::begin(TwoWire& wire) {
-  if (!sensor_.begin(wire, I2C_SPEED_FAST)) {
+  if (!sensor_.begin(wire, I2C_SPEED_STANDARD)) {
     return false;
   }
   sensor_.setup();
@@ -46,4 +49,4 @@ void Max30102Sensor::sample(uint32_t nowMs,
   }
   lastBeatMs_ = nowMs;
 }
-
+#endif

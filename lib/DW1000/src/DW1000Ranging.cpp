@@ -34,6 +34,10 @@
 #define UWB_TRACE_FRAMES false
 #endif
 
+#ifndef UWB_LIBRARY_LOGS
+#define UWB_LIBRARY_LOGS true
+#endif
+
 DW1000RangingClass DW1000Ranging;
 
 
@@ -168,8 +172,10 @@ void DW1000RangingClass::startAsAnchor(char address[], const byte mode[], const 
 	DW1000.convertToByte(address, _currentAddress);
 	//write the address on the DW1000 chip
 	DW1000.setEUI(address);
-	Serial.print("device address: ");
-	Serial.println(address);
+	if(UWB_LIBRARY_LOGS) {
+		Serial.print("device address: ");
+		Serial.println(address);
+	}
 	if (randomShortAddress) {
 		//we need to define a random short address:
 		randomSeed(analogRead(0));
@@ -192,7 +198,9 @@ void DW1000RangingClass::startAsAnchor(char address[], const byte mode[], const 
 	//defined type as anchor
 	_type = ANCHOR;
 	
-	Serial.println("### ANCHOR ###");
+	if(UWB_LIBRARY_LOGS) {
+		Serial.println("### ANCHOR ###");
+	}
 	
 }
 
@@ -201,8 +209,10 @@ void DW1000RangingClass::startAsTag(char address[], const byte mode[], const boo
 	DW1000.convertToByte(address, _currentAddress);
 	//write the address on the DW1000 chip
 	DW1000.setEUI(address);
-	Serial.print("device address: ");
-	Serial.println(address);
+	if(UWB_LIBRARY_LOGS) {
+		Serial.print("device address: ");
+		Serial.println(address);
+	}
 	if (randomShortAddress) {
 		//we need to define a random short address:
 		randomSeed(analogRead(0));
@@ -223,7 +233,9 @@ void DW1000RangingClass::startAsTag(char address[], const byte mode[], const boo
 	//defined type as tag
 	_type = TAG;
 	
-	Serial.println("### TAG ###");
+	if(UWB_LIBRARY_LOGS) {
+		Serial.println("### TAG ###");
+	}
 }
 
 boolean DW1000RangingClass::addNetworkDevices(DW1000Device* device, boolean shortAddress) {
@@ -390,13 +402,16 @@ void DW1000RangingClass::loop() {
 		// TODO cc
 		int messageType = detectMessageType(data);
 		if(UWB_TRACE_FRAMES) {
-			if(messageType == BLINK) {
-				Serial.println("[TAG] BLINK TX done interrupt");
-			}
-			else {
-				Serial.print("[UWB] TX done interrupt; type=");
-				Serial.println(messageType);
-			}
+			Serial.print("[UWB] TX done interrupt; type=");
+			Serial.print(messageType);
+			Serial.print(" expected=");
+			Serial.print(_expectedMsgId);
+			Serial.print(" role=");
+			Serial.print(_type == ANCHOR ? "ANCHOR" : "TAG");
+			Serial.print(" dev=");
+			Serial.print(_networkDevicesNumber);
+			Serial.print(" failed=");
+			Serial.println(_protocolFailed ? 1 : 0);
 		}
 		
 		if(messageType != POLL_ACK && messageType != POLL && messageType != RANGE)
@@ -467,7 +482,15 @@ void DW1000RangingClass::loop() {
 		int messageType = detectMessageType(data);
 		if(UWB_TRACE_FRAMES) {
 			Serial.print("[UWB] RX interrupt; type=");
-			Serial.println(messageType);
+			Serial.print(messageType);
+			Serial.print(" expected=");
+			Serial.print(_expectedMsgId);
+			Serial.print(" role=");
+			Serial.print(_type == ANCHOR ? "ANCHOR" : "TAG");
+			Serial.print(" dev=");
+			Serial.print(_networkDevicesNumber);
+			Serial.print(" failed=");
+			Serial.println(_protocolFailed ? 1 : 0);
 		}
 		
 		//we have just received a BLINK message from tag

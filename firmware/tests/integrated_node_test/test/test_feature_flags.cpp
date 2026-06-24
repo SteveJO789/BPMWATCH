@@ -1,0 +1,10 @@
+#include <unity.h>
+
+#include "../src/FeatureFlags.h"
+
+void testFeatureFlagsDefaultToIntegratedDiagnostics() {
+  TEST_ASSERT_TRUE(BPMWATCH_ENABLE_DISPLAY);
+  TEST_ASSERT_TRUE(BPMWATCH_ENABLE_GY511);
+  TEST_ASSERT_TRUE(BPMWATCH_ENABLE_MAX30102);
+  TEST_ASSERT_TRUE(BPMWATCH_ENABLE_I2C_SCAN);
+}

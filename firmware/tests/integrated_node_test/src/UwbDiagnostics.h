@@ -5,6 +5,7 @@
 
 #include "DiagnosticsState.h"
 #include "MedianRangeFilter.h"
+#include "UwbRecoveryGate.h"
 
 class UwbDiagnostics {
  public:
@@ -16,7 +17,9 @@ class UwbDiagnostics {
   static UwbDiagnosticState* state_;
 
   MedianRangeFilter rangeFilter_;
-  uint32_t lastActivityMs_ = 0;
+  UwbRecoveryGate recoveryGate_;
+  uint32_t lastObservedRangeCount_ = 0;
+  bool lastObservedPeerPresent_ = false;
   bool hasEverConnected_ = false;
   char eui_[24]{};
 
@@ -31,4 +34,3 @@ class UwbDiagnostics {
   static void onInactiveDevice(DW1000Device* device);
   static void onBlinkDevice(DW1000Device* device);
 };
-

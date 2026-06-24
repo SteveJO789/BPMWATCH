@@ -39,6 +39,7 @@ void (* DW1000Class::_handleReceiveFailed)(void)             = 0;
 void (* DW1000Class::_handleReceiveTimeout)(void)            = 0;
 void (* DW1000Class::_handleReceiveTimestampAvailable)(void) = 0;
 void (* DW1000Class::_handleInterruptComplete)(void)         = 0;
+volatile uint32_t DW1000Class::_pendingInterruptCount        = 0;
 
 // registers
 byte       DW1000Class::_syscfg[LEN_SYS_CFG];
@@ -180,7 +181,8 @@ void DW1000Class::begin(uint8_t irq, uint8_t rst) {
 	// attach interrupt
 	//attachInterrupt(_irq, DW1000Class::handleInterrupt, CHANGE); // todo interrupt for ESP8266
 	// TODO throw error if pin is not a interrupt pin
-	attachInterrupt(digitalPinToInterrupt(_irq), DW1000Class::handleInterrupt, RISING); // todo interrupt for ESP8266
+	_pendingInterruptCount = 0;
+	attachInterrupt(digitalPinToInterrupt(_irq), DW1000Class::handleInterruptRequest, RISING); // todo interrupt for ESP8266
 }
 
 void DW1000Class::manageLDE() {
@@ -723,6 +725,25 @@ void DW1000Class::tune() {
  * #### Interrupt handling ###################################################
  * ######################################################################### */
 
+void IRAM_ATTR DW1000Class::handleInterruptRequest() {
+	++_pendingInterruptCount;
+	if(_handleInterruptComplete != 0) {
+		(*_handleInterruptComplete)();
+	}
+}
+
+boolean DW1000Class::handleInterruptIfPending() {
+	noInterrupts();
+	if(_pendingInterruptCount == 0) {
+		interrupts();
+		return false;
+	}
+	--_pendingInterruptCount;
+	interrupts();
+	handleInterrupt();
+	return true;
+}
+
 void DW1000Class::handleInterrupt() {
 	// read current status and handle via callbacks
 	readSystemEventStatusRegister();
@@ -761,9 +782,6 @@ void DW1000Class::handleInterrupt() {
 	}
 	// clear all status that is left unhandled
 	clearAllStatus();
-	if(_handleInterruptComplete != 0) {
-		(*_handleInterruptComplete)();
-	}
 }
 
 /* ###########################################################################
@@ -1016,6 +1034,8 @@ void DW1000Class::interruptOnReceiveFailed(boolean val) {
 
 void DW1000Class::interruptOnReceiveTimeout(boolean val) {
 	setBit(_sysmask, LEN_SYS_MASK, RXRFTO_BIT, val);
+	setBit(_sysmask, LEN_SYS_MASK, RXPTO_BIT, val);
+	setBit(_sysmask, LEN_SYS_MASK, RXSFDTO_BIT, val);
 }
 
 void DW1000Class::interruptOnReceiveTimestampAvailable(boolean val) {
@@ -1524,6 +1544,9 @@ void DW1000Class::clearReceiveStatus() {
 	setBit(_sysstatus, LEN_SYS_STATUS, RXFCE_BIT, true);
 	setBit(_sysstatus, LEN_SYS_STATUS, RXFCG_BIT, true);
 	setBit(_sysstatus, LEN_SYS_STATUS, RXRFSL_BIT, true);
+	setBit(_sysstatus, LEN_SYS_STATUS, RXRFTO_BIT, true);
+	setBit(_sysstatus, LEN_SYS_STATUS, RXPTO_BIT, true);
+	setBit(_sysstatus, LEN_SYS_STATUS, RXSFDTO_BIT, true);
 	writeBytes(SYS_STATUS, NO_SUB, _sysstatus, LEN_SYS_STATUS);
 }
 

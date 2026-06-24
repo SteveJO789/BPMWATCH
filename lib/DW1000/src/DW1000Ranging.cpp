@@ -394,6 +394,8 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 }
 
 void DW1000RangingClass::loop() {
+	DW1000.handleInterruptIfPending();
+
 	//we check if needed to reset !
 	checkForReset();
 	uint32_t time = millis(); // TODO other name - too close to "timer"
@@ -775,6 +777,7 @@ void DW1000RangingClass::handleReceiveFailed() {
 		Serial.print("[UWB] RX failed; receiver reset #");
 		Serial.println(_receiverResetCount);
 	}
+	DW1000.idle();
 	DW1000.resetReceiver();
 }
 
@@ -785,6 +788,7 @@ void DW1000RangingClass::handleReceiveTimeout() {
 		Serial.print("[UWB] RX timeout; receiver reset #");
 		Serial.println(_receiverResetCount);
 	}
+	DW1000.idle();
 	DW1000.resetReceiver();
 }
 

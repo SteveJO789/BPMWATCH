@@ -266,6 +266,7 @@ public:
 	static float getReceiveQuality();
 	
 	/* interrupt management. */
+	static boolean handleInterruptIfPending();
 	static void interruptOnSent(boolean val);
 	static void interruptOnReceived(boolean val);
 	static void interruptOnReceiveFailed(boolean val);
@@ -477,7 +478,9 @@ public:
 	// whether debounce clock is active
 	static boolean _debounceClockEnabled;
 
-	/* Arduino interrupt handler */
+	/* Arduino interrupt request handling. */
+	static volatile uint32_t _pendingInterruptCount;
+	static void handleInterruptRequest();
 	static void handleInterrupt();
 	
 	/* Allow MAC frame filtering . */

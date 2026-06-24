@@ -1,11 +1,14 @@
-#pragma once
+﻿#pragma once
 
 #include <Arduino.h>
 #include <DW1000Ranging.h>
 
 #include "DiagnosticsState.h"
 #include "MedianRangeFilter.h"
+#include "UwbLongRangeConfig.h"
 #include "UwbRecoveryGate.h"
+
+class DW1000Device;
 
 class UwbDiagnostics {
  public:
@@ -25,6 +28,17 @@ class UwbDiagnostics {
   char eui_[24]{};
 
   void restart(UwbDiagnosticState& state);
+  void receiverRecover(UwbDiagnosticState& state);
+  void configureDw1000LongRangeMode();
+  void dumpRegisterSnapshot(UwbDiagnosticState& state);
+  void verifyLongRangeConfig(UwbDiagnosticState& state);
+  void copyLongRangeSnapshotToState(
+      const UwbLongRangeRegisterSnapshot& snapshot,
+      UwbDiagnosticState& state);
+  void logLongRangeRegisterSnapshot(
+      const UwbLongRangeRegisterSnapshot& snapshot,
+      uint32_t failureMask);
+  void captureRxQuality(DW1000Device* device, UwbDiagnosticState& state);
   void handleNewRange();
   void handleNewDevice(DW1000Device* device);
   void handleInactiveDevice(DW1000Device* device);

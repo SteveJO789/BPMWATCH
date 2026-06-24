@@ -21,7 +21,9 @@
 #if BPMWATCH_ENABLE_MAX30102
 #include "Max30102Sensor.h"
 #endif
+#include "Max30102Diagnostics.h"
 #include "NodeConfig.h"
+#include "TimeUtils.h"
 #include "UwbDiagnostics.h"
 #include "UwbEventQueue.h"
 #include "UwbTaskCadence.h"
@@ -57,6 +59,25 @@
 #define BPMWATCH_UWB_IRQ_BURST_POLLS 16
 #endif
 
+#ifndef BPMWATCH_MAX_TASK
+#define BPMWATCH_MAX_TASK false
+#endif
+
+#ifndef BPMWATCH_MAX_TASK_PRIORITY
+#define BPMWATCH_MAX_TASK_PRIORITY 3
+#endif
+
+#ifndef BPMWATCH_MAX_TASK_CORE
+#define BPMWATCH_MAX_TASK_CORE 0
+#endif
+
+#ifndef BPMWATCH_MAX_TASK_STACK
+#define BPMWATCH_MAX_TASK_STACK 6144
+#endif
+
+#ifndef BPMWATCH_MAX_SAMPLE_INTERVAL_MS
+#define BPMWATCH_MAX_SAMPLE_INTERVAL_MS 10
+#endif
 #ifndef BPMWATCH_DISCOVERY_DISPLAY_INTERVAL_MS
 #define BPMWATCH_DISCOVERY_DISPLAY_INTERVAL_MS 1000
 #endif
@@ -129,27 +150,49 @@ void IRAM_ATTR wakeUwbTaskFromDw1000Interrupt() {
   }
 }
 
+void updateUwbTaskDiagnostics(uint32_t nowMs, uint32_t& lastStackReportMs) {
+  if (lastStackReportMs != 0 &&
+      safeAgeMs(nowMs, lastStackReportMs) < 1000) {
+    return;
+  }
+  lastStackReportMs = nowMs;
+  DiagnosticsLock lock;
+  state.uwb.uwbTaskStackHighWater = uxTaskGetStackHighWaterMark(nullptr);
+  state.uwb.uwbInterruptCount = uwbInterruptWakeCount;
+  state.uwb.uwbIrqPinLevel = digitalRead(kUwbIrqPin) ? 1 : 0;
+}
+
 void uwbTask(void*) {
   uint32_t lastStackReportMs = 0;
   for (;;) {
+    updateUwbTaskDiagnostics(millis(), lastStackReportMs);
     const uint32_t notificationCount =
-        ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(1));
+        ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(2));
     const uint16_t pollCount = uwbPollsForTaskWake(
         notificationCount, BPMWATCH_UWB_IDLE_POLLS,
-        BPMWATCH_UWB_IRQ_BURST_POLLS);
+        BPMWATCH_UWB_IRQ_BURST_POLLS, BPMWATCH_UWB_POLLS_PER_TICK);
+    if (pollCount == 0) {
+      vTaskDelay(pdMS_TO_TICKS(2));
+      continue;
+    }
     for (uint16_t i = 0; i < pollCount; ++i) {
       uwb.poll(millis(), state.uwb);
     }
-#if defined(ARDUINO_ARCH_ESP32)
-    const uint32_t nowMs = millis();
-    if (nowMs - lastStackReportMs >= 1000) {
-      lastStackReportMs = nowMs;
-      DiagnosticsLock lock;
-      state.uwb.uwbTaskStackHighWater = uxTaskGetStackHighWaterMark(nullptr);
-      state.uwb.uwbInterruptCount = uwbInterruptWakeCount;
-      state.uwb.uwbIrqPinLevel = digitalRead(kUwbIrqPin) ? 1 : 0;
-    }
+    updateUwbTaskDiagnostics(millis(), lastStackReportMs);
+    vTaskDelay(pdMS_TO_TICKS(1));
+  }
+}
 #endif
+
+#if BPMWATCH_MAX_TASK && defined(ARDUINO_ARCH_ESP32)
+void maxTask(void*) {
+  TickType_t lastWake = xTaskGetTickCount();
+  const TickType_t period = pdMS_TO_TICKS(BPMWATCH_MAX_SAMPLE_INTERVAL_MS);
+  for (;;) {
+    if (state.max30102.initialized) {
+      max30102.sample(millis(), state.max30102);
+    }
+    vTaskDelayUntil(&lastWake, period);
   }
 }
 #endif
@@ -205,22 +248,44 @@ void tryBeginMax30102(TwoWire& wire, bool logResult) {
 #endif
 
 void logDiagnostics(const DiagnosticsState& current, uint32_t nowMs) {
-  const char* uwbStatus = !current.uwb.spiReady
-                              ? "SPI_ERR"
-                          : current.uwb.rangeStale ? "LOST"
-                          : current.uwb.hasRange   ? "OK"
-                                                   : "WAIT";
-  const char* gyStatus = current.gy511.initialized && current.gy511.readOk
-                             ? "OK"
-                             : gy511StatusLabel(current.gy511.status);
-  const char* maxStatus = !current.max30102.initialized
-                              ? "ERR"
-                          : current.max30102.fingerPresent ? "OK"
-                                                           : "NO_FINGER";
+  const char* uwbStatus = "IDLE";
+  if (!current.uwb.spiReady) {
+    uwbStatus = "NO-SPI";
+  } else if (current.uwb.hasRange && !current.uwb.rangeStale) {
+    uwbStatus = "RANGING";
+  } else if (current.uwb.peerPresent) {
+    uwbStatus = "PEER";
+  } else {
+    uwbStatus = "DISCOVERY";
+  }
+
+  const char* losStatus = "---";
+  if (current.uwb.rxLosNlosHint == 1) {
+    losStatus = "LOS";
+  } else if (current.uwb.rxLosNlosHint == 2) {
+    losStatus = "MAYBE";
+  } else if (current.uwb.rxLosNlosHint == 3) {
+    losStatus = "NLOS";
+  }
+
+  const char* gyStatus =
+      current.gy511.initialized
+          ? (current.gy511.readOk
+                 ? "OK"
+                 : "RDERR")
+          : "OFF";
+  const char* maxStatus = current.max30102.initialized ? "OK" : "OFF";
+  const char* maxReason = max30102BpmZeroReasonLabel(max30102BpmZeroReason(
+      current.max30102.initialized, current.max30102.fingerPresent,
+      current.max30102.averageBpm, current.max30102.maxSps,
+      current.max30102.maxIrAc1s, current.max30102.maxBeatDetectCount,
+      current.max30102.rejectedBeatCount));
+  const char* irqMode =
+      current.uwb.uwbInterruptCount > 0 ? "IRQ" : "SAFETY_POLL";
 
   Serial.printf(
-      "t=%lu %s | UWB=%s peer=%d R#=%lu REC#=%lu AGE=%lums ACT=%lums RCAGE=%lums D=%.2fm STK=%lu IRQ#=%lu IRQPIN=%u P#=%lu EV=%lu/%lu/%lu RST#=%lu RXERR=%lu/%lu RRST#=%lu REG=S:%02X%08lX M:%08lX C:%08lX CFG:%08lX DM:%u | ESPNOW=%s TX=%lu/%lu RX=%lu | "
-      "GY=%s H=%.1f A=%d,%d,%d | MAX=%s IR=%ld BPM=%d\n",
+      "t=%lu %s | UWB=%s peer=%d R#=%lu REC#=%lu AGE=%lums ACT=%lums RCAGE=%lums D=%.2fm STK=%lu IRQ#=%lu IRQPIN=%u IRQMODE=%s P#=%lu EV=%lu/%lu/%lu RST#=%lu RXERR=%lu/%lu RRST#=%lu REG=S:%02X%08lX M:%08lX C:%08lX CFG:%08lX DM:%u LR_OK=%d LR_FAIL=%u LR_FAIL_REASON=%s RX_POWER=%.1f FP_POWER=%.1f DELTA=%.1f LOS=%s RXPACC=%u CIR_PWR=%u FP_AMPL=%u/%u/%u STD_NOISE=%u | ESPNOW=%s TX=%lu/%lu RX=%lu | "
+      "GY=%s H=%.1f A=%d,%d,%d | MAX=%s IR=%ld BPM=%d SPS=%lu BEAT#=%lu IR_MIN=%ld IR_MAX=%ld IRAC=%ld LASTBEAT=%lums REJ#=%lu BI=%lums WHY=%s\n",
       static_cast<unsigned long>(nowMs), kNodeConfig.displayLabel, uwbStatus,
       current.uwb.peerPresent ? 1 : 0,
       static_cast<unsigned long>(current.uwb.rangeCount),
@@ -232,6 +297,7 @@ void logDiagnostics(const DiagnosticsState& current, uint32_t nowMs) {
       static_cast<unsigned long>(current.uwb.uwbTaskStackHighWater),
       static_cast<unsigned long>(current.uwb.uwbInterruptCount),
       static_cast<unsigned>(current.uwb.uwbIrqPinLevel),
+      irqMode,
       static_cast<unsigned long>(current.uwb.uwbPollCount),
       static_cast<unsigned long>(current.uwb.uwbRangeEventCount),
       static_cast<unsigned long>(current.uwb.uwbPeerEventCount),
@@ -246,13 +312,35 @@ void logDiagnostics(const DiagnosticsState& current, uint32_t nowMs) {
       static_cast<unsigned long>(current.uwb.uwbSysCtrl),
       static_cast<unsigned long>(current.uwb.uwbSysCfg),
       static_cast<unsigned>(current.uwb.uwbDeviceMode),
+      current.uwb.longRangeConfigOk ? 1 : 0,
+      static_cast<unsigned>(current.uwb.regConfigFailures),
+      current.uwb.regConfigFailureReason,
+      current.uwb.rxPowerDbm,
+      current.uwb.rxFpPowerDbm,
+      current.uwb.rxLosNlosDelta,
+      losStatus,
+      static_cast<unsigned>(current.uwb.rxPacc),
+      static_cast<unsigned>(current.uwb.rxCirPower),
+      static_cast<unsigned>(current.uwb.rxFpAmpl1),
+      static_cast<unsigned>(current.uwb.rxFpAmpl2),
+      static_cast<unsigned>(current.uwb.rxFpAmpl3),
+      static_cast<unsigned>(current.uwb.rxStdNoise),
       current.uwb.espNowReady ? "OK" : "OFF",
       static_cast<unsigned long>(current.uwb.espNowTxCount),
       static_cast<unsigned long>(current.uwb.espNowTxFailCount),
       static_cast<unsigned long>(current.uwb.espNowRxCount), gyStatus,
       current.gy511.headingDeg,
       current.gy511.accelX, current.gy511.accelY, current.gy511.accelZ,
-      maxStatus, current.max30102.irValue, current.max30102.averageBpm);
+      maxStatus, current.max30102.irValue, current.max30102.averageBpm,
+      static_cast<unsigned long>(current.max30102.maxSps),
+      static_cast<unsigned long>(current.max30102.maxBeatDetectCount),
+      static_cast<long>(current.max30102.maxIrMin1s),
+      static_cast<long>(current.max30102.maxIrMax1s),
+      static_cast<long>(current.max30102.maxIrAc1s),
+      static_cast<unsigned long>(current.max30102.lastBeatAgeMs),
+      static_cast<unsigned long>(current.max30102.rejectedBeatCount),
+      static_cast<unsigned long>(current.max30102.lastBeatIntervalMs),
+      maxReason);
 }
 }  // namespace
 
@@ -305,17 +393,38 @@ void setup() {
   uwb.begin(state.uwb);
 
 #if BPMWATCH_UWB_TASK && defined(ARDUINO_ARCH_ESP32)
-  xTaskCreatePinnedToCore(uwbTask, "UWBTask", BPMWATCH_UWB_TASK_STACK, nullptr,
-                          BPMWATCH_UWB_TASK_PRIORITY, &uwbTaskHandle,
-                          BPMWATCH_UWB_TASK_CORE);
+  pinMode(kUwbIrqPin, INPUT);
+  const BaseType_t uwbTaskCreateResult = xTaskCreatePinnedToCore(
+      uwbTask, "UWBTask", BPMWATCH_UWB_TASK_STACK, nullptr,
+      BPMWATCH_UWB_TASK_PRIORITY, &uwbTaskHandle, BPMWATCH_UWB_TASK_CORE);
+  const bool uwbTaskCreated = uwbTaskCreateResult == pdPASS;
+  const int uwbIrqNumber = digitalPinToInterrupt(kUwbIrqPin);
+  const bool uwbGpioIrqAttached = uwbTaskCreated && uwbIrqNumber >= 0;
   DW1000.attachInterruptCompleteHandler(wakeUwbTaskFromDw1000Interrupt);
+  if (uwbGpioIrqAttached) {
+    attachInterrupt(uwbIrqNumber, wakeUwbTaskFromDw1000Interrupt, RISING);
+  }
   Serial.printf(
-      "UWB task: ON priority=%d core=%d stack=%d idle_polls=%d irq_burst=%d\n",
-                BPMWATCH_UWB_TASK_PRIORITY, BPMWATCH_UWB_TASK_CORE,
-                BPMWATCH_UWB_TASK_STACK, BPMWATCH_UWB_IDLE_POLLS,
-                BPMWATCH_UWB_IRQ_BURST_POLLS);
+      "UWB task: enabled=1 created=%d priority=%d core=%d stack=%d idle_polls=%d irq_burst=%d polls_per_tick=%d gpio_irq=%s irq_pin=%d\n",
+      uwbTaskCreated ? 1 : 0, BPMWATCH_UWB_TASK_PRIORITY,
+      BPMWATCH_UWB_TASK_CORE, BPMWATCH_UWB_TASK_STACK,
+      BPMWATCH_UWB_IDLE_POLLS, BPMWATCH_UWB_IRQ_BURST_POLLS,
+      BPMWATCH_UWB_POLLS_PER_TICK, uwbGpioIrqAttached ? "ATTACHED" : "OFF",
+      kUwbIrqPin);
+  if (!uwbTaskCreated) {
+    Serial.println("UWB task warning: task create failed; loop fallback is disabled for this build");
+  }
 #else
-  Serial.println("UWB task: OFF");
+  Serial.println("UWB task: enabled=0");
+#endif
+
+#if BPMWATCH_MAX_TASK && defined(ARDUINO_ARCH_ESP32)
+  xTaskCreatePinnedToCore(maxTask, "MAXTask", BPMWATCH_MAX_TASK_STACK, nullptr,
+                          BPMWATCH_MAX_TASK_PRIORITY, nullptr,
+                          BPMWATCH_MAX_TASK_CORE);
+  Serial.printf("MAX task: ON priority=%d core=%d stack=%d interval=%dms\n",
+                BPMWATCH_MAX_TASK_PRIORITY, BPMWATCH_MAX_TASK_CORE,
+                BPMWATCH_MAX_TASK_STACK, BPMWATCH_MAX_SAMPLE_INTERVAL_MS);
 #endif
 }
 
@@ -353,10 +462,12 @@ void loop() {
     tryBeginMax30102(Wire, true);
   }
 
+#if !BPMWATCH_MAX_TASK
   if (nowMs - lastMaxMs >= sensorIntervalMs) {
     lastMaxMs = nowMs;
     max30102.sample(nowMs, state.max30102);
   }
+#endif
 #endif
 
 #if BPMWATCH_ENABLE_GY511

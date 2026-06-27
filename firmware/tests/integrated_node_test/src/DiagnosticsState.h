@@ -2,8 +2,9 @@
 
 #include <Arduino.h>
 
-#include "Gy511Status.h"
+#include "CompassSensor.h"
 #include "RadarMap.h"
+#include "SosButton.h"
 
 struct UwbDiagnosticState {
   bool spiReady = false;
@@ -79,21 +80,6 @@ struct UwbDiagnosticState {
   uint32_t uwbTaskStackHighWater = 0;
 };
 
-struct Gy511DiagnosticState {
-  bool initialized = false;
-  bool readOk = false;
-  bool accelAvailable = false;
-  Gy511Status status = Gy511Status::InitError;
-  int16_t accelX = 0;
-  int16_t accelY = 0;
-  int16_t accelZ = 0;
-  int16_t magX = 0;
-  int16_t magY = 0;
-  int16_t magZ = 0;
-  float headingDeg = 0.0f;
-  char i2cAddresses[32] = "SCAN";
-};
-
 struct Max30102DiagnosticState {
   bool initialized = false;
   bool fingerPresent = false;
@@ -118,9 +104,19 @@ struct Max30102DiagnosticState {
   bool maxTaskCreated = false;
 };
 
+struct PeerTelemetryState {
+  bool headingValid = false;
+  float headingDeg = 0.0f;
+  uint8_t nodeId = 0;
+  uint32_t lastRxMs = 0;
+  RemoteSosState remoteSos;
+};
+
 struct DiagnosticsState {
   UwbDiagnosticState uwb;
-  Gy511DiagnosticState gy511;
+  CompassDiagnosticState compass;
   Max30102DiagnosticState max30102;
+  SosButtonState sos;
+  PeerTelemetryState peer;
   RadarState radar;
 };

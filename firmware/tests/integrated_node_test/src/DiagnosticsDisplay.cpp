@@ -71,6 +71,10 @@ void DiagnosticsDisplay::drawRadarStatic(const char* nodeLabel) {
 }
 
 void DiagnosticsDisplay::drawRadarGrid() {
+  tft_.setTextColor(ST77XX_CYAN);
+  tft_.setTextSize(1);
+  tft_.setCursor(kRadarCenterX - 3, kRadarCenterY - kRadarRadius - 11);
+  tft_.print("N");
   tft_.drawCircle(kRadarCenterX, kRadarCenterY, kRadarRadius, ST77XX_BLUE);
   tft_.drawCircle(kRadarCenterX, kRadarCenterY, kRadarRadius / 2,
                   ST77XX_BLUE);
@@ -90,7 +94,7 @@ void DiagnosticsDisplay::render(const DiagnosticsState& state,
     tft_.fillScreen(ST77XX_BLACK);
     drawRadarStatic(nodeLabel_);
   }
-  renderRadarMap(state);
+  renderRadarMap(state, nowMs);
 }
 
 void DiagnosticsDisplay::drawPanel(int y, int height, const char* title) {
@@ -220,15 +224,48 @@ void DiagnosticsDisplay::renderMax30102(
   }
 }
 
-void DiagnosticsDisplay::renderRadarMap(const DiagnosticsState& state) {
-  if (previousPeerVisible_) {
-    tft_.fillCircle(previousPeerX_, previousPeerY_, 8, ST77XX_BLACK);
-    previousPeerVisible_ = false;
+void DiagnosticsDisplay::renderRadarMap(const DiagnosticsState& state,
+                                        uint32_t nowMs) {
+  tft_.fillRect(0, 0, 240, 31, ST77XX_BLACK);
+  const bool localSos = state.sos.sosActive;
+  const bool remoteSos = remoteSosVisible(state.peer.remoteSos, nowMs);
+  if (localSos || remoteSos) {
+    tft_.fillRect(0, 0, 240, 31, ST77XX_RED);
+    tft_.setTextColor(ST77XX_WHITE);
+    tft_.setTextSize(2);
+    tft_.setCursor(18, 7);
+    tft_.print("!!! SOS !!!");
+    tft_.setTextSize(1);
+    tft_.setCursor(160, 11);
+    tft_.print(remoteSos ? "PEER" : "LOCAL");
+  } else {
+    tft_.setTextColor(ST77XX_CYAN);
+    tft_.setTextSize(2);
+    tft_.setCursor(8, 8);
+    tft_.print("RADAR ");
+    tft_.print(nodeLabel_);
   }
+
+  tft_.fillCircle(kRadarCenterX, kRadarCenterY, kRadarRadius + 4,
+                  ST77XX_BLACK);
+  previousPeerVisible_ = false;
   drawRadarGrid();
 
+  const bool headingValid = compassHeadingValid(state.compass);
+  if (headingValid) {
+    const float headingRad = state.compass.headingDeg * kPi / 180.0f;
+    const int headingX =
+        kRadarCenterX + static_cast<int>((kRadarRadius - 12) * sinf(headingRad));
+    const int headingY =
+        kRadarCenterY - static_cast<int>((kRadarRadius - 12) * cosf(headingRad));
+    tft_.drawLine(kRadarCenterX, kRadarCenterY, headingX, headingY,
+                  ST77XX_YELLOW);
+  }
+
   if (state.radar.hasAngle && !state.radar.hidePeerDot) {
-    const float angleRad = state.radar.peerAngleDeg * kPi / 180.0f;
+    const float displayAngleDeg = northOrientedRadarAngleDeg(
+        state.radar.demoRadarAngleDeg, state.compass.headingDeg, headingValid);
+    const float angleRad = displayAngleDeg * kPi / 180.0f;
     const float radiusPx =
         mapDistanceToRadius(state.radar.smoothedDistanceM, kRadarRadius);
     const int peerX =
@@ -268,6 +305,14 @@ void DiagnosticsDisplay::renderRadarMap(const DiagnosticsState& state) {
     tft_.print("--");
   }
 
+  tft_.setCursor(154, kFooterY);
+  tft_.print("HDG:");
+  if (headingValid) {
+    tft_.print(state.compass.headingDeg, 0);
+  } else {
+    tft_.print("--");
+  }
+
   tft_.setCursor(8, kFooterY + 18);
   tft_.print("BPM:");
   if (!state.max30102.initialized) {
@@ -284,8 +329,24 @@ void DiagnosticsDisplay::renderRadarMap(const DiagnosticsState& state) {
     tft_.print("--");
   }
   tft_.setTextColor(ST77XX_WHITE);
-  tft_.setCursor(92, kFooterY + 18);
-  tft_.print("Angle:");
-  tft_.print(state.radar.peerAngleDeg, 0);
+  tft_.setCursor(78, kFooterY + 18);
+  tft_.print("SOS:");
+  if (remoteSos) {
+    tft_.setTextColor(ST77XX_RED);
+    tft_.print("PEER");
+  } else if (localSos) {
+    tft_.setTextColor(ST77XX_RED);
+    tft_.print("LOCAL");
+  } else {
+    tft_.print("OFF");
+  }
+  tft_.setTextColor(ST77XX_WHITE);
+  tft_.setCursor(140, kFooterY + 18);
+  tft_.print("RH:");
+  if (state.peer.headingValid) {
+    tft_.print(state.peer.headingDeg, 0);
+  } else {
+    tft_.print("--");
+  }
 }
 #endif

@@ -64,3 +64,15 @@ void testRadarMapReportsLostOnlyAfterPreviousRangeTimesOut() {
 
   TEST_ASSERT_EQUAL_STRING("LOST", radarLinkStatusLabel(true, state));
 }
+
+void testRadarMapRotatesDemoAngleIntoNorthOrientedDisplay() {
+  TEST_ASSERT_FLOAT_WITHIN(
+      0.001f, 90.0f, northOrientedRadarAngleDeg(0.0f, 90.0f, true));
+  TEST_ASSERT_FLOAT_WITHIN(
+      0.001f, 90.0f, northOrientedRadarAngleDeg(180.0f, 270.0f, true));
+}
+
+void testRadarMapKeepsDemoAngleWhenHeadingInvalid() {
+  TEST_ASSERT_FLOAT_WITHIN(
+      0.001f, 180.0f, northOrientedRadarAngleDeg(180.0f, 270.0f, false));
+}

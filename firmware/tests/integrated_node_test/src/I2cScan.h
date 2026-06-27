@@ -25,3 +25,26 @@ inline void formatI2cAddressList(const uint8_t* addresses, uint8_t count,
     offset += static_cast<size_t>(written);
   }
 }
+
+inline void formatI2cDeviceList(const uint8_t* addresses, uint8_t count,
+                                char* buffer, size_t bufferSize) {
+  if (bufferSize == 0) {
+    return;
+  }
+  if (count == 0 || addresses == nullptr) {
+    snprintf(buffer, bufferSize, "NONE");
+    return;
+  }
+
+  size_t offset = 0;
+  buffer[0] = '\0';
+  for (uint8_t i = 0; i < count && offset < bufferSize; ++i) {
+    const int written = snprintf(buffer + offset, bufferSize - offset,
+                                 i == 0 ? "0x%02X" : ",0x%02X",
+                                 addresses[i]);
+    if (written < 0) {
+      break;
+    }
+    offset += static_cast<size_t>(written);
+  }
+}

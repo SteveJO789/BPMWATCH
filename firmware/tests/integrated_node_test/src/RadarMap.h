@@ -10,6 +10,8 @@ struct RadarInput {
 };
 
 struct RadarState {
+  // Body-relative/movement-based demo angle. This is not true peer bearing.
+  float demoRadarAngleDeg = 0.0f;
   float peerAngleDeg = 0.0f;
   float peerDistanceM = 0.0f;
   float lastDistanceM = 0.0f;
@@ -50,6 +52,15 @@ inline float mapDistanceToRadius(float distanceM, float radarRadiusPx) {
   return clampFloat(radius, 5.0f, radarRadiusPx);
 }
 
+inline float northOrientedRadarAngleDeg(float demoRadarAngleDeg,
+                                        float localHeadingDeg,
+                                        bool headingValid) {
+  if (!headingValid) {
+    return normalizeAngle(demoRadarAngleDeg);
+  }
+  return normalizeAngle(demoRadarAngleDeg + localHeadingDeg);
+}
+
 inline void updateRadarState(const RadarInput& input, RadarState& state) {
   if (!input.linkOk) {
     state.hidePeerDot =
@@ -64,7 +75,8 @@ inline void updateRadarState(const RadarInput& input, RadarState& state) {
   if (!state.hasDistance) {
     state.lastDistanceM = input.distanceM;
     state.smoothedDistanceM = input.distanceM;
-    state.peerAngleDeg = 0.0f;
+    state.demoRadarAngleDeg = 0.0f;
+    state.peerAngleDeg = state.demoRadarAngleDeg;
     state.hasAngle = true;
     state.hasDistance = true;
     return;
@@ -73,7 +85,8 @@ inline void updateRadarState(const RadarInput& input, RadarState& state) {
   state.smoothedDistanceM = state.smoothedDistanceM * 0.75f + input.distanceM * 0.25f;
   const float delta = input.distanceM - state.lastDistanceM;
   if (fabsf(delta) > kRadarDistanceDeltaThresholdM) {
-    state.peerAngleDeg = delta < 0.0f ? 0.0f : 180.0f;
+    state.demoRadarAngleDeg = delta < 0.0f ? 0.0f : 180.0f;
+    state.peerAngleDeg = state.demoRadarAngleDeg;
     state.hasAngle = true;
   }
   state.lastDistanceM = input.distanceM;

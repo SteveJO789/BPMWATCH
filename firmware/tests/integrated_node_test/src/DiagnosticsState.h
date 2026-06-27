@@ -107,6 +107,10 @@ struct Max30102DiagnosticState {
 struct PeerTelemetryState {
   bool headingValid = false;
   float headingDeg = 0.0f;
+  bool bpmValid = false;
+  bool bpmLost = false;
+  uint16_t bpm = 0;
+  uint32_t lastBpmRxMs = 0;
   uint8_t nodeId = 0;
   uint32_t lastRxMs = 0;
   RemoteSosState remoteSos;

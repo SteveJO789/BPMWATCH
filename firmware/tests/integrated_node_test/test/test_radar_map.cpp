@@ -76,3 +76,24 @@ void testRadarMapKeepsDemoAngleWhenHeadingInvalid() {
   TEST_ASSERT_FLOAT_WITHIN(
       0.001f, 180.0f, northOrientedRadarAngleDeg(180.0f, 270.0f, false));
 }
+
+void testRadarBpmLostPolicyRequiresUsableBpm() {
+  TEST_ASSERT_TRUE(radarBpmLost(true, false, false, 0));
+  TEST_ASSERT_TRUE(radarBpmLost(true, true, false, 0));
+  TEST_ASSERT_TRUE(radarBpmLost(true, true, true, 0));
+  TEST_ASSERT_FALSE(radarBpmLost(true, true, true, 72));
+  TEST_ASSERT_FALSE(radarBpmLost(false, false, false, 0));
+}
+
+void testRadarNodeAlertUsesSosOrBpmLost() {
+  TEST_ASSERT_TRUE(radarNodeAlert(true, false));
+  TEST_ASSERT_TRUE(radarNodeAlert(false, true));
+  TEST_ASSERT_FALSE(radarNodeAlert(false, false));
+}
+
+void testRemoteBpmLostExpiresWithSnapshot() {
+  TEST_ASSERT_FALSE(remoteBpmLostVisible(true, 0, 1000));
+  TEST_ASSERT_TRUE(remoteBpmLostVisible(true, 1000, 3500));
+  TEST_ASSERT_FALSE(remoteBpmLostVisible(true, 1000, 5001));
+  TEST_ASSERT_FALSE(remoteBpmLostVisible(false, 1000, 3500));
+}

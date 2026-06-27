@@ -141,7 +141,23 @@
 #endif
 
 #ifndef BPMWATCH_ESPNOW_TX_INTERVAL_MS
-#define BPMWATCH_ESPNOW_TX_INTERVAL_MS 250
+#define BPMWATCH_ESPNOW_TX_INTERVAL_MS 1000
+#endif
+
+#ifndef BPMWATCH_ESPNOW_TASK
+#define BPMWATCH_ESPNOW_TASK true
+#endif
+
+#ifndef BPMWATCH_ESPNOW_TASK_PRIORITY
+#define BPMWATCH_ESPNOW_TASK_PRIORITY 1
+#endif
+
+#ifndef BPMWATCH_ESPNOW_TASK_CORE
+#define BPMWATCH_ESPNOW_TASK_CORE 0
+#endif
+
+#ifndef BPMWATCH_ESPNOW_TASK_STACK
+#define BPMWATCH_ESPNOW_TASK_STACK 4096
 #endif
 #ifndef BPMWATCH_DISCOVERY_DISPLAY_INTERVAL_MS
 #define BPMWATCH_DISCOVERY_DISPLAY_INTERVAL_MS 1000
@@ -199,9 +215,11 @@ uint32_t lastCompassCalLogMs = 0;
 #endif
 #endif
 #if BPMWATCH_ESPNOW_RANGE_LINK
-uint32_t lastEspNowSentRangeCount = UINT32_MAX;
-uint32_t lastEspNowSentSosSeq = UINT32_MAX;
 uint32_t lastEspNowTxMs = 0;
+#if BPMWATCH_ESPNOW_TASK && defined(ARDUINO_ARCH_ESP32)
+TaskHandle_t espNowTaskHandle = nullptr;
+bool espNowTaskCreated = false;
+#endif
 #endif
 #if BPMWATCH_ENABLE_SOS
 SosButtonConfig sosConfig{BPMWATCH_SOS_DEBOUNCE_MS,
@@ -323,6 +341,22 @@ DiagnosticsState copyDiagnosticsState() {
   DiagnosticsLock lock;
   return state;
 }
+
+#if BPMWATCH_ESPNOW_RANGE_LINK
+void sendEspNowSnapshot(uint32_t nowMs) {
+  espNowRange.sendTelemetry(copyDiagnosticsState(), nowMs);
+}
+#endif
+
+#if BPMWATCH_ESPNOW_RANGE_LINK && BPMWATCH_ESPNOW_TASK && defined(ARDUINO_ARCH_ESP32)
+void espNowTask(void*) {
+  TickType_t lastWake = xTaskGetTickCount();
+  for (;;) {
+    sendEspNowSnapshot(millis());
+    vTaskDelayUntil(&lastWake, pdMS_TO_TICKS(BPMWATCH_ESPNOW_TX_INTERVAL_MS));
+  }
+}
+#endif
 
 void drainUwbEvents() {
   UwbEvent event;
@@ -685,6 +719,22 @@ void setup() {
     Serial.println("COMPASS task warning: task create failed; loop fallback will sample compass");
   }
 #endif
+
+#if BPMWATCH_ESPNOW_RANGE_LINK && BPMWATCH_ESPNOW_TASK && defined(ARDUINO_ARCH_ESP32)
+  const BaseType_t espNowTaskCreateResult = xTaskCreatePinnedToCore(
+      espNowTask, "EspNowTask", BPMWATCH_ESPNOW_TASK_STACK, nullptr,
+      BPMWATCH_ESPNOW_TASK_PRIORITY, &espNowTaskHandle,
+      BPMWATCH_ESPNOW_TASK_CORE);
+  espNowTaskCreated = espNowTaskCreateResult == pdPASS;
+  Serial.printf(
+      "ESPNOW task: enabled=1 created=%d priority=%d core=%d stack=%d interval=%dms\n",
+      espNowTaskCreated ? 1 : 0, BPMWATCH_ESPNOW_TASK_PRIORITY,
+      BPMWATCH_ESPNOW_TASK_CORE, BPMWATCH_ESPNOW_TASK_STACK,
+      BPMWATCH_ESPNOW_TX_INTERVAL_MS);
+  if (!espNowTaskCreated) {
+    Serial.println("ESPNOW task warning: task create failed; loop fallback will send snapshots");
+  }
+#endif
 }
 
 void loop() {
@@ -696,16 +746,15 @@ void loop() {
   const UwbDiagnosticState uwbSnapshot = copyUwbState();
 
 #if BPMWATCH_ESPNOW_RANGE_LINK
-  const bool espNowRangeChanged =
-      uwbSnapshot.rangeCount != lastEspNowSentRangeCount;
-  const bool espNowSosChanged = state.sos.sosSeq != lastEspNowSentSosSeq;
-  const bool espNowPeriodicDue =
-      safeAgeMs(nowMs, lastEspNowTxMs) >= BPMWATCH_ESPNOW_TX_INTERVAL_MS;
-  if (espNowRangeChanged || espNowSosChanged || espNowPeriodicDue) {
-    lastEspNowSentRangeCount = uwbSnapshot.rangeCount;
-    lastEspNowSentSosSeq = state.sos.sosSeq;
+#if BPMWATCH_ESPNOW_TASK && defined(ARDUINO_ARCH_ESP32)
+  const bool espNowLoopFallback = !espNowTaskCreated;
+#else
+  const bool espNowLoopFallback = true;
+#endif
+  if (espNowLoopFallback &&
+      safeAgeMs(nowMs, lastEspNowTxMs) >= BPMWATCH_ESPNOW_TX_INTERVAL_MS) {
     lastEspNowTxMs = nowMs;
-    espNowRange.sendTelemetry(copyDiagnosticsState(), nowMs);
+    sendEspNowSnapshot(nowMs);
   }
 #endif
 

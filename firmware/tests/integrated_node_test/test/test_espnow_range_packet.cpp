@@ -39,3 +39,32 @@ void test_heading_encoding_clamps_to_compact_centidegrees() {
   TEST_ASSERT_EQUAL_UINT16(0, encodeHeadingCdeg(360.0f));
   TEST_ASSERT_EQUAL_UINT16(35999, encodeHeadingCdeg(359.999f));
 }
+
+void test_bpm_encoding_clamps_to_packet_range() {
+  TEST_ASSERT_EQUAL_UINT16(0, encodeBpm(0));
+  TEST_ASSERT_EQUAL_UINT16(1, encodeBpm(1));
+  TEST_ASSERT_EQUAL_UINT16(255, encodeBpm(300));
+}
+
+void test_packet_reports_bpm_valid_and_lost_flags() {
+  EspNowRangePacket packet{};
+  packet.bpm = encodeBpm(78);
+  packet.flags = kEspNowRangeFlagBpmValid;
+
+  TEST_ASSERT_TRUE(packetHasBpm(packet));
+  TEST_ASSERT_FALSE(packetHasBpmLost(packet));
+  TEST_ASSERT_EQUAL_UINT16(78, packet.bpm);
+
+  packet.flags = kEspNowRangeFlagBpmLost;
+
+  TEST_ASSERT_FALSE(packetHasBpm(packet));
+  TEST_ASSERT_TRUE(packetHasBpmLost(packet));
+}
+
+void test_packet_identifies_local_sender_for_broadcast_filtering() {
+  EspNowRangePacket packet{};
+  packet.senderNodeId = 1;
+
+  TEST_ASSERT_TRUE(packetFromLocalNode(packet, 1));
+  TEST_ASSERT_FALSE(packetFromLocalNode(packet, 0));
+}

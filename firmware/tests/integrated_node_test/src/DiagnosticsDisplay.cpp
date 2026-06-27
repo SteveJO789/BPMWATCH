@@ -20,6 +20,10 @@ constexpr int kRadarCenterY = 108;
 constexpr int kRadarRadius = 82;
 constexpr int kFooterY = 198;
 constexpr float kPi = 3.14159265358979323846f;
+
+uint16_t radarDotColor(bool alert) {
+  return alert ? ST77XX_RED : ST77XX_GREEN;
+}
 }  // namespace
 
 DiagnosticsDisplay::DiagnosticsDisplay()
@@ -62,11 +66,11 @@ void DiagnosticsDisplay::begin(const char* nodeLabel) {
 }
 
 void DiagnosticsDisplay::drawRadarStatic(const char* nodeLabel) {
+  (void)nodeLabel;
   tft_.setTextColor(ST77XX_CYAN);
   tft_.setTextSize(2);
   tft_.setCursor(8, 8);
-  tft_.print("RADAR ");
-  tft_.print(nodeLabel);
+  tft_.print("RADAR");
   drawRadarGrid();
 }
 
@@ -242,8 +246,7 @@ void DiagnosticsDisplay::renderRadarMap(const DiagnosticsState& state,
     tft_.setTextColor(ST77XX_CYAN);
     tft_.setTextSize(2);
     tft_.setCursor(8, 8);
-    tft_.print("RADAR ");
-    tft_.print(nodeLabel_);
+    tft_.print("RADAR");
   }
 
   tft_.fillCircle(kRadarCenterX, kRadarCenterY, kRadarRadius + 4,
@@ -251,6 +254,13 @@ void DiagnosticsDisplay::renderRadarMap(const DiagnosticsState& state,
   previousPeerVisible_ = false;
   drawRadarGrid();
 
+  const bool localBpmLost =
+      radarBpmLost(BPMWATCH_ENABLE_MAX30102, state.max30102.initialized,
+                   state.max30102.fingerPresent, state.max30102.averageBpm);
+  const bool peerBpmLost =
+      remoteBpmLostVisible(state.peer.bpmLost, state.peer.lastBpmRxMs, nowMs);
+  const bool localAlert = radarNodeAlert(localSos, localBpmLost);
+  const bool peerAlert = radarNodeAlert(remoteSos, peerBpmLost);
   const bool headingValid = compassHeadingValid(state.compass);
   if (headingValid) {
     const float headingRad = state.compass.headingDeg * kPi / 180.0f;
@@ -261,6 +271,8 @@ void DiagnosticsDisplay::renderRadarMap(const DiagnosticsState& state,
     tft_.drawLine(kRadarCenterX, kRadarCenterY, headingX, headingY,
                   ST77XX_YELLOW);
   }
+  tft_.fillCircle(kRadarCenterX, kRadarCenterY, 5,
+                  radarDotColor(localAlert));
 
   if (state.radar.hasAngle && !state.radar.hidePeerDot) {
     const float displayAngleDeg = northOrientedRadarAngleDeg(
@@ -272,7 +284,7 @@ void DiagnosticsDisplay::renderRadarMap(const DiagnosticsState& state,
         kRadarCenterX + static_cast<int>(radiusPx * sinf(angleRad));
     const int peerY =
         kRadarCenterY - static_cast<int>(radiusPx * cosf(angleRad));
-    tft_.fillCircle(peerX, peerY, 7, ST77XX_ORANGE);
+    tft_.fillCircle(peerX, peerY, 7, radarDotColor(peerAlert));
     previousPeerX_ = peerX;
     previousPeerY_ = peerY;
     previousPeerVisible_ = true;
@@ -282,7 +294,7 @@ void DiagnosticsDisplay::renderRadarMap(const DiagnosticsState& state,
   tft_.setTextSize(1);
   tft_.setTextColor(ST77XX_WHITE);
   tft_.setCursor(8, kFooterY);
-  tft_.print("UWB:");
+  tft_.print("LINK:");
   const char* uwbStatus = radarLinkStatusLabel(state.uwb.spiReady, state.radar);
   if (strcmp(uwbStatus, "SPI ERR") == 0) {
     tft_.setTextColor(ST77XX_RED);
@@ -296,7 +308,7 @@ void DiagnosticsDisplay::renderRadarMap(const DiagnosticsState& state,
   tft_.print(uwbStatus);
 
   tft_.setTextColor(ST77XX_WHITE);
-  tft_.setCursor(92, kFooterY);
+  tft_.setCursor(100, kFooterY);
   tft_.print("D:");
   if (state.uwb.hasRange) {
     tft_.print(state.uwb.distanceM, 1);
@@ -305,28 +317,16 @@ void DiagnosticsDisplay::renderRadarMap(const DiagnosticsState& state,
     tft_.print("--");
   }
 
-  tft_.setCursor(154, kFooterY);
-  tft_.print("HDG:");
-  if (headingValid) {
-    tft_.print(state.compass.headingDeg, 0);
-  } else {
-    tft_.print("--");
-  }
-
   tft_.setCursor(8, kFooterY + 18);
   tft_.print("BPM:");
-  if (!state.max30102.initialized) {
+  if (!BPMWATCH_ENABLE_MAX30102) {
+    tft_.print("OFF");
+  } else if (localBpmLost) {
     tft_.setTextColor(ST77XX_RED);
-    tft_.print("ERR");
-  } else if (!state.max30102.fingerPresent) {
-    tft_.setTextColor(ST77XX_ORANGE);
-    tft_.print("TOUCH");
-  } else if (state.max30102.averageBpm > 0) {
+    tft_.print("LOST");
+  } else {
     tft_.setTextColor(ST77XX_GREEN);
     tft_.print(state.max30102.averageBpm);
-  } else {
-    tft_.setTextColor(ST77XX_WHITE);
-    tft_.print("--");
   }
   tft_.setTextColor(ST77XX_WHITE);
   tft_.setCursor(78, kFooterY + 18);
@@ -342,9 +342,16 @@ void DiagnosticsDisplay::renderRadarMap(const DiagnosticsState& state,
   }
   tft_.setTextColor(ST77XX_WHITE);
   tft_.setCursor(140, kFooterY + 18);
-  tft_.print("RH:");
-  if (state.peer.headingValid) {
-    tft_.print(state.peer.headingDeg, 0);
+  tft_.print("PEER:");
+  if (peerBpmLost) {
+    tft_.setTextColor(ST77XX_RED);
+    tft_.print("BPM");
+  } else if (remoteSos) {
+    tft_.setTextColor(ST77XX_RED);
+    tft_.print("SOS");
+  } else if (state.radar.hasAngle && !state.radar.hidePeerDot) {
+    tft_.setTextColor(ST77XX_GREEN);
+    tft_.print("OK");
   } else {
     tft_.print("--");
   }

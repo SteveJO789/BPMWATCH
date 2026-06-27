@@ -3,6 +3,8 @@
 #include <math.h>
 #include <stdint.h>
 
+#include "TimeUtils.h"
+
 struct RadarInput {
   float distanceM = 0.0f;
   bool linkOk = false;
@@ -25,6 +27,7 @@ struct RadarState {
 constexpr float kRadarMaxRangeM = 15.0f;
 constexpr float kRadarDistanceDeltaThresholdM = 0.25f;
 constexpr uint32_t kRadarPeerHoldMs = 3000;
+constexpr uint32_t kRemoteBpmLostHoldMs = 3000;
 
 inline float normalizeAngle(float angle) {
   while (angle < 0.0f) {
@@ -103,4 +106,23 @@ inline const char* radarLinkStatusLabel(bool spiReady, const RadarState& state) 
     return "LOST";
   }
   return "OK";
+}
+
+inline bool radarBpmLost(bool sensorEnabled,
+                         bool initialized,
+                         bool fingerPresent,
+                         int averageBpm) {
+  if (!sensorEnabled) {
+    return false;
+  }
+  return !initialized || !fingerPresent || averageBpm <= 0;
+}
+
+inline bool radarNodeAlert(bool sosActive, bool bpmLost) {
+  return sosActive || bpmLost;
+}
+
+inline bool remoteBpmLostVisible(bool bpmLost, uint32_t lastRxMs, uint32_t nowMs) {
+  return bpmLost && lastRxMs != 0 &&
+         safeAgeMs(nowMs, lastRxMs) <= kRemoteBpmLostHoldMs;
 }

@@ -87,6 +87,12 @@ inline bool packetHasBpmLost(const EspNowRangePacket& packet) {
   return (packet.flags & kEspNowRangeFlagBpmLost) != 0;
 }
 
+inline bool espNowShouldSendBpmLost(bool sensorEnabled,
+                                    bool bpmTelemetryValid,
+                                    bool bpmLostAlert) {
+  return sensorEnabled && !bpmTelemetryValid && bpmLostAlert;
+}
+
 inline bool packetFromLocalNode(const EspNowRangePacket& packet,
                                 uint8_t localNodeId) {
   return packet.senderNodeId == localNodeId;

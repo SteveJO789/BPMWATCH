@@ -135,13 +135,19 @@ bool EspNowRangeLink::sendTelemetry(const DiagnosticsState& diagnosticsState,
     packet.headingCdeg = encodeHeadingCdeg(diagnosticsState.compass.headingDeg);
   }
 #if BPMWATCH_ENABLE_MAX30102
-  if (radarBpmLost(true, diagnosticsState.max30102.initialized,
-                   diagnosticsState.max30102.fingerPresent,
-                   diagnosticsState.max30102.averageBpm)) {
-    packet.flags |= kEspNowRangeFlagBpmLost;
-  } else {
+  const bool bpmTelemetryValid =
+      diagnosticsState.max30102.initialized &&
+      diagnosticsState.max30102.fingerPresent &&
+      diagnosticsState.max30102.signalUsable &&
+      diagnosticsState.max30102.bpmValid &&
+      diagnosticsState.max30102.averageBpm > 0;
+  if (bpmTelemetryValid) {
     packet.flags |= kEspNowRangeFlagBpmValid;
     packet.bpm = encodeBpm(diagnosticsState.max30102.averageBpm);
+  } else if (espNowShouldSendBpmLost(BPMWATCH_ENABLE_MAX30102,
+                                     bpmTelemetryValid,
+                                     diagnosticsState.max30102.bpmLostAlert)) {
+    packet.flags |= kEspNowRangeFlagBpmLost;
   }
 #endif
   if (diagnosticsState.sos.sosActive) {

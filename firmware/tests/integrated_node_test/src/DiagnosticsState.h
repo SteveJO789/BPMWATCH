@@ -3,6 +3,7 @@
 #include <Arduino.h>
 
 #include "CompassSensor.h"
+#include "Max30102SignalReason.h"
 #include "RadarMap.h"
 #include "SosButton.h"
 
@@ -86,17 +87,51 @@ struct Max30102DiagnosticState {
   long irValue = 0;
   float bpm = 0.0f;
   int averageBpm = 0;
+  bool bpmValid = false;
+  uint32_t bpmInvalidSinceMs = 0;
+  uint32_t bpmInvalidAgeMs = 0;
+  bool bpmLostAlert = false;
+  bool signalUsable = false;
+  uint8_t stableBeatCount = 0;
+  uint32_t irAcRatioPpm = 0;
+  uint32_t irAcThreshold = 0;
+  uint32_t irAcRatioThresholdPpm = 0;
+  bool wristSignalGate = false;
+  uint32_t wristIrAcThreshold = 0;
+  uint32_t wristIrAcExitThreshold = 0;
+  uint32_t wristIrAcRatioThresholdPpm = 0;
+  uint32_t wristIrAcRatioExitPpm = 0;
+  bool signalHold = false;
+  uint32_t signalLostMs = 0;
+  uint32_t wristEnterCount = 0;
+  uint32_t wristExitCount = 0;
+  uint8_t signalOkReason = Max30102SignalReasonOff;
+  uint32_t falseBeatGateCount = 0;
+  uint32_t noFingerResetCount = 0;
+  uint32_t lowSignalRejectCount = 0;
+  uint32_t refractoryBeatRejectCount = 0;
+  uint32_t intervalBeatRejectCount = 0;
+  uint32_t unstableBeatRejectCount = 0;
+  long irDcBaseline = 0;
+  long irAcGate = 0;
   // Diagnostics added for sampling rate & beat detection visibility
   uint32_t maxSampleCount = 0;
   uint32_t maxSampleResetMs = 0;
   uint32_t maxSps = 0;
   uint32_t maxBeatDetectCount = 0;
+  uint32_t acceptedBeatCount = 0;
+  bool acceptedBeatSeeded = false;
   uint32_t lastBeatAgeMs = 0;
   long maxIrMin1s = 0;
   long maxIrMax1s = 0;
   long maxIrAc1s = 0;
   uint32_t rejectedBeatCount = 0;
+  uint32_t rawBeatIntervalMs = 0;
+  uint32_t candidateBeatIntervalMs = 0;
+  uint32_t acceptedBeatIntervalMs = 0;
+  uint32_t medianBeatIntervalMs = 0;
   uint32_t lastBeatIntervalMs = 0;
+  uint32_t beatReseedCount = 0;
   uint32_t maxSampleDurationUs = 0;
   uint32_t maxSampleDurationMaxUs = 0;
   uint32_t maxLockFailCount = 0;

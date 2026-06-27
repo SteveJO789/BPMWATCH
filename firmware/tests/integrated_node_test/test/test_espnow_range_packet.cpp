@@ -61,6 +61,13 @@ void test_packet_reports_bpm_valid_and_lost_flags() {
   TEST_ASSERT_TRUE(packetHasBpmLost(packet));
 }
 
+void test_bpm_lost_telemetry_waits_for_alert_flag() {
+  TEST_ASSERT_FALSE(espNowShouldSendBpmLost(true, false, false));
+  TEST_ASSERT_TRUE(espNowShouldSendBpmLost(true, false, true));
+  TEST_ASSERT_FALSE(espNowShouldSendBpmLost(true, true, true));
+  TEST_ASSERT_FALSE(espNowShouldSendBpmLost(false, false, true));
+}
+
 void test_packet_identifies_local_sender_for_broadcast_filtering() {
   EspNowRangePacket packet{};
   packet.senderNodeId = 1;

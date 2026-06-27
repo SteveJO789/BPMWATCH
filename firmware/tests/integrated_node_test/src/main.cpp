@@ -9,20 +9,24 @@
 #endif
 #include "DiagnosticsState.h"
 #include "DiagnosticsSync.h"
+#if BPMWATCH_ENABLE_COMPASS
+#include "CompassSensor.h"
+#endif
 #if BPMWATCH_ESPNOW_RANGE_LINK
 #include "EspNowRangeLink.h"
 #endif
-#if BPMWATCH_ENABLE_GY511
-#include "Gy511Sensor.h"
-#endif
 #if BPMWATCH_ENABLE_I2C_SCAN
 #include "I2cScan.h"
+#endif
+#if BPMWATCH_NEEDS_I2C
+#include "I2cBusSync.h"
 #endif
 #if BPMWATCH_ENABLE_MAX30102
 #include "Max30102Sensor.h"
 #endif
 #include "Max30102Diagnostics.h"
 #include "NodeConfig.h"
+#include "SosButton.h"
 #include "TimeUtils.h"
 #include "UwbDiagnostics.h"
 #include "UwbEventQueue.h"
@@ -80,8 +84,64 @@
 #define BPMWATCH_MAX_SAMPLE_INTERVAL_MS 10
 #endif
 
+#ifndef BPMWATCH_COMPASS_TASK
+#define BPMWATCH_COMPASS_TASK true
+#endif
+
+#ifndef BPMWATCH_COMPASS_TASK_PRIORITY
+#define BPMWATCH_COMPASS_TASK_PRIORITY 2
+#endif
+
+#ifndef BPMWATCH_COMPASS_TASK_CORE
+#define BPMWATCH_COMPASS_TASK_CORE 0
+#endif
+
+#ifndef BPMWATCH_COMPASS_TASK_STACK
+#define BPMWATCH_COMPASS_TASK_STACK 4096
+#endif
+
+#ifndef BPMWATCH_COMPASS_SAMPLE_INTERVAL_MS
+#define BPMWATCH_COMPASS_SAMPLE_INTERVAL_MS 100
+#endif
+
+#ifndef BPMWATCH_COMPASS_CAL_LOG
+#define BPMWATCH_COMPASS_CAL_LOG false
+#endif
+
+#ifndef BPMWATCH_COMPASS_CAL_LOG_INTERVAL_MS
+#define BPMWATCH_COMPASS_CAL_LOG_INTERVAL_MS 2000
+#endif
+
 #ifndef BPMWATCH_I2C_CLOCK_HZ
 #define BPMWATCH_I2C_CLOCK_HZ 400000
+#endif
+
+#ifndef BPMWATCH_I2C_LOCK_TIMEOUT_MS
+#define BPMWATCH_I2C_LOCK_TIMEOUT_MS 20
+#endif
+
+#ifndef BPMWATCH_COMPASS_I2C_LOCK_TIMEOUT_MS
+#define BPMWATCH_COMPASS_I2C_LOCK_TIMEOUT_MS 50
+#endif
+
+#ifndef BPMWATCH_SOS_BUTTON_PIN
+#define BPMWATCH_SOS_BUTTON_PIN 32
+#endif
+
+#ifndef BPMWATCH_SOS_DEBOUNCE_MS
+#define BPMWATCH_SOS_DEBOUNCE_MS 50
+#endif
+
+#ifndef BPMWATCH_SOS_LONG_PRESS_MS
+#define BPMWATCH_SOS_LONG_PRESS_MS 1000
+#endif
+
+#ifndef BPMWATCH_SOS_POLL_INTERVAL_MS
+#define BPMWATCH_SOS_POLL_INTERVAL_MS 20
+#endif
+
+#ifndef BPMWATCH_ESPNOW_TX_INTERVAL_MS
+#define BPMWATCH_ESPNOW_TX_INTERVAL_MS 250
 #endif
 #ifndef BPMWATCH_DISCOVERY_DISPLAY_INTERVAL_MS
 #define BPMWATCH_DISCOVERY_DISPLAY_INTERVAL_MS 1000
@@ -116,8 +176,8 @@ DiagnosticsDisplay display;
 uint32_t lastDisplayMs = 0;
 uint32_t lastDisplayFullRefreshMs = 0;
 #endif
-#if BPMWATCH_ENABLE_GY511
-Gy511Sensor gy511;
+#if BPMWATCH_ENABLE_COMPASS
+CompassSensor compass;
 #endif
 #if BPMWATCH_ENABLE_MAX30102
 Max30102Sensor max30102;
@@ -132,11 +192,21 @@ uint32_t lastMaxMs = 0;
 uint32_t lastMaxInitAttemptMs = 0;
 uint32_t maxInitAttemptCount = 0;
 #endif
-#if BPMWATCH_ENABLE_GY511
-uint32_t lastGyMs = 0;
+#if BPMWATCH_ENABLE_COMPASS
+uint32_t lastCompassMs = 0;
+#if BPMWATCH_COMPASS_CAL_LOG
+uint32_t lastCompassCalLogMs = 0;
+#endif
 #endif
 #if BPMWATCH_ESPNOW_RANGE_LINK
-uint32_t lastEspNowSentRangeCount = 0;
+uint32_t lastEspNowSentRangeCount = UINT32_MAX;
+uint32_t lastEspNowSentSosSeq = UINT32_MAX;
+uint32_t lastEspNowTxMs = 0;
+#endif
+#if BPMWATCH_ENABLE_SOS
+SosButtonConfig sosConfig{BPMWATCH_SOS_DEBOUNCE_MS,
+                          BPMWATCH_SOS_LONG_PRESS_MS};
+uint32_t lastSosPollMs = 0;
 #endif
 uint32_t lastLogMs = 0;
 
@@ -199,8 +269,46 @@ void maxTask(void*) {
     state.max30102.maxTaskStackHighWater = uxTaskGetStackHighWaterMark(nullptr);
     if (state.max30102.initialized) {
       // Keep the I2C read out of DiagnosticsLock so logging cannot throttle SPS.
-      max30102.sample(millis(), state.max30102);
+      I2cBusLock i2cLock(BPMWATCH_I2C_LOCK_TIMEOUT_MS);
+      if (i2cLock.acquired()) {
+        max30102.sample(millis(), state.max30102);
+      } else {
+        ++state.max30102.maxLockFailCount;
+      }
     }
+    vTaskDelayUntil(&lastWake, period);
+  }
+}
+#endif
+
+#if BPMWATCH_ENABLE_COMPASS
+void sampleCompass(uint32_t nowMs) {
+  if (!state.compass.initialized) {
+    updateCompassAge(state.compass, nowMs);
+    return;
+  }
+  I2cBusLock i2cLock(BPMWATCH_COMPASS_I2C_LOCK_TIMEOUT_MS);
+  if (i2cLock.acquired()) {
+    compass.sample(nowMs, state.compass);
+  } else {
+    ++state.compass.i2cLockFailCount;
+    state.compass.readOk = false;
+    state.compass.lastIssue = CompassIssue::LockTimeout;
+    updateCompassAge(state.compass, nowMs);
+  }
+}
+#endif
+
+#if BPMWATCH_ENABLE_COMPASS && BPMWATCH_COMPASS_TASK && defined(ARDUINO_ARCH_ESP32)
+TaskHandle_t compassTaskHandle = nullptr;
+
+void compassTask(void*) {
+  TickType_t lastWake = xTaskGetTickCount();
+  const TickType_t period = pdMS_TO_TICKS(BPMWATCH_COMPASS_SAMPLE_INTERVAL_MS);
+  for (;;) {
+    state.compass.compassTaskStackHighWater =
+        uxTaskGetStackHighWaterMark(nullptr);
+    sampleCompass(millis());
     vTaskDelayUntil(&lastWake, period);
   }
 }
@@ -235,13 +343,23 @@ void scanI2cBus(TwoWire& wire, Gy511DiagnosticState& gyState) {
   }
   formatI2cAddressList(addresses, count, gyState.i2cAddresses,
                        sizeof(gyState.i2cAddresses));
+  formatI2cDeviceList(addresses, count, gyState.i2cDeviceList,
+                      sizeof(gyState.i2cDeviceList));
 }
 #endif
 
 #if BPMWATCH_ENABLE_MAX30102
 void tryBeginMax30102(TwoWire& wire, bool logResult) {
   ++maxInitAttemptCount;
-  state.max30102.initialized = max30102.begin(wire);
+  {
+    I2cBusLock i2cLock(BPMWATCH_I2C_LOCK_TIMEOUT_MS);
+    if (i2cLock.acquired()) {
+      state.max30102.initialized = max30102.begin(wire);
+    } else {
+      state.max30102.initialized = false;
+      ++state.max30102.maxLockFailCount;
+    }
+  }
   if (state.max30102.initialized) {
     state.max30102.irValue = 0;
     state.max30102.fingerPresent = false;
@@ -253,6 +371,24 @@ void tryBeginMax30102(TwoWire& wire, bool logResult) {
                   static_cast<unsigned long>(maxInitAttemptCount),
                   state.max30102.initialized ? "OK" : "ERROR");
   }
+}
+#endif
+
+#if BPMWATCH_ENABLE_SOS
+void sampleSosButton(uint32_t nowMs) {
+  const bool pressed = digitalRead(BPMWATCH_SOS_BUTTON_PIN) == LOW;
+  updateSosButton({nowMs, pressed}, state.sos, sosConfig);
+}
+#endif
+
+#if BPMWATCH_ENABLE_COMPASS && BPMWATCH_COMPASS_CAL_LOG
+void logCompassCalibrationSnapshot(const CompassDiagnosticState& compassState) {
+  Serial.printf(
+      "COMPASS_CAL MAG_MIN=%d,%d,%d MAG_MAX=%d,%d,%d RAW=%d,%d,%d SAMPLES=%lu\n",
+      compassState.magMinX, compassState.magMinY, compassState.magMinZ,
+      compassState.magMaxX, compassState.magMaxY, compassState.magMaxZ,
+      compassState.magX, compassState.magY, compassState.magZ,
+      static_cast<unsigned long>(compassState.sampleCount));
 }
 #endif
 
@@ -282,12 +418,8 @@ void logDiagnostics(const DiagnosticsState& current, uint32_t nowMs) {
           : uwbRfQualityLabel(current.uwb.rxFpPowerDbm,
                               current.uwb.rxLosNlosDelta);
 
-  const char* gyStatus =
-      current.gy511.initialized
-          ? (current.gy511.readOk
-                 ? "OK"
-                 : "RDERR")
-          : "OFF";
+  const char* compassStatus =
+      current.compass.initialized ? compassHealthLabel(current.compass) : "OFF";
   const char* maxStatus = current.max30102.initialized ? "OK" : "OFF";
   const char* maxReason = max30102BpmZeroReasonLabel(max30102BpmZeroReason(
       current.max30102.initialized, current.max30102.fingerPresent,
@@ -296,10 +428,14 @@ void logDiagnostics(const DiagnosticsState& current, uint32_t nowMs) {
       current.max30102.rejectedBeatCount));
   const char* irqMode =
       current.uwb.uwbInterruptCount > 0 ? "IRQ" : "SAFETY_POLL";
+  const bool remoteSosActive = remoteSosVisible(current.peer.remoteSos, nowMs);
+  const char* radarMode =
+      BPMWATCH_ENABLE_RADAR_HEADING ? "HEADING_UI" : "DEMO";
 
   Serial.printf(
       "t=%lu %s | UWB=%s peer=%d R#=%lu REC#=%lu AGE=%lums ACT=%lums RCAGE=%lums D=%.2fm STK=%lu IRQ#=%lu IRQPIN=%u IRQMODE=%s P#=%lu EV=%lu/%lu/%lu RST#=%lu RXERR=%lu/%lu RRST#=%lu REG=S:%02X%08lX M:%08lX C:%08lX CFG:%08lX DM:%u LR_OK=%d LR_FAIL=%u LR_FAIL_REASON=%s RX_POWER=%.1f FP_POWER=%.1f DELTA=%.1f LOS=%s RF=%s RXPACC=%u CIR_PWR=%u FP_AMPL=%u/%u/%u STD_NOISE=%u | ESPNOW=%s TX=%lu/%lu RX=%lu | "
-      "GY=%s H=%.1f A=%d,%d,%d | MAX=%s IR=%ld BPM=%d SPS=%lu BEAT#=%lu IR_MIN=%ld IR_MAX=%ld IRAC=%ld LASTBEAT=%lums REJ#=%lu BI=%lums WHY=%s MAX_DUR_US=%lu MAX_DUR_MAX_US=%lu MAX_LOCK_FAIL=%lu MAX_TASK_STK=%lu\n",
+      "COMPASS=%s CSTAT=%s C_ERR=%s MAG=%s MAG_ADDR=%s MAG_DRIVER=%s MAG_WHOAMI=0x%02X MAG_RAW=%d,%d,%d MAG_ABS=%lu MAG_DATA_OK=%d ACC=%s ACC_ADDR=%s ACC_DRIVER=%s ACC_RAW=%d,%d,%d ACC_ABS=%lu ACC_DATA_OK=%d COMPASS_MODE=%s HEADING_MODE=%s HDG=%.1f HDG_VALID=%d C_LOCK_FAIL=%lu C_READ_FAIL=%lu C_WRITE_FAIL=%lu C_LAST_FAIL_STAGE=%s CAL=%s CS#=%lu CAGE=%lums | SOS=%d SOS_SEQ=%lu BTN_RAW=%d BTN_EVENT=%s BTN_DUR_MS=%lu REMOTE_SOS=%d REMOTE_ID=%u REMOTE_HDG=%.1f RADAR_MODE=%s | "
+      "MAX=%s IR=%ld BPM=%d SPS=%lu BEAT#=%lu IR_MIN=%ld IR_MAX=%ld IRAC=%ld LASTBEAT=%lums REJ#=%lu BI=%lums WHY=%s MAX_DUR_US=%lu MAX_DUR_MAX_US=%lu MAX_LOCK_FAIL=%lu MAX_TASK_STK=%lu\n",
       static_cast<unsigned long>(nowMs), kNodeConfig.displayLabel, uwbStatus,
       current.uwb.peerPresent ? 1 : 0,
       static_cast<unsigned long>(current.uwb.rangeCount),
@@ -343,9 +479,42 @@ void logDiagnostics(const DiagnosticsState& current, uint32_t nowMs) {
       current.uwb.espNowReady ? "OK" : "OFF",
       static_cast<unsigned long>(current.uwb.espNowTxCount),
       static_cast<unsigned long>(current.uwb.espNowTxFailCount),
-      static_cast<unsigned long>(current.uwb.espNowRxCount), gyStatus,
-      current.gy511.headingDeg,
-      current.gy511.accelX, current.gy511.accelY, current.gy511.accelZ,
+      static_cast<unsigned long>(current.uwb.espNowRxCount), compassStatus,
+      compassCompactStatusLabel(current.compass),
+      compassIssueLabel(current.compass),
+      compassMagLabel(current.compass),
+      compassMagAddressLabel(current.compass),
+      compassMagDriverLabel(current.compass),
+      static_cast<unsigned>(current.compass.magWhoAmI),
+      current.compass.magX, current.compass.magY, current.compass.magZ,
+      static_cast<unsigned long>(current.compass.magAbs),
+      current.compass.magDataOk ? 1 : 0,
+      compassAccelLabel(current.compass),
+      compassAccelAddressLabel(current.compass),
+      compassAccelDriverLabel(current.compass),
+      current.compass.accelX, current.compass.accelY, current.compass.accelZ,
+      static_cast<unsigned long>(current.compass.accAbs),
+      current.compass.accelDataOk ? 1 : 0,
+      compassModeLabel(current.compass),
+      compassHeadingModeLabel(current.compass),
+      current.compass.headingDeg,
+      compassHeadingValid(current.compass) ? 1 : 0,
+      static_cast<unsigned long>(current.compass.i2cLockFailCount),
+      static_cast<unsigned long>(current.compass.i2cReadFailCount),
+      static_cast<unsigned long>(current.compass.i2cWriteFailCount),
+      compassFailStageLabel(current.compass),
+      compassCalibrationStatusLabel(current.compass),
+      static_cast<unsigned long>(current.compass.sampleCount),
+      static_cast<unsigned long>(current.compass.lastUpdateAgeMs),
+      current.sos.sosActive ? 1 : 0,
+      static_cast<unsigned long>(current.sos.sosSeq),
+      current.sos.rawPressed ? 1 : 0,
+      sosButtonEventLabel(current.sos.lastEvent),
+      static_cast<unsigned long>(current.sos.lastEventDurationMs),
+      remoteSosActive ? 1 : 0,
+      static_cast<unsigned>(current.peer.remoteSos.senderNodeId),
+      current.peer.headingValid ? current.peer.headingDeg : -1.0f,
+      radarMode,
       maxStatus, current.max30102.irValue, current.max30102.averageBpm,
       static_cast<unsigned long>(current.max30102.maxSps),
       static_cast<unsigned long>(current.max30102.maxBeatDetectCount),
@@ -369,9 +538,12 @@ void setup() {
   Serial.printf("BPMWATCH integrated diagnostics: %s\n",
                 kNodeConfig.displayLabel);
   beginDiagnosticsSync();
+#if BPMWATCH_NEEDS_I2C
+  beginI2cBusSync();
+#endif
   beginUwbEventQueue();
 
-#if BPMWATCH_ENABLE_I2C_SCAN || BPMWATCH_ENABLE_GY511 || BPMWATCH_ENABLE_MAX30102
+#if BPMWATCH_NEEDS_I2C
   Wire.begin(21, 22);
   Wire.setClock(BPMWATCH_I2C_CLOCK_HZ);
   Serial.printf("I2C clock: %lu Hz\n",
@@ -385,18 +557,51 @@ void setup() {
 #endif
 
 #if BPMWATCH_ENABLE_I2C_SCAN
-  scanI2cBus(Wire, state.gy511);
-  Serial.printf("I2C scan: %s\n", state.gy511.i2cAddresses);
+  {
+    I2cBusLock i2cLock(BPMWATCH_I2C_LOCK_TIMEOUT_MS);
+    if (i2cLock.acquired()) {
+      scanI2cBus(Wire, state.compass);
+    } else {
+      ++state.compass.i2cLockFailCount;
+    }
+  }
+  Serial.printf("I2C_DEVICES=%s\n", state.compass.i2cDeviceList);
 #else
-  Serial.println("I2C scan: OFF");
+  Serial.println("I2C_DEVICES=OFF");
 #endif
 
-#if BPMWATCH_ENABLE_GY511
-  gy511.begin(Wire, state.gy511);
-  Serial.printf("GY-511 init: %s\n",
-                state.gy511.initialized ? "OK" : "ERROR");
+#if BPMWATCH_ENABLE_COMPASS
+  {
+    I2cBusLock i2cLock(BPMWATCH_COMPASS_I2C_LOCK_TIMEOUT_MS);
+    if (i2cLock.acquired()) {
+      compass.begin(Wire, state.compass);
+    } else {
+      ++state.compass.i2cLockFailCount;
+      state.compass.lastIssue = CompassIssue::LockTimeout;
+    }
+  }
+  Serial.printf(
+      "COMPASS init: %s CSTAT=%s C_ERR=%s MAG=%s MAG_ADDR=%s MAG_DRIVER=%s MAG_WHOAMI=0x%02X ACC=%s ACC_ADDR=%s ACC_DRIVER=%s COMPASS_MODE=%s HEADING_MODE=%s C_LOCK_FAIL=%lu C_READ_FAIL=%lu C_WRITE_FAIL=%lu C_LAST_FAIL_STAGE=%s\n",
+                state.compass.initialized
+                    ? (state.compass.accelAvailable ? "OK" : "PARTIAL")
+                    : "FAIL",
+                state.compass.initialized ? "OK" : "ERR",
+                compassIssueLabel(state.compass),
+                compassMagLabel(state.compass),
+                compassMagAddressLabel(state.compass),
+                compassMagDriverLabel(state.compass),
+                static_cast<unsigned>(state.compass.magWhoAmI),
+                compassAccelLabel(state.compass),
+                compassAccelAddressLabel(state.compass),
+                compassAccelDriverLabel(state.compass),
+                compassModeLabel(state.compass),
+                compassHeadingModeLabel(state.compass),
+                static_cast<unsigned long>(state.compass.i2cLockFailCount),
+                static_cast<unsigned long>(state.compass.i2cReadFailCount),
+                static_cast<unsigned long>(state.compass.i2cWriteFailCount),
+                compassFailStageLabel(state.compass));
 #else
-  Serial.println("GY-511: OFF");
+  Serial.println("COMPASS: OFF");
 #endif
 
 #if BPMWATCH_ENABLE_MAX30102
@@ -405,9 +610,19 @@ void setup() {
   Serial.println("MAX30102: OFF");
 #endif
 
+#if BPMWATCH_ENABLE_SOS
+  pinMode(BPMWATCH_SOS_BUTTON_PIN, INPUT_PULLUP);
+  Serial.printf("SOS button: pin=%d active=LOW debounce=%lums long=%lums\n",
+                BPMWATCH_SOS_BUTTON_PIN,
+                static_cast<unsigned long>(BPMWATCH_SOS_DEBOUNCE_MS),
+                static_cast<unsigned long>(BPMWATCH_SOS_LONG_PRESS_MS));
+#else
+  Serial.println("SOS button: OFF");
+#endif
+
 #if BPMWATCH_ESPNOW_RANGE_LINK
   Serial.printf("ESP-NOW range link: %s\n",
-                espNowRange.begin(state.uwb) ? "OK" : "ERROR");
+                espNowRange.begin(state) ? "OK" : "ERROR");
 #else
   Serial.println("ESP-NOW range link: OFF");
 #endif
@@ -454,6 +669,22 @@ void setup() {
     Serial.println("MAX task warning: task create failed; loop fallback is disabled for this build");
   }
 #endif
+
+#if BPMWATCH_ENABLE_COMPASS && BPMWATCH_COMPASS_TASK && defined(ARDUINO_ARCH_ESP32)
+  const BaseType_t compassTaskCreateResult = xTaskCreatePinnedToCore(
+      compassTask, "CompassTask", BPMWATCH_COMPASS_TASK_STACK, nullptr,
+      BPMWATCH_COMPASS_TASK_PRIORITY, &compassTaskHandle,
+      BPMWATCH_COMPASS_TASK_CORE);
+  state.compass.compassTaskCreated = compassTaskCreateResult == pdPASS;
+  Serial.printf(
+      "COMPASS task: enabled=1 created=%d priority=%d core=%d stack=%d interval=%dms\n",
+      state.compass.compassTaskCreated ? 1 : 0,
+      BPMWATCH_COMPASS_TASK_PRIORITY, BPMWATCH_COMPASS_TASK_CORE,
+      BPMWATCH_COMPASS_TASK_STACK, BPMWATCH_COMPASS_SAMPLE_INTERVAL_MS);
+  if (!state.compass.compassTaskCreated) {
+    Serial.println("COMPASS task warning: task create failed; loop fallback will sample compass");
+  }
+#endif
 }
 
 void loop() {
@@ -465,10 +696,16 @@ void loop() {
   const UwbDiagnosticState uwbSnapshot = copyUwbState();
 
 #if BPMWATCH_ESPNOW_RANGE_LINK
-  if (kNodeConfig.isAnchor && uwbSnapshot.hasRange &&
-      uwbSnapshot.rangeCount != lastEspNowSentRangeCount) {
+  const bool espNowRangeChanged =
+      uwbSnapshot.rangeCount != lastEspNowSentRangeCount;
+  const bool espNowSosChanged = state.sos.sosSeq != lastEspNowSentSosSeq;
+  const bool espNowPeriodicDue =
+      safeAgeMs(nowMs, lastEspNowTxMs) >= BPMWATCH_ESPNOW_TX_INTERVAL_MS;
+  if (espNowRangeChanged || espNowSosChanged || espNowPeriodicDue) {
     lastEspNowSentRangeCount = uwbSnapshot.rangeCount;
-    espNowRange.sendRange(uwbSnapshot, nowMs);
+    lastEspNowSentSosSeq = state.sos.sosSeq;
+    lastEspNowTxMs = nowMs;
+    espNowRange.sendTelemetry(copyDiagnosticsState(), nowMs);
   }
 #endif
 
@@ -477,7 +714,7 @@ void loop() {
        nowMs},
       state.radar);
 
-#if BPMWATCH_ENABLE_GY511 || BPMWATCH_ENABLE_MAX30102
+#if BPMWATCH_ENABLE_COMPASS || BPMWATCH_ENABLE_MAX30102
   const uint32_t sensorIntervalMs =
       uwbSnapshot.hasRange ? BPMWATCH_CONNECTED_SENSOR_INTERVAL_MS
                            : BPMWATCH_DISCOVERY_SENSOR_INTERVAL_MS;
@@ -493,15 +730,32 @@ void loop() {
 #if !BPMWATCH_MAX_TASK
   if (nowMs - lastMaxMs >= sensorIntervalMs) {
     lastMaxMs = nowMs;
-    max30102.sample(nowMs, state.max30102);
+    I2cBusLock i2cLock(BPMWATCH_I2C_LOCK_TIMEOUT_MS);
+    if (i2cLock.acquired()) {
+      max30102.sample(nowMs, state.max30102);
+    } else {
+      ++state.max30102.maxLockFailCount;
+    }
   }
 #endif
 #endif
 
-#if BPMWATCH_ENABLE_GY511
-  if (nowMs - lastGyMs >= sensorIntervalMs) {
-    lastGyMs = nowMs;
-    gy511.sample(state.gy511);
+#if BPMWATCH_ENABLE_COMPASS
+#if BPMWATCH_COMPASS_TASK && defined(ARDUINO_ARCH_ESP32)
+  const bool sampleCompassInLoop = !state.compass.compassTaskCreated;
+#else
+  const bool sampleCompassInLoop = true;
+#endif
+  if (sampleCompassInLoop && nowMs - lastCompassMs >= sensorIntervalMs) {
+    lastCompassMs = nowMs;
+    sampleCompass(nowMs);
+  }
+#endif
+
+#if BPMWATCH_ENABLE_SOS
+  if (nowMs - lastSosPollMs >= BPMWATCH_SOS_POLL_INTERVAL_MS) {
+    lastSosPollMs = nowMs;
+    sampleSosButton(nowMs);
   }
 #endif
 
@@ -517,6 +771,13 @@ void loop() {
       lastDisplayFullRefreshMs = nowMs;
     }
     display.render(copyDiagnosticsState(), nowMs, forceFullDisplayRefresh);
+  }
+#endif
+
+#if BPMWATCH_ENABLE_COMPASS && BPMWATCH_COMPASS_CAL_LOG
+  if (nowMs - lastCompassCalLogMs >= BPMWATCH_COMPASS_CAL_LOG_INTERVAL_MS) {
+    lastCompassCalLogMs = nowMs;
+    logCompassCalibrationSnapshot(copyDiagnosticsState().compass);
   }
 #endif
 

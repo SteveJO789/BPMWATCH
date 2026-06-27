@@ -35,5 +35,5 @@ class DiagnosticsDisplay {
   void renderUwb(const UwbDiagnosticState& state);
   void renderGy511(const Gy511DiagnosticState& state);
   void renderMax30102(const Max30102DiagnosticState& state);
-  void renderRadarMap(const DiagnosticsState& state);
+  void renderRadarMap(const DiagnosticsState& state, uint32_t nowMs);
 };

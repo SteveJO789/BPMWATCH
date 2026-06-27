@@ -11,6 +11,15 @@ void testI2cScanFormatsDetectedAddressesForLcd() {
   TEST_ASSERT_EQUAL_STRING("1E 57", output);
 }
 
+void testI2cScanFormatsDeviceListForDiagnosticsLog() {
+  const uint8_t addresses[] = {0x1E, 0x57};
+  char output[32]{};
+
+  formatI2cDeviceList(addresses, 2, output, sizeof(output));
+
+  TEST_ASSERT_EQUAL_STRING("0x1E,0x57", output);
+}
+
 void testI2cScanShowsNoneWhenNoAddressResponds() {
   char output[24]{};
 

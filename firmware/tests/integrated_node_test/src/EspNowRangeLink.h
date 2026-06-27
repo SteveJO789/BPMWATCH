@@ -13,6 +13,8 @@ constexpr uint32_t kEspNowRangeStaleMs = 3000;
 constexpr uint16_t kEspNowRangeFlagRangeValid = 1U << 0;
 constexpr uint16_t kEspNowRangeFlagHeadingValid = 1U << 1;
 constexpr uint16_t kEspNowRangeFlagSosActive = 1U << 2;
+constexpr uint16_t kEspNowRangeFlagBpmValid = 1U << 3;
+constexpr uint16_t kEspNowRangeFlagBpmLost = 1U << 4;
 
 struct EspNowRangePacket {
   uint32_t magic = kEspNowRangeMagic;
@@ -27,7 +29,7 @@ struct EspNowRangePacket {
   float rxPowerDbm = 0.0f;
   float quality = 0.0f;
   uint16_t headingCdeg = 0;
-  uint16_t reserved = 0;
+  uint16_t bpm = 0;
   uint32_t sosSeq = 0;
   uint32_t timestampMs = 0;
 };
@@ -58,6 +60,13 @@ inline float decodeHeadingDeg(uint16_t headingCdeg) {
   return static_cast<float>(headingCdeg) / 100.0f;
 }
 
+inline uint16_t encodeBpm(int bpm) {
+  if (bpm <= 0) {
+    return 0;
+  }
+  return bpm > 255 ? 255 : static_cast<uint16_t>(bpm);
+}
+
 inline bool packetHasRange(const EspNowRangePacket& packet) {
   return (packet.flags & kEspNowRangeFlagRangeValid) != 0;
 }
@@ -68,6 +77,25 @@ inline bool packetHasHeading(const EspNowRangePacket& packet) {
 
 inline bool packetHasSos(const EspNowRangePacket& packet) {
   return (packet.flags & kEspNowRangeFlagSosActive) != 0;
+}
+
+inline bool packetHasBpm(const EspNowRangePacket& packet) {
+  return (packet.flags & kEspNowRangeFlagBpmValid) != 0;
+}
+
+inline bool packetHasBpmLost(const EspNowRangePacket& packet) {
+  return (packet.flags & kEspNowRangeFlagBpmLost) != 0;
+}
+
+inline bool espNowShouldSendBpmLost(bool sensorEnabled,
+                                    bool bpmTelemetryValid,
+                                    bool bpmLostAlert) {
+  return sensorEnabled && !bpmTelemetryValid && bpmLostAlert;
+}
+
+inline bool packetFromLocalNode(const EspNowRangePacket& packet,
+                                uint8_t localNodeId) {
+  return packet.senderNodeId == localNodeId;
 }
 
 inline bool isValidEspNowRangePacket(const void* data, size_t length) {
@@ -102,5 +130,6 @@ class EspNowRangeLink {
   uint8_t peerMac_[6]{};
 
   void handleReceive(const uint8_t* data, int length);
+  void handleSendComplete(bool delivered);
   void applyPacket(const EspNowRangePacket& packet);
 };

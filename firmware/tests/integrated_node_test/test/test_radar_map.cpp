@@ -76,3 +76,59 @@ void testRadarMapKeepsDemoAngleWhenHeadingInvalid() {
   TEST_ASSERT_FLOAT_WITHIN(
       0.001f, 180.0f, northOrientedRadarAngleDeg(180.0f, 270.0f, false));
 }
+
+void testRadarBpmLostPolicyRequiresUsableBpm() {
+  TEST_ASSERT_TRUE(radarBpmLost(true, false, false, false, false));
+  TEST_ASSERT_TRUE(radarBpmLost(true, true, false, false, false));
+  TEST_ASSERT_TRUE(radarBpmLost(true, true, true, false, false));
+  TEST_ASSERT_TRUE(radarBpmLost(true, true, true, false, true));
+  TEST_ASSERT_FALSE(radarBpmLost(true, true, true, true, true));
+  TEST_ASSERT_FALSE(radarBpmLost(false, false, false, false, false));
+}
+
+void testRadarBpmLostAlertWaitsFiveMinutesForNoFinger() {
+  uint32_t invalidSinceMs = 0;
+  uint32_t invalidAgeMs = 0;
+  bool alert = false;
+
+  updateRadarBpmLostAlert(true, false, 1000, invalidSinceMs,
+                          invalidAgeMs, alert);
+  TEST_ASSERT_EQUAL_UINT32(1000, invalidSinceMs);
+  TEST_ASSERT_EQUAL_UINT32(0, invalidAgeMs);
+  TEST_ASSERT_FALSE(alert);
+
+  updateRadarBpmLostAlert(true, false, 1000 + kBpmLostAlertGraceMs - 1,
+                          invalidSinceMs, invalidAgeMs, alert);
+  TEST_ASSERT_FALSE(alert);
+
+  updateRadarBpmLostAlert(true, false, 1000 + kBpmLostAlertGraceMs,
+                          invalidSinceMs, invalidAgeMs, alert);
+  TEST_ASSERT_EQUAL_UINT32(kBpmLostAlertGraceMs, invalidAgeMs);
+  TEST_ASSERT_TRUE(alert);
+}
+
+void testRadarBpmLostAlertResetsWhenBpmReturns() {
+  uint32_t invalidSinceMs = 1000;
+  uint32_t invalidAgeMs = kBpmLostAlertGraceMs;
+  bool alert = true;
+
+  updateRadarBpmLostAlert(true, true, 1000 + kBpmLostAlertGraceMs + 1,
+                          invalidSinceMs, invalidAgeMs, alert);
+
+  TEST_ASSERT_EQUAL_UINT32(0, invalidSinceMs);
+  TEST_ASSERT_EQUAL_UINT32(0, invalidAgeMs);
+  TEST_ASSERT_FALSE(alert);
+}
+
+void testRadarNodeAlertUsesSosOrBpmLost() {
+  TEST_ASSERT_TRUE(radarNodeAlert(true, false));
+  TEST_ASSERT_TRUE(radarNodeAlert(false, true));
+  TEST_ASSERT_FALSE(radarNodeAlert(false, false));
+}
+
+void testRemoteBpmLostExpiresWithSnapshot() {
+  TEST_ASSERT_FALSE(remoteBpmLostVisible(true, 0, 1000));
+  TEST_ASSERT_TRUE(remoteBpmLostVisible(true, 1000, 3500));
+  TEST_ASSERT_FALSE(remoteBpmLostVisible(true, 1000, 5001));
+  TEST_ASSERT_FALSE(remoteBpmLostVisible(false, 1000, 3500));
+}

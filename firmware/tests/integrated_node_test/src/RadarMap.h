@@ -3,6 +3,8 @@
 #include <math.h>
 #include <stdint.h>
 
+#include "TimeUtils.h"
+
 struct RadarInput {
   float distanceM = 0.0f;
   bool linkOk = false;
@@ -25,6 +27,13 @@ struct RadarState {
 constexpr float kRadarMaxRangeM = 15.0f;
 constexpr float kRadarDistanceDeltaThresholdM = 0.25f;
 constexpr uint32_t kRadarPeerHoldMs = 3000;
+constexpr uint32_t kRemoteBpmLostHoldMs = 3000;
+
+#ifndef BPMWATCH_BPM_LOST_ALERT_GRACE_MS
+#define BPMWATCH_BPM_LOST_ALERT_GRACE_MS 300000UL
+#endif
+
+constexpr uint32_t kBpmLostAlertGraceMs = BPMWATCH_BPM_LOST_ALERT_GRACE_MS;
 
 inline float normalizeAngle(float angle) {
   while (angle < 0.0f) {
@@ -103,4 +112,48 @@ inline const char* radarLinkStatusLabel(bool spiReady, const RadarState& state) 
     return "LOST";
   }
   return "OK";
+}
+
+inline bool radarBpmLost(bool sensorEnabled,
+                         bool initialized,
+                         bool fingerPresent,
+                         bool signalUsable,
+                         bool bpmValid) {
+  if (!sensorEnabled) {
+    return false;
+  }
+  return !initialized || !fingerPresent || !signalUsable || !bpmValid;
+}
+
+inline void updateRadarBpmLostAlert(bool sensorEnabled,
+                                    bool bpmUsable,
+                                    uint32_t nowMs,
+                                    uint32_t& invalidSinceMs,
+                                    uint32_t& invalidAgeMs,
+                                    bool& alert) {
+  if (!sensorEnabled || bpmUsable) {
+    invalidSinceMs = 0;
+    invalidAgeMs = 0;
+    alert = false;
+    return;
+  }
+
+  if (invalidSinceMs == 0) {
+    invalidSinceMs = nowMs == 0 ? 1 : nowMs;
+    invalidAgeMs = 0;
+    alert = false;
+    return;
+  }
+
+  invalidAgeMs = safeAgeMs(nowMs, invalidSinceMs);
+  alert = invalidAgeMs >= kBpmLostAlertGraceMs;
+}
+
+inline bool radarNodeAlert(bool sosActive, bool bpmLost) {
+  return sosActive || bpmLost;
+}
+
+inline bool remoteBpmLostVisible(bool bpmLost, uint32_t lastRxMs, uint32_t nowMs) {
+  return bpmLost && lastRxMs != 0 &&
+         safeAgeMs(nowMs, lastRxMs) <= kRemoteBpmLostHoldMs;
 }

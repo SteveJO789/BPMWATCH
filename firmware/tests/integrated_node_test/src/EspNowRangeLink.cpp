@@ -10,13 +10,38 @@
 
 #include <WiFi.h>
 #include <esp_now.h>
+#include <esp_wifi.h>
+
+#include <stdio.h>
+
+#ifndef BPMWATCH_ESPNOW_BROADCAST
+#define BPMWATCH_ESPNOW_BROADCAST true
+#endif
+
+#ifndef BPMWATCH_ESPNOW_CHANNEL
+#define BPMWATCH_ESPNOW_CHANNEL 1
+#endif
 
 namespace {
 constexpr uint8_t kNodeAPeerMac[6] = {0x0C, 0x8A, 0xD3, 0x7C, 0xE5, 0xA4};
 constexpr uint8_t kNodeBPeerMac[6] = {0x1C, 0x75, 0xC4, 0xF4, 0xE9, 0xD4};
+constexpr uint8_t kBroadcastPeerMac[6] = {0xFF, 0xFF, 0xFF,
+                                          0xFF, 0xFF, 0xFF};
 
 const uint8_t* peerMacForCurrentNode() {
+#if BPMWATCH_ESPNOW_BROADCAST
+  return kBroadcastPeerMac;
+#else
   return kNodeConfig.isAnchor ? kNodeBPeerMac : kNodeAPeerMac;
+#endif
+}
+
+void formatMac(const uint8_t* mac, char* out, size_t outSize) {
+  if (outSize < 18) {
+    return;
+  }
+  snprintf(out, outSize, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1],
+           mac[2], mac[3], mac[4], mac[5]);
 }
 }
 #endif
@@ -31,6 +56,7 @@ bool EspNowRangeLink::begin(DiagnosticsState& diagnosticsState) {
 #if defined(ARDUINO_ARCH_ESP32)
   WiFi.mode(WIFI_STA);
   WiFi.disconnect(false, false);
+  esp_wifi_set_channel(BPMWATCH_ESPNOW_CHANNEL, WIFI_SECOND_CHAN_NONE);
 
   if (esp_now_init() != ESP_OK) {
     ready_ = false;
@@ -42,7 +68,7 @@ bool EspNowRangeLink::begin(DiagnosticsState& diagnosticsState) {
   memcpy(peerMac_, peerMacForCurrentNode(), sizeof(peerMac_));
   esp_now_peer_info_t peerInfo{};
   memcpy(peerInfo.peer_addr, peerMac_, sizeof(peerMac_));
-  peerInfo.channel = 0;
+  peerInfo.channel = BPMWATCH_ESPNOW_CHANNEL;
   peerInfo.encrypt = false;
   if (!esp_now_is_peer_exist(peerMac_) &&
       esp_now_add_peer(&peerInfo) != ESP_OK) {
@@ -58,12 +84,23 @@ bool EspNowRangeLink::begin(DiagnosticsState& diagnosticsState) {
           instance_->handleReceive(data, length);
         }
       });
+  esp_now_register_send_cb(
+      [](const wifi_tx_info_t*, esp_now_send_status_t status) {
+        if (instance_ != nullptr) {
+          instance_->handleSendComplete(status == ESP_NOW_SEND_SUCCESS);
+        }
+      });
 
   ready_ = true;
   {
     DiagnosticsLock lock;
     diagnosticsState.uwb.espNowReady = true;
   }
+  char peerMacText[18]{};
+  formatMac(peerMac_, peerMacText, sizeof(peerMacText));
+  Serial.printf("ESPNOW config: local_sta=%s peer=%s channel=%d broadcast=%d\n",
+                WiFi.macAddress().c_str(), peerMacText,
+                BPMWATCH_ESPNOW_CHANNEL, BPMWATCH_ESPNOW_BROADCAST ? 1 : 0);
   return true;
 #else
   (void)diagnosticsState;
@@ -97,6 +134,22 @@ bool EspNowRangeLink::sendTelemetry(const DiagnosticsState& diagnosticsState,
     packet.flags |= kEspNowRangeFlagHeadingValid;
     packet.headingCdeg = encodeHeadingCdeg(diagnosticsState.compass.headingDeg);
   }
+#if BPMWATCH_ENABLE_MAX30102
+  const bool bpmTelemetryValid =
+      diagnosticsState.max30102.initialized &&
+      diagnosticsState.max30102.fingerPresent &&
+      diagnosticsState.max30102.signalUsable &&
+      diagnosticsState.max30102.bpmValid &&
+      diagnosticsState.max30102.averageBpm > 0;
+  if (bpmTelemetryValid) {
+    packet.flags |= kEspNowRangeFlagBpmValid;
+    packet.bpm = encodeBpm(diagnosticsState.max30102.averageBpm);
+  } else if (espNowShouldSendBpmLost(BPMWATCH_ENABLE_MAX30102,
+                                     bpmTelemetryValid,
+                                     diagnosticsState.max30102.bpmLostAlert)) {
+    packet.flags |= kEspNowRangeFlagBpmLost;
+  }
+#endif
   if (diagnosticsState.sos.sosActive) {
     packet.flags |= kEspNowRangeFlagSosActive;
   }
@@ -120,6 +173,18 @@ bool EspNowRangeLink::sendTelemetry(const DiagnosticsState& diagnosticsState,
 #endif
 }
 
+void EspNowRangeLink::handleSendComplete(bool delivered) {
+#if defined(ARDUINO_ARCH_ESP32)
+  if (delivered || diagnosticsState_ == nullptr) {
+    return;
+  }
+  DiagnosticsLock lock;
+  ++diagnosticsState_->uwb.espNowTxFailCount;
+#else
+  (void)delivered;
+#endif
+}
+
 void EspNowRangeLink::handleReceive(const uint8_t* data, int length) {
   if (!isValidEspNowRangePacket(data, static_cast<size_t>(length))) {
     return;
@@ -137,10 +202,16 @@ void EspNowRangeLink::handleReceive(const uint8_t* data, int length) {
     packet.rawDistanceM = legacy->rawDistanceM;
     packet.rxPowerDbm = legacy->rxPowerDbm;
     packet.quality = legacy->quality;
+    if (packetFromLocalNode(packet, kNodeConfig.nodeId)) {
+      return;
+    }
     applyPacket(packet);
     return;
   }
   const auto* packet = reinterpret_cast<const EspNowRangePacket*>(data);
+  if (packetFromLocalNode(*packet, kNodeConfig.nodeId)) {
+    return;
+  }
   applyPacket(*packet);
 }
 
@@ -158,6 +229,13 @@ void EspNowRangeLink::applyPacket(const EspNowRangePacket& packet) {
     diagnosticsState_->peer.headingDeg = decodeHeadingDeg(packet.headingCdeg);
   } else {
     diagnosticsState_->peer.headingValid = false;
+  }
+  diagnosticsState_->peer.bpmValid = packetHasBpm(packet);
+  diagnosticsState_->peer.bpmLost = packetHasBpmLost(packet);
+  diagnosticsState_->peer.bpm =
+      diagnosticsState_->peer.bpmValid ? packet.bpm : 0;
+  if (diagnosticsState_->peer.bpmValid || diagnosticsState_->peer.bpmLost) {
+    diagnosticsState_->peer.lastBpmRxMs = nowMs;
   }
   diagnosticsState_->peer.remoteSos.active = packetHasSos(packet);
   diagnosticsState_->peer.remoteSos.seq = packet.sosSeq;

@@ -141,7 +141,23 @@
 #endif
 
 #ifndef BPMWATCH_ESPNOW_TX_INTERVAL_MS
-#define BPMWATCH_ESPNOW_TX_INTERVAL_MS 250
+#define BPMWATCH_ESPNOW_TX_INTERVAL_MS 1000
+#endif
+
+#ifndef BPMWATCH_ESPNOW_TASK
+#define BPMWATCH_ESPNOW_TASK true
+#endif
+
+#ifndef BPMWATCH_ESPNOW_TASK_PRIORITY
+#define BPMWATCH_ESPNOW_TASK_PRIORITY 1
+#endif
+
+#ifndef BPMWATCH_ESPNOW_TASK_CORE
+#define BPMWATCH_ESPNOW_TASK_CORE 0
+#endif
+
+#ifndef BPMWATCH_ESPNOW_TASK_STACK
+#define BPMWATCH_ESPNOW_TASK_STACK 4096
 #endif
 #ifndef BPMWATCH_DISCOVERY_DISPLAY_INTERVAL_MS
 #define BPMWATCH_DISCOVERY_DISPLAY_INTERVAL_MS 1000
@@ -199,9 +215,11 @@ uint32_t lastCompassCalLogMs = 0;
 #endif
 #endif
 #if BPMWATCH_ESPNOW_RANGE_LINK
-uint32_t lastEspNowSentRangeCount = UINT32_MAX;
-uint32_t lastEspNowSentSosSeq = UINT32_MAX;
 uint32_t lastEspNowTxMs = 0;
+#if BPMWATCH_ESPNOW_TASK && defined(ARDUINO_ARCH_ESP32)
+TaskHandle_t espNowTaskHandle = nullptr;
+bool espNowTaskCreated = false;
+#endif
 #endif
 #if BPMWATCH_ENABLE_SOS
 SosButtonConfig sosConfig{BPMWATCH_SOS_DEBOUNCE_MS,
@@ -324,6 +342,42 @@ DiagnosticsState copyDiagnosticsState() {
   return state;
 }
 
+#if BPMWATCH_ENABLE_MAX30102
+bool max30102BpmTelemetryValid(const Max30102DiagnosticState& maxState) {
+  return maxState.initialized && maxState.fingerPresent &&
+         maxState.signalUsable && maxState.bpmValid &&
+         maxState.averageBpm > 0;
+}
+
+void updateMax30102BpmLostAlert(uint32_t nowMs) {
+  DiagnosticsLock lock;
+  updateRadarBpmLostAlert(BPMWATCH_ENABLE_MAX30102,
+                          max30102BpmTelemetryValid(state.max30102), nowMs,
+                          state.max30102.bpmInvalidSinceMs,
+                          state.max30102.bpmInvalidAgeMs,
+                          state.max30102.bpmLostAlert);
+}
+#endif
+
+#if BPMWATCH_ESPNOW_RANGE_LINK
+void sendEspNowSnapshot(uint32_t nowMs) {
+#if BPMWATCH_ENABLE_MAX30102
+  updateMax30102BpmLostAlert(nowMs);
+#endif
+  espNowRange.sendTelemetry(copyDiagnosticsState(), nowMs);
+}
+#endif
+
+#if BPMWATCH_ESPNOW_RANGE_LINK && BPMWATCH_ESPNOW_TASK && defined(ARDUINO_ARCH_ESP32)
+void espNowTask(void*) {
+  TickType_t lastWake = xTaskGetTickCount();
+  for (;;) {
+    sendEspNowSnapshot(millis());
+    vTaskDelayUntil(&lastWake, pdMS_TO_TICKS(BPMWATCH_ESPNOW_TX_INTERVAL_MS));
+  }
+}
+#endif
+
 void drainUwbEvents() {
   UwbEvent event;
   while (popUwbEvent(event)) {
@@ -360,12 +414,50 @@ void tryBeginMax30102(TwoWire& wire, bool logResult) {
       ++state.max30102.maxLockFailCount;
     }
   }
-  if (state.max30102.initialized) {
-    state.max30102.irValue = 0;
-    state.max30102.fingerPresent = false;
-    state.max30102.bpm = 0.0f;
-    state.max30102.averageBpm = 0;
-  }
+  state.max30102.irValue = 0;
+  state.max30102.fingerPresent = false;
+  state.max30102.bpm = 0.0f;
+  state.max30102.averageBpm = 0;
+  state.max30102.bpmValid = false;
+  state.max30102.bpmInvalidSinceMs = 0;
+  state.max30102.bpmInvalidAgeMs = 0;
+  state.max30102.bpmLostAlert = false;
+  state.max30102.signalUsable = false;
+  state.max30102.stableBeatCount = 0;
+  state.max30102.falseBeatGateCount = 0;
+  state.max30102.noFingerResetCount = 0;
+  state.max30102.lowSignalRejectCount = 0;
+  state.max30102.refractoryBeatRejectCount = 0;
+  state.max30102.intervalBeatRejectCount = 0;
+  state.max30102.unstableBeatRejectCount = 0;
+  state.max30102.irDcBaseline = 0;
+  state.max30102.irAcGate = 0;
+  state.max30102.maxBeatDetectCount = 0;
+  state.max30102.acceptedBeatCount = 0;
+  state.max30102.acceptedBeatSeeded = false;
+  state.max30102.rawBeatIntervalMs = 0;
+  state.max30102.candidateBeatIntervalMs = 0;
+  state.max30102.acceptedBeatIntervalMs = 0;
+  state.max30102.medianBeatIntervalMs = 0;
+  state.max30102.lastBeatIntervalMs = 0;
+  state.max30102.beatReseedCount = 0;
+  state.max30102.irAcRatioPpm = 0;
+  state.max30102.irAcThreshold = BPMWATCH_MAX30102_MIN_IR_AC;
+  state.max30102.irAcRatioThresholdPpm =
+      BPMWATCH_MAX30102_MIN_IR_AC_RATIO_PPM;
+  state.max30102.wristSignalGate = false;
+  state.max30102.wristIrAcThreshold = BPMWATCH_MAX30102_WRIST_IRAC_THR;
+  state.max30102.wristIrAcExitThreshold =
+      BPMWATCH_MAX30102_WRIST_IRAC_EXIT_THR;
+  state.max30102.wristIrAcRatioThresholdPpm =
+      BPMWATCH_MAX30102_WRIST_RATIO_THR_PPM;
+  state.max30102.wristIrAcRatioExitPpm =
+      BPMWATCH_MAX30102_WRIST_RATIO_EXIT_PPM;
+  state.max30102.signalHold = false;
+  state.max30102.signalLostMs = 0;
+  state.max30102.wristEnterCount = 0;
+  state.max30102.wristExitCount = 0;
+  state.max30102.signalOkReason = Max30102SignalReasonOff;
   if (logResult) {
     Serial.printf("MAX30102 init attempt #%lu: %s\n",
                   static_cast<unsigned long>(maxInitAttemptCount),
@@ -423,9 +515,15 @@ void logDiagnostics(const DiagnosticsState& current, uint32_t nowMs) {
   const char* maxStatus = current.max30102.initialized ? "OK" : "OFF";
   const char* maxReason = max30102BpmZeroReasonLabel(max30102BpmZeroReason(
       current.max30102.initialized, current.max30102.fingerPresent,
-      current.max30102.averageBpm, current.max30102.maxSps,
-      current.max30102.maxIrAc1s, current.max30102.maxBeatDetectCount,
-      current.max30102.rejectedBeatCount));
+      current.max30102.signalUsable, current.max30102.bpmValid,
+      current.max30102.stableBeatCount, current.max30102.maxSps,
+      current.max30102.maxIrAc1s, current.max30102.irAcRatioPpm,
+      current.max30102.maxBeatDetectCount, current.max30102.rejectedBeatCount,
+      current.max30102.refractoryBeatRejectCount,
+      current.max30102.intervalBeatRejectCount,
+      current.max30102.unstableBeatRejectCount));
+  const char* maxSignalReason =
+      max30102SignalOkReasonLabel(current.max30102.signalOkReason);
   const char* irqMode =
       current.uwb.uwbInterruptCount > 0 ? "IRQ" : "SAFETY_POLL";
   const bool remoteSosActive = remoteSosVisible(current.peer.remoteSos, nowMs);
@@ -435,7 +533,7 @@ void logDiagnostics(const DiagnosticsState& current, uint32_t nowMs) {
   Serial.printf(
       "t=%lu %s | UWB=%s peer=%d R#=%lu REC#=%lu AGE=%lums ACT=%lums RCAGE=%lums D=%.2fm STK=%lu IRQ#=%lu IRQPIN=%u IRQMODE=%s P#=%lu EV=%lu/%lu/%lu RST#=%lu RXERR=%lu/%lu RRST#=%lu REG=S:%02X%08lX M:%08lX C:%08lX CFG:%08lX DM:%u LR_OK=%d LR_FAIL=%u LR_FAIL_REASON=%s RX_POWER=%.1f FP_POWER=%.1f DELTA=%.1f LOS=%s RF=%s RXPACC=%u CIR_PWR=%u FP_AMPL=%u/%u/%u STD_NOISE=%u | ESPNOW=%s TX=%lu/%lu RX=%lu | "
       "COMPASS=%s CSTAT=%s C_ERR=%s MAG=%s MAG_ADDR=%s MAG_DRIVER=%s MAG_WHOAMI=0x%02X MAG_RAW=%d,%d,%d MAG_ABS=%lu MAG_DATA_OK=%d ACC=%s ACC_ADDR=%s ACC_DRIVER=%s ACC_RAW=%d,%d,%d ACC_ABS=%lu ACC_DATA_OK=%d COMPASS_MODE=%s HEADING_MODE=%s HDG=%.1f HDG_VALID=%d C_LOCK_FAIL=%lu C_READ_FAIL=%lu C_WRITE_FAIL=%lu C_LAST_FAIL_STAGE=%s CAL=%s CS#=%lu CAGE=%lums | SOS=%d SOS_SEQ=%lu BTN_RAW=%d BTN_EVENT=%s BTN_DUR_MS=%lu REMOTE_SOS=%d REMOTE_ID=%u REMOTE_HDG=%.1f RADAR_MODE=%s | "
-      "MAX=%s IR=%ld BPM=%d SPS=%lu BEAT#=%lu IR_MIN=%ld IR_MAX=%ld IRAC=%ld LASTBEAT=%lums REJ#=%lu BI=%lums WHY=%s MAX_DUR_US=%lu MAX_DUR_MAX_US=%lu MAX_LOCK_FAIL=%lu MAX_TASK_STK=%lu\n",
+      "MAX=%s IR=%ld FINGER=%d SIG_OK=%d BPM=%d BPM_VALID=%d BPM_BAD_AGE=%lums BPM_ALERT=%d SPS=%lu BEAT#=%lu RAWBEAT#=%lu ACCBEAT#=%lu SEED=%d IR_MIN=%ld IR_MAX=%ld IRAC=%ld IRAC_THR=%lu IRAC_RATIO=%luppm IRAC_RATIO_THR=%luppm WRIST_GATE=%d SIG_HOLD=%d SIG_LOST_MS=%lu WRIST_ENTER=%lu WRIST_EXIT=%lu SIG_OK_REASON=%s WRIST_IRAC_THR=%lu WRIST_IRAC_EXIT=%lu WRIST_RATIO_THR=%luppm WRIST_RATIO_EXIT=%luppm LASTBEAT=%lums REJ#=%lu BI=%lums RAW_BI=%lums CAND_BI=%lums ACC_BI=%lums MED_BI=%lums STABLE#=%u NOFINGER_RST#=%lu LOWSIG_REJ#=%lu REFRACTORY_REJ#=%lu INTERVAL_REJ#=%lu RESEED#=%lu UNSTABLE_REJ#=%lu FALSE_GATE#=%lu WRIST_MODE=%d BPM_SRC=MEDIAN_INTERVAL IR_THR=%ld BPM_RANGE=%d-%d WHY=%s MAX_DUR_US=%lu MAX_DUR_MAX_US=%lu MAX_LOCK_FAIL=%lu MAX_TASK_STK=%lu\n",
       static_cast<unsigned long>(nowMs), kNodeConfig.displayLabel, uwbStatus,
       current.uwb.peerPresent ? 1 : 0,
       static_cast<unsigned long>(current.uwb.rangeCount),
@@ -515,15 +613,53 @@ void logDiagnostics(const DiagnosticsState& current, uint32_t nowMs) {
       static_cast<unsigned>(current.peer.remoteSos.senderNodeId),
       current.peer.headingValid ? current.peer.headingDeg : -1.0f,
       radarMode,
-      maxStatus, current.max30102.irValue, current.max30102.averageBpm,
+      maxStatus, current.max30102.irValue,
+      current.max30102.fingerPresent ? 1 : 0,
+      current.max30102.signalUsable ? 1 : 0,
+      current.max30102.averageBpm,
+      current.max30102.bpmValid ? 1 : 0,
+      static_cast<unsigned long>(current.max30102.bpmInvalidAgeMs),
+      current.max30102.bpmLostAlert ? 1 : 0,
       static_cast<unsigned long>(current.max30102.maxSps),
       static_cast<unsigned long>(current.max30102.maxBeatDetectCount),
+      static_cast<unsigned long>(current.max30102.maxBeatDetectCount),
+      static_cast<unsigned long>(current.max30102.acceptedBeatCount),
+      current.max30102.acceptedBeatSeeded ? 1 : 0,
       static_cast<long>(current.max30102.maxIrMin1s),
       static_cast<long>(current.max30102.maxIrMax1s),
       static_cast<long>(current.max30102.maxIrAc1s),
+      static_cast<unsigned long>(current.max30102.irAcThreshold),
+      static_cast<unsigned long>(current.max30102.irAcRatioPpm),
+      static_cast<unsigned long>(current.max30102.irAcRatioThresholdPpm),
+      current.max30102.wristSignalGate ? 1 : 0,
+      current.max30102.signalHold ? 1 : 0,
+      static_cast<unsigned long>(current.max30102.signalLostMs),
+      static_cast<unsigned long>(current.max30102.wristEnterCount),
+      static_cast<unsigned long>(current.max30102.wristExitCount),
+      maxSignalReason,
+      static_cast<unsigned long>(current.max30102.wristIrAcThreshold),
+      static_cast<unsigned long>(current.max30102.wristIrAcExitThreshold),
+      static_cast<unsigned long>(current.max30102.wristIrAcRatioThresholdPpm),
+      static_cast<unsigned long>(current.max30102.wristIrAcRatioExitPpm),
       static_cast<unsigned long>(current.max30102.lastBeatAgeMs),
       static_cast<unsigned long>(current.max30102.rejectedBeatCount),
       static_cast<unsigned long>(current.max30102.lastBeatIntervalMs),
+      static_cast<unsigned long>(current.max30102.rawBeatIntervalMs),
+      static_cast<unsigned long>(current.max30102.candidateBeatIntervalMs),
+      static_cast<unsigned long>(current.max30102.acceptedBeatIntervalMs),
+      static_cast<unsigned long>(current.max30102.medianBeatIntervalMs),
+      static_cast<unsigned>(current.max30102.stableBeatCount),
+      static_cast<unsigned long>(current.max30102.noFingerResetCount),
+      static_cast<unsigned long>(current.max30102.lowSignalRejectCount),
+      static_cast<unsigned long>(current.max30102.refractoryBeatRejectCount),
+      static_cast<unsigned long>(current.max30102.intervalBeatRejectCount),
+      static_cast<unsigned long>(current.max30102.beatReseedCount),
+      static_cast<unsigned long>(current.max30102.unstableBeatRejectCount),
+      static_cast<unsigned long>(current.max30102.falseBeatGateCount),
+      BPMWATCH_MAX30102_WRIST_MODE ? 1 : 0,
+      static_cast<long>(BPMWATCH_MAX30102_FINGER_IR_MIN),
+      BPMWATCH_MAX30102_BPM_MIN,
+      BPMWATCH_MAX30102_BPM_MAX,
       maxReason,
       static_cast<unsigned long>(current.max30102.maxSampleDurationUs),
       static_cast<unsigned long>(current.max30102.maxSampleDurationMaxUs),
@@ -685,6 +821,22 @@ void setup() {
     Serial.println("COMPASS task warning: task create failed; loop fallback will sample compass");
   }
 #endif
+
+#if BPMWATCH_ESPNOW_RANGE_LINK && BPMWATCH_ESPNOW_TASK && defined(ARDUINO_ARCH_ESP32)
+  const BaseType_t espNowTaskCreateResult = xTaskCreatePinnedToCore(
+      espNowTask, "EspNowTask", BPMWATCH_ESPNOW_TASK_STACK, nullptr,
+      BPMWATCH_ESPNOW_TASK_PRIORITY, &espNowTaskHandle,
+      BPMWATCH_ESPNOW_TASK_CORE);
+  espNowTaskCreated = espNowTaskCreateResult == pdPASS;
+  Serial.printf(
+      "ESPNOW task: enabled=1 created=%d priority=%d core=%d stack=%d interval=%dms\n",
+      espNowTaskCreated ? 1 : 0, BPMWATCH_ESPNOW_TASK_PRIORITY,
+      BPMWATCH_ESPNOW_TASK_CORE, BPMWATCH_ESPNOW_TASK_STACK,
+      BPMWATCH_ESPNOW_TX_INTERVAL_MS);
+  if (!espNowTaskCreated) {
+    Serial.println("ESPNOW task warning: task create failed; loop fallback will send snapshots");
+  }
+#endif
 }
 
 void loop() {
@@ -696,16 +848,15 @@ void loop() {
   const UwbDiagnosticState uwbSnapshot = copyUwbState();
 
 #if BPMWATCH_ESPNOW_RANGE_LINK
-  const bool espNowRangeChanged =
-      uwbSnapshot.rangeCount != lastEspNowSentRangeCount;
-  const bool espNowSosChanged = state.sos.sosSeq != lastEspNowSentSosSeq;
-  const bool espNowPeriodicDue =
-      safeAgeMs(nowMs, lastEspNowTxMs) >= BPMWATCH_ESPNOW_TX_INTERVAL_MS;
-  if (espNowRangeChanged || espNowSosChanged || espNowPeriodicDue) {
-    lastEspNowSentRangeCount = uwbSnapshot.rangeCount;
-    lastEspNowSentSosSeq = state.sos.sosSeq;
+#if BPMWATCH_ESPNOW_TASK && defined(ARDUINO_ARCH_ESP32)
+  const bool espNowLoopFallback = !espNowTaskCreated;
+#else
+  const bool espNowLoopFallback = true;
+#endif
+  if (espNowLoopFallback &&
+      safeAgeMs(nowMs, lastEspNowTxMs) >= BPMWATCH_ESPNOW_TX_INTERVAL_MS) {
     lastEspNowTxMs = nowMs;
-    espNowRange.sendTelemetry(copyDiagnosticsState(), nowMs);
+    sendEspNowSnapshot(nowMs);
   }
 #endif
 
@@ -770,6 +921,9 @@ void loop() {
     if (forceFullDisplayRefresh) {
       lastDisplayFullRefreshMs = nowMs;
     }
+#if BPMWATCH_ENABLE_MAX30102
+    updateMax30102BpmLostAlert(nowMs);
+#endif
     display.render(copyDiagnosticsState(), nowMs, forceFullDisplayRefresh);
   }
 #endif
@@ -783,6 +937,9 @@ void loop() {
 
   if (nowMs - lastLogMs >= 1000) {
     lastLogMs = nowMs;
+#if BPMWATCH_ENABLE_MAX30102
+    updateMax30102BpmLostAlert(nowMs);
+#endif
     logDiagnostics(copyDiagnosticsState(), nowMs);
   }
 }
